@@ -1,0 +1,528 @@
+<?php
+
+function _pagerer_tags_merge_default($theme, $tags = null)
+{
+    switch($theme) {
+    case 'pagerer_mini':
+        $default_tags = array(
+            'first'           => '«',
+            'previous'        => '-@no',
+            'next'            => '+@no',
+            'last'            => '»',
+            'label'           => 'Page',
+            'pager_breaker'   => t('…'),
+            'pager_separator' => t('|'),
+            'range_separator' => t('-'),
+            'range_of'        => t('of '),
+        );
+        break;
+    default:
+        $default_tags = array(
+            'first'           => '« first',
+            'previous'        => '‹ previous @no',
+            'next'            => 'next @no›',
+            'last'            => 'last »',
+            'label'           => null,
+            'pager_breaker'   => t('…'),
+            'pager_separator' => t('|'),
+            'range_separator' => t('-'),
+            'range_of'        => t('of'),
+        );
+        break;
+    }
+    if ($tags) {
+        return array_merge($default_tags, $tags);
+    } else {
+        return $default_tags;
+    }
+}
+
+function _pagerer_resolve_markers($variables)
+{
+    $element = $variables['element'];
+    $parameters = $variables['parameters'];
+    $quantity = $variables['quantity'];
+    global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
+    
+    // Calculate various markers
+
+    $markers = array();
+    
+    // Pages
+
+    // Middle is used to "center" pages around the current page.
+    $markers['pager_middle'] = ceil($quantity / 2);
+    // current is the page we are currently paged to
+    $markers['pager_current'] = $pager_page_array[$element] + 1;
+    // first is the first page listed by this pager piece (re quantity)
+    $markers['pager_first'] = $markers['pager_current'] - $markers['pager_middle'] + 1;
+    // last is the last page listed by this pager piece (re quantity)
+    $markers['pager_last'] = $markers['pager_current'] + $quantity - $markers['pager_middle'];
+    // max is the maximum page number
+    $markers['pager_max'] = $pager_total[$element];
+
+    // Items
+    // @todo manage overflow
+    // pager_current_first_item is the first item listed on the current page
+    $markers['pager_current_first_item'] = $pager_limits[$element] * $pager_page_array[$element] + 1;
+    // pager_current_last_item is the last item listed by this pager piece
+    $markers['pager_current_last_item'] = 
+        ($pager_limits[$element] * $markers['pager_current']) > $pager_total_items[$element] ? 
+        $pager_total_items[$element] : 
+        $pager_limits[$element] * $markers['pager_current'];
+    // pager_item_max is the maximum item number
+    $markers['pager_item_max'] = $pager_total_items[$element];
+    // pager_items_next is the number of items expected on next page
+    $markers['pager_items_next'] = 
+        $pager_total_items[$element] - ($markers['pager_current'] * $pager_limits[$element]) > $pager_limits[$element] ? 
+        $pager_limits[$element] : 
+        $pager_total_items[$element] - ($markers['pager_current'] * $pager_limits[$element]);
+    // pager_item_previous is the number of items expected on previous page
+    $markers['pager_items_previous'] = $pager_limits[$element];
+
+    // End of marker calculations.
+    
+    return $markers;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function pagerer_theme()
+{
+    // @todo incorporate common tags
+    $commonTheme = drupal_common_theme();
+    $theme = array(
+        'pagerer' => array(
+            'variables' => array(
+                'tags'         => _pagerer_tags_merge_default('pagerer'),
+                'element'      => $commonTheme['pager']['variables']['element'],
+                'parameters'   => $commonTheme['pager']['variables']['parameters'],
+                'quantity'     => $commonTheme['pager']['variables']['quantity'],
+            ),
+        ),
+        'pagerer_std' => array(
+            'variables' => array(
+                'tags'         => _pagerer_tags_merge_default('pagerer_std'),
+                'element'      => $commonTheme['pager']['variables']['element'],
+                'parameters'   => $commonTheme['pager']['variables']['parameters'],
+                'quantity'     => $commonTheme['pager']['variables']['quantity'],
+                'display'      => 'pages',              // pages|items|item_ranges
+                'left_arrows'  => 'not_on_first',       // not_on_first|always|never
+                'right_arrows' => 'not_on_last',        // not_on_last|always|never
+            ),
+        ),
+        'pagerer_mini' => array(
+            'variables' => array(
+                'tags'         => _pagerer_tags_merge_default('pagerer_mini'),
+                'element'      => $commonTheme['pager']['variables']['element'],
+                'parameters'   => $commonTheme['pager']['variables']['parameters'],
+                'quantity'     => $commonTheme['pager']['variables']['quantity'],
+                'display'      => 'pages',
+                'left_arrows'  => 'always',
+                'right_arrows' => 'always',
+            ),
+        ),
+    );
+    return $theme;
+}
+
+/**
+ * @file
+ * A Drupal front-end for mondrake.
+ *
+ * More soon...
+ */
+
+/**
+ * This is pagerer's wrapper for overriden standard 'pager' theme calls
+ */
+function theme_pagerer($variables)
+{ 
+    drupal_add_css(drupal_get_path('module', 'pagerer') .'/pagerer.css');
+    
+    // item-list
+/*    $items = array();
+    $items[] = array(
+        'class' => array('pagerer-left'),   
+        'data' =>  theme('pagerer_mini', $variables), 
+    );
+    $items[] = array(
+        'class' => array('pagerer-center'), 
+        'data' =>  theme('pagerer_std', $variables), 
+    );
+    $items[] = array(
+        'class' => array('pagerer-right'), 
+        'data' => theme('pagerer_mini', $variables), 
+    );
+    $output = theme('item_list', array('items' => $items, 'attributes' => array('class' => array('pagerer'))));*/
+
+    // div
+/*    $output  = '<div class=pagerer>';
+        $output .= '<div class=pagerer-left>';
+        $output .= theme('pagerer_mini', $variables);
+        $output .= '</div>';
+        $output .= '<div class=pagerer-center>';
+        $output .= theme('pagerer_std', $variables);
+        $output .= '</div>';
+        $output .= '<div class=pagerer-right>';
+        $output .= theme('pagerer_mini', $variables);
+        $output .= '</div>';
+    $output .= '</div>';*/
+    
+    // table
+    $rows = array();
+    $row = array();
+    $variables['tags'] = array();
+
+    $variables['left_arrows'] = 'always';
+    $variables['right_arrows'] = 'never';
+    $cell1 = array( 'data' => theme('pagerer_std', $variables), 'class' => array('pagerer', 'pagerer-left'), );
+
+    $variables['left_arrows'] = 'never';
+    $variables['right_arrows'] = 'always';
+    $cell2 = array( 'data' => theme('pagerer_std', $variables), 'class' => array('pagerer', 'pagerer-center'), );
+
+    unset($variables['left_arrows']);
+    unset($variables['right_arrows']);
+    $variables['display'] = 'items';
+    $variables['tags']['label'] = t('Item');
+    $cell3 = array( 'data' => theme('pagerer_mini', $variables), 'class' => array('pagerer', 'pagerer-right'), );
+
+    $row = array(
+        'data' => array(
+            $cell1,
+            $cell2,
+            $cell3,
+        ),
+        'no_striping' => true,
+    );
+    $rows[] = $row;
+        
+    $output = theme_table(array(
+        'header' => array(),
+        'rows' => $rows,
+        'attributes' => array( 'class' => array('pagerer',), ),
+        'caption' => null,
+        'colgroups' => null,
+        'sticky' => false,
+        'empty' => null,
+    ));
+    
+    return $output;
+}
+
+/**
+ * This is the standard pager + extensions
+ */
+function theme_pagerer_std($variables)
+{ 
+    $tags = _pagerer_tags_merge_default('pagerer_std', $variables['tags']);
+    $element = $variables['element'];
+    $parameters = $variables['parameters'];
+    $quantity = $variables['quantity'];
+    $display = $variables['display'];
+    $left_arrows = $variables['left_arrows'];
+    $right_arrows = $variables['right_arrows'];
+    global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
+
+    // Calculate various markers within this pager piece:
+    $markers = _pagerer_resolve_markers($variables);
+
+    // Prepare for generation loop.
+    $i = $markers['pager_first'];
+    if ($markers['pager_last'] > $markers['pager_max']) {
+    // Adjust "center" if at end of query.
+        $i = $i + ($markers['pager_max'] - $markers['pager_last']);
+        $markers['pager_last'] = $markers['pager_max'];
+    }
+    if ($i <= 0) {
+    // Adjust "center" if at start of query.
+        $markers['pager_last'] = $markers['pager_last'] + (1 - $i);
+        $i = 1;
+    }
+    // End of generation loop preparation.
+
+    $li_first = theme('pager_first', array('text' => t($tags['first']), 'element' => $element, 'parameters' => $parameters));
+    $li_previous = theme('pager_previous', array('text' => t($tags['previous'], array('@no' => null)), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
+    $li_next = theme('pager_next', array('text' => t($tags['next'], array('@no' => null)), 'element' => $element, 'interval' => 1, 'parameters' => $parameters));
+    $li_last = theme('pager_last', array('text' => t($tags['last']), 'element' => $element, 'parameters' => $parameters));
+
+    if ($pager_total[$element] > 1) {
+        if ($left_arrows <> 'never') {
+            if ($li_first or $left_arrows == 'always') {
+                $items[] = array(
+                    'class' => array('pager-first'),
+                    'data' => $li_first ? $li_first : 'xxx',
+                );
+                $items[] = array(
+                    'class' => array('pager-item'),
+                    'data' => $tags['pager_separator'],
+                );
+            }
+            if ($li_previous or $left_arrows == 'always') {
+                $items[] = array(
+                    'class' => array('pager-previous'),
+                    'data' => $li_previous ? $li_previous : 'xxx',
+                );
+                $items[] = array(
+                    'class' => array('pager-item'),
+                    'data' => $tags['pager_separator'],
+                );
+            }
+        }
+
+        // When there is more than one page, create the pager list.
+        if ($i != $markers['pager_max']) {
+            if ($i > 1) {
+                $items[] = array(
+                    'class' => array('pager-ellipsis'),
+                    'data' => $tags['pager_breaker'],
+                );
+                $items[] = array(
+                    'class' => array('pager-item'),
+                    'data' => $tags['pager_separator'],
+                );
+            }
+            
+            // Now generate the actual pager piece.
+            for (; $i <= $markers['pager_last'] && $i <= $markers['pager_max']; $i++) {
+                if ($i < $markers['pager_current']) {
+                    $items[] = array(
+                        'class' => array('pager-item'),
+                        'data' => theme('pager_previous', array('text' => $i, 'element' => $element, 'interval' => ($markers['pager_current'] - $i), 'parameters' => $parameters)),
+                    );
+                    $items[] = array(
+                        'class' => array('pager-item'),
+                        'data' => $tags['pager_separator'],
+                    );
+                }
+                if ($i == $markers['pager_current']) {
+                    $items[] = array(
+                        'class' => array('pager-current'),
+                        'data' => $i,
+                    );
+                    $items[] = array(
+                        'class' => array('pager-item'),
+                        'data' => $tags['pager_separator'],
+                    );
+                }
+                if ($i > $markers['pager_current']) {
+                    $items[] = array(
+                        'class' => array('pager-item'),
+                        'data' => theme('pager_next', array('text' => $i, 'element' => $element, 'interval' => ($i - $markers['pager_current']), 'parameters' => $parameters)),
+                    );
+                    $items[] = array(
+                        'class' => array('pager-item'),
+                        'data' => $tags['pager_separator'],
+                    );
+                }
+            }
+
+            if ($i < $markers['pager_max']) {
+                $items[] = array(
+                    'class' => array('pager-ellipsis'),
+                    'data' => $tags['pager_breaker'],
+                );
+                $items[] = array(
+                    'class' => array('pager-item'),
+                    'data' => $tags['pager_separator'],
+                );
+            }
+        }   
+        // End generation.
+        
+        if ($right_arrows <> 'never') {
+            if ($li_next or $right_arrows == 'always') {
+                $items[] = array(
+                    'class' => array('pager-next'),
+                    'data' => $li_next ? $li_next : 'xxx',
+                );
+                $items[] = array(
+                    'class' => array('pager-item'),
+                    'data' => $tags['pager_separator'],
+                );
+            }
+            if ($li_last or $right_arrows == 'always') {
+                $items[] = array(
+                    'class' => array('pager-last'),
+                    'data' => $li_last ? $li_last : 'xxx',
+                );
+            }
+        }
+        
+        return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
+            'items' => $items,
+            'attributes' => array('class' => array('pager')),
+        ));
+    }
+}
+
+/**
+* This is the standard pager + extensions
+*/
+function theme_pagerer_mini($variables)
+{ 
+    global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
+
+    $left_arrows = $variables['left_arrows'];
+    $right_arrows = $variables['right_arrows'];
+    $element = $variables['element'];
+
+    // Check if pager is needed; if not, return immediately
+    if ($pager_total[$element] == 1 and $right_arrows <> 'always' and $right_arrows <> 'always') {
+        return null;
+    }
+    
+    $tags = _pagerer_tags_merge_default('pagerer_mini', $variables['tags']);
+    $parameters = $variables['parameters'];
+    $quantity = $variables['quantity'];
+    $display = $variables['display'];
+    
+    // Calculate various markers within this pager piece:
+    $markers = _pagerer_resolve_markers($variables);
+
+    // Prepare the links
+    $items_prev = $variables['display'] <> 'pages' ? $markers['pager_items_previous'] : null;
+    $items_next = $variables['display'] <> 'pages' ? $markers['pager_items_next'] : null;
+    $li_first = theme(
+        'pager_first', 
+        array(
+            'text' => t($tags['first']), 
+            'element' => $element, 
+            'parameters' => $parameters,
+        )
+    );
+    $li_previous = theme(
+        'pager_previous', 
+        array(
+            'text' => t($tags['previous'], array('@no' => $items_prev)), 
+            'element' => $element, 
+            'interval' => 1, 
+            'parameters' => $parameters,
+        )
+    );
+    $li_next = theme(
+        'pager_next', 
+        array(
+            'text' => t($tags['next'], array('@no' => $items_next)), 
+            'element' => $element, 
+            'interval' => 1, 
+            'parameters' => $parameters
+        )
+    );
+    $li_last = theme(
+        'pager_last', 
+        array(
+            'text' => t($tags['last']), 
+            'element' => $element, 
+            'parameters' => $parameters
+        )
+    );
+    
+    // @todo wrong calculation of next items
+
+    // Now generate the actual pager piece.
+    // left links
+    if ($left_arrows <> 'never') {
+        if ($li_first or $left_arrows == 'always') {
+            $items[] = array(
+                'class' => array('pager-first'),
+                'data' => $li_first ? $li_first : t($tags['first']),
+            );
+            $items[] = array(
+                'class' => array('pager-item'),
+                'data' => $tags['pager_separator'],
+            );
+        }
+        if ($li_previous or $left_arrows == 'always') {
+            $items[] = array(
+                'class' => array('pager-previous'),
+                'data' => $li_previous ? $li_previous : t($tags['previous'], array('@no' => $items_prev)),
+            );
+            $items[] = array(
+                'class' => array('pager-item'),
+                'data' => $tags['pager_separator'],
+            );
+        }
+    }
+    // label
+    $items[] = array(
+      'class' => array('pager-item'),
+      'data' => $tags['label'],
+    );
+    // current page
+    $items[] = array(
+       'class' => array('pager-item'),
+       //'data' => $i,
+       'data' => pagerer_drpager_widget($variables, $markers),
+    );
+    $items[] = array(
+      'class' => array('pager-item'),
+      'data' => $tags['range_of'] . ($variables['display'] <> 'pages' ? $markers['pager_item_max'] : $markers['pager_max']),
+    );
+    $items[] = array(
+        'class' => array('pager-item'),
+        'data' => $tags['pager_separator'],
+    );
+    // right links
+    if ($right_arrows <> 'never') {
+        if ($li_next or $right_arrows == 'always') {
+            $items[] = array(
+                'class' => array('pager-next'),
+                'data' => $li_next ? $li_next : t($tags['next'], array('@no' => $items_next)),
+            );
+            $items[] = array(
+                'class' => array('pager-item'),
+                'data' => $tags['pager_separator'],
+            );
+        }
+        if ($li_last or $right_arrows == 'always') {
+            $items[] = array(
+                'class' => array('pager-last'),
+                'data' => $li_last ? $li_last : t($tags['last']),
+            );
+        }
+    }
+    // End generation.
+
+    return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
+      'items' => $items,
+      'attributes' => array('class' => array('pager')),
+    ));
+}
+
+function pagerer_drpager_widget($variables, $markers) {
+    drupal_add_css(drupal_get_path('module', 'pagerer') .'/pagerer.css');
+    drupal_add_js(drupal_get_path('module', 'pagerer') .'/drpager.js');  
+
+    // construct the query string exactly like the pager
+    // @todo what to do with $parameters??
+    global $pager_page_array, $pager_total, $pager_total_items, $pager_limits;
+    $element = $variables['element'];
+    $parameters = $variables['parameters'];
+    
+    if ($variables['display'] == 'pages') {
+        $curr = $markers['pager_current'];
+        $max = $markers['pager_max'];
+        $interval = 1;
+    } else {
+        $curr = $markers['pager_current_first_item'];
+        $max = $markers['pager_item_max'];
+        $interval = $pager_limits[$element];
+    }    
+    
+    $page_new = pager_load_array($markers['pager_current'] - 1, $element, $pager_page_array);
+    $page_new[$element] = 'drpagerpage';
+    $parameters['page'] = implode(',', $page_new);
+    $queryParameters = pager_get_query_parameters();
+    array_merge($parameters, $queryParameters);
+
+    $url = url($_GET['q'], array('query' => $parameters,));
+    // @todo improve  
+    $url = substr($url, 7);
+    $state = drupal_json_encode(array('url' => $url, 'total' => $max, 'interval' => $interval, 'display' => $variables['display']));
+    $title = t('Set page number to go to, then press enter');
+    return "<input type=\"text\" class=\"drpager-page\" name ='$state' title=\"$title\" value=\"$curr\" />";
+}
+

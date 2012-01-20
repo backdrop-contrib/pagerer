@@ -1,0 +1,85 @@
+table.pagerer,
+table.pagerer tbody,
+table.pagerer tbody tr,
+table.pagerer tbody tr td,
+table.pagerer tbody tr td div,
+table.pagerer tbody tr td div ul,
+table.pagerer tbody tr td div li.pager-item,
+table.pagerer tbody tr td div li.pager-current,
+table.pagerer tbody tr td div li.pager-first,
+table.pagerer tbody tr td div li.pager-last,
+table.pagerer tbody tr td div li.pager-previous,
+table.pagerer tbody tr td div li.pager-next {
+    list-style-type: none;
+    list-style-image:none;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.pagerer-left .item-list .pager{
+	text-align: left;
+}
+.pagerer-center .item-list .pager{
+	text-align: center;
+}
+.pagerer-right .item-list .pager{
+	text-align: right;
+}
+
+
+/*li.pager-item {
+	margin: 0;
+	padding: 0;
+}*/
+
+/* this is overrdien by Garland theme, so it should be placed in style.css there */
+/*.item-list ul.pager,
+.item-list ul.pagerer,
+.item-list ul.pagerer li { 
+  list-style-type: none;
+  list-style-image:none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+
+.item-list .pagerer {
+	margin-left: 0; 
+	list-style-type: none;
+	list-style-image: none;
+}
+.item-list .pagerer .item-list {
+	list-style-type: none;
+	list-style-image: none;
+}
+.pagerer-left {
+	margin-left: 0;   
+	float: left;
+}
+.pagerer-center {
+	float: left;
+}
+.pagerer-right {
+	float: right; 
+}
+.pagerer-left .item-list .pager{
+	text-align:left;
+}
+.pagerer-center .item-list .pager{
+	text-align:center;
+}
+.pagerer-right .item-list .pager{
+	text-align:right;
+}*/
+.drpager-page {
+	width: 2.5em;
+	text-align: center;
+	border: 2px;
+	margin: 0;
+	padding: 0;
+}
+.drpager-page-has-focus {
+	background-color: Gainsboro;
+}
