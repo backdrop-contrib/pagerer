@@ -17,6 +17,9 @@ table.pagerer tbody tr td div li.pager-next {
 	padding: 0;
 	vertical-align: middle;
 }
+table.pagerer {
+	margin: 0.5em 0;
+}
 
 .pagerer-left .item-list .pager{
 	text-align: left;
@@ -74,9 +77,11 @@ table.pagerer tbody tr td div li.pager-next {
 	text-align:right;
 }*/
 .drpager-page {
-	width: 2.5em;
+	width: 1em;
 	text-align: center;
-	border: 2px;
+	border: 1px;
+	border-color: black;
+	border-style: solid;
 	margin: 0;
 	padding: 0;
 }

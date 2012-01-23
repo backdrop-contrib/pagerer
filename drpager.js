@@ -4,7 +4,13 @@ Drupal.Drpager = {};
 
 Drupal.behaviors.drpager = {
   attach: function(context, settings) {
-      $(".drpager-page", context).bind('focus', function(e) {
+      $(document).ready(function(){
+        var self = $('.drpager-page');
+        var state = eval('(' + self.attr('name') + ');');
+        self.width(String(state.total).length + 'em');
+      });
+      $(".drpager-page", context)
+	  .bind('focus', function(e) {
         this.select();
         $(this).addClass('drpager-page-has-focus');
       })
