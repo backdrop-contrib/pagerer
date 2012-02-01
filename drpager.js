@@ -4,10 +4,13 @@ Drupal.Drpager = {};
 
 Drupal.behaviors.drpager = {
   attach: function(context, settings) {
-      $(document).ready(function(){
-        var self = $('.drpager-page');
-        var state = eval('(' + self.attr('name') + ');');
-        self.width(String(state.total).length + 'em');
+      // on document ready, adjust all the widths of drpager to corresponding max
+	  // width expected
+	  $(document).ready(function(){
+		$('.drpager-page').each(function(index) {
+			var state = eval('(' + $(this).attr('name') + ');');
+			$(this).width(String(state.total).length + 'em');
+		});
       });
       $(".drpager-page", context)
 	  .bind('focus', function(e) {
@@ -42,11 +45,11 @@ Drupal.behaviors.drpager = {
             var viewContext = Drupal.Drpager.getAjaxViewContext(this);
             if (viewContext) {								// Views
               Drupal.Drpager.doAjaxView(self.next(), page, viewContext);
-            } else if (window.Drupal.overlayChild) {		// Drupal admin overlay	
+            } else if (window.Drupal.overlayChild) {		// Drupal admin overlay
 			  window.parent.jQuery.bbq.pushState({'overlay': state.url.replace(/drpagerpage/, page)});
 			} else {										// Normal page
 			  document.location = state.url.replace(/drpagerpage/, page);
-			} 
+			}
             e.preventDefault();
             return false;
           case 38:    // up key
@@ -84,7 +87,7 @@ Drupal.behaviors.drpager = {
         if (!this.title) {
           this.title = Drupal.t("Go to last page");
         }
-      });      
+      });
   }
 };
 
