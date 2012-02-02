@@ -362,14 +362,30 @@ function theme_pagerer_adaptive($variables)
 
     // determine pager items needed
     $pages = array();
+    $c = $markers['pager_current'] - 1;
     // first
-    $pages[0]['interval'] = -$markers['pager_current'] + 1;
-    $pages[0]['text'] = _pagerer_get_page_text($variables, $markers, $markers['pager_current'] - 1, -$markers['pager_current'] + 1);
+    $pages[0]['interval'] = -$c;
+    $pages[0]['text'] = _pagerer_get_page_text($variables, $markers, $c, -$c);
     // last
     $pages[$markers['pager_max'] - 1]['interval'] = $markers['pager_max'] - $markers['pager_current'];
-    $pages[$markers['pager_max'] - 1]['text'] = _pagerer_get_page_text($variables, $markers, $markers['pager_current'] - 1, $markers['pager_max'] - $markers['pager_current']);
+    $pages[$markers['pager_max'] - 1]['text'] = _pagerer_get_page_text($variables, $markers, $c, $markers['pager_max'] - $markers['pager_current']);
     // neighborhood
-    $pages += _pagerer_get_neighborhood_pages($variables, $markers);
+    $nPages = _pagerer_get_neighborhood_pages($variables, $markers);
+    // enrich neighborhood with adaptive markers
+    if ($nPages) {
+        foreach ($nPages as $page => &$page_data) {
+            if (isset($queryParameters['page_pc'])) {
+                $page_data['page_pl'] = $queryParameters['page_pl'];
+                $page_data['page_pr'] = $queryParameters['page_pr'];
+                $page_data['page_pc'] = $queryParameters['page_pc'];
+            } else {
+                $page_data['page_pl'] = isset($queryParameters['page_pl']) ? $queryParameters['page_pl'] : 0;
+                $page_data['page_pr'] = isset($queryParameters['page_pr']) ? $queryParameters['page_pr'] : $markers['pager_max'] - 1;
+                $page_data['page_pc'] = $c;
+            }
+        }
+    }
+    $pages += $nPages;
     // progressives
     if (isset($queryParameters['page_pl'])) {
         if (($queryParameters['page_pl'] > 0) and !isset($pages[$queryParameters['page_pl']])) {
@@ -377,52 +393,56 @@ function theme_pagerer_adaptive($variables)
             $pages[$queryParameters['page_pl']]['text'] = _pagerer_get_page_text($variables, $markers, $markers['pager_current'] - 1, -$markers['pager_current'] + $queryParameters['page_pl'] + 1, $variables['prog_links']);
             $pages[$queryParameters['page_pl']]['progressive'] = true;
         }
+        if (isset($queryParameters['page_pc'])) {
+            $lOffset = $queryParameters['page_pc'] - $queryParameters['page_pl'];
+        } else {
+            $lOffset = $c - $queryParameters['page_pl'];
+        }
+    } else {
+        $lOffset = $c;
+    }
+    if (isset($queryParameters['page_pr'])) {
         if (($queryParameters['page_pr'] < $markers['pager_max'] - 1)  and !isset($pages[$queryParameters['page_pr']])) {
             $pages[$queryParameters['page_pr']]['interval'] = $queryParameters['page_pr'] - $markers['pager_current'] + 1;
             $pages[$queryParameters['page_pr']]['text'] = _pagerer_get_page_text($variables, $markers, $markers['pager_current'] - 1, $queryParameters['page_pr'] - $markers['pager_current'] + 1, $variables['prog_links']);
             $pages[$queryParameters['page_pr']]['progressive'] = true;
         }
-        if (isset($queryParameters['page_nbhl'])) {
-            $lOffset = $markers['pager_current'] - 1 - $queryParameters['page_nbhl'];
-            $lx = $queryParameters['page_nbhl'];
-        } else {
-            $lOffset = $markers['pager_current'] - 1 - $queryParameters['page_pl'];
-            $lx = $queryParameters['page_pl'];
-        }
-        if (isset($queryParameters['page_nbhr'])) {
-            $rOffset = -($markers['pager_current'] - 1 - $queryParameters['page_nbhr']);
-            $rx = $queryParameters['page_nbhr'];
-        } else {
-            $rOffset = -($markers['pager_current'] - 1 - $queryParameters['page_pr']);
-            $rx = $queryParameters['page_pr'];
-        }
-        $pages = _pagerer_get_progressive_pages(
-            $variables,
-            $markers,
-            $pages,
-            max($lOffset, $rOffset) / 2,        // scale factor
-            0.5,                                // ratio
-            2,                                  // limit
-            $lx,                                // outer left limit
-            $rx                                 // outer right limit
-        );
-        $output = 'Page req=' . $queryParameters['page'] . ' p_left=' . $queryParameters['page_pl'] . ' p_right=' . $queryParameters['page_pr'];
-        $output .= ' l_offset=' . $lOffset . ' r_offest=' . $rOffset . ' max=' . max($lOffset, $rOffset);
+        /*if (isset($queryParameters['page_pc'])) {
+            $rOffset = $queryParameters['page_pr'] - $queryParameters['page_pc'];
+        } else {*/
+            $rOffset = $queryParameters['page_pr'] - $c;
+        /*}*/
     } else {
-        $lOffset = $markers['pager_current'] - 1;
-        $rOffset = $markers['pager_max'] - $markers['pager_current'];
-        $pages += _pagerer_get_progressive_pages(
-            $variables,
-            $markers,
-            $pages,
-            max($lOffset, $rOffset) / 2,        // scale factor
-            0.5,                                // ratio
-            2);                                 // limit
-        $output = 'Page req=' . (isset($queryParameters['page']) ? $queryParameters['page'] : 0);
-        $output .= ' l_offset=' . $lOffset . ' r_offest=' . $rOffset . ' max=' . max($lOffset, $rOffset);
+        $rOffset =  $markers['pager_max'] - 1 - $c;
     }
-
+    // progressives
+    $pages += _pagerer_get_progressive_pages(
+        $variables,
+        $markers,
+        $pages,
+        max($lOffset, $rOffset) / 2,        // scale factor
+        0.5,                                // ratio
+        2                                   // limit
+    );                                 
     ksort($pages);
+    kpr($pages);
+    // enrich progressives with adaptive markers 
+    if ($pages) {
+        $kpages = array_keys($pages);
+        for ($x = 1; $x < count($kpages) - 1; $x++) {
+            $d = &$pages[$kpages[$x]];
+            // attuale prog
+            if (isset($pages[$kpages[$x]]['progressive'])) {
+                $d['page_pl'] = $kpages[$x - 1];
+                $d['page_pr'] = $kpages[$x + 1];
+            } 
+        }
+    }
+    $output = 'Page pl=' . (isset($queryParameters['page_pl']) ? $queryParameters['page_pl'] : null);
+    $output .= '; Page pr=' . (isset($queryParameters['page_pr']) ? $queryParameters['page_pr'] : null);
+    $output .= '; Page pc=' . (isset($queryParameters['page_pc']) ? $queryParameters['page_pc'] : null);
+    $output .= '<br/>Page req=' . (isset($queryParameters['page']) ? $queryParameters['page'] : 0);
+    $output .= ' l_offset=' . $lOffset . ' r_offset=' . $rOffset . ' max=' . max($lOffset, $rOffset);
 
     // compose pager
     // 1. label
@@ -439,7 +459,7 @@ function theme_pagerer_adaptive($variables)
         $items = array_merge($items, _pagerer_previous_link($variables, $markers));
     }
     // 3. items
-    $items =  array_merge($items, _pagerer_item_links($variables, $markers, $pages, $listProgressive = true));
+    $items =  array_merge($items, _pagerer_item_links($variables, $markers, $pages));
     // 4. next + last links
     if ($variables['right_links'] <> 'never') {
         $items = array_merge($items, _pagerer_next_link($variables, $markers));
@@ -738,38 +758,8 @@ function _pagerer_last_link($variables, $markers)
     return $items;
 }
 
-function _pagerer_item_links($variables, $markers, $pages, $listProgressive = false)
+function _pagerer_item_links($variables, $markers, $pages)
 {
-    if ($listProgressive) {
-        $kpages = array_keys($pages);
-        for ($x = 1; $x < count($kpages) - 1; $x++) {
-            $c = &$pages[$kpages[$x]];
-            // attuale prog
-            if (isset($pages[$kpages[$x]]['progressive'])) {
-                $c['page_pl'] = $kpages[$x - 1];
-                $c['page_pr'] = $kpages[$x + 1];
-            } else {
-            // attuale non prog
-                // precedente prog
-                if (isset($pages[$kpages[$x - 1]]['progressive'])) {
-                    $c['page_pl'] = $kpages[$x - 1];
-                } else {
-                // precedente non prog
-                    $c['page_pl'] = $kpages[$x - 1];
-                    $c['page_nbhl'] = 0;
-                }
-                // successiva prog
-                if (isset($pages[$kpages[$x + 1]]['progressive'])) {
-                    $c['page_pr'] = $kpages[$x + 1];
-                } else {
-                // successiva non prog
-                    $c['page_pr'] = $kpages[$x + 1];
-                    $c['page_nbhr'] = $kpages[count($kpages) - 1];
-                }
-            }
-        }
-    }
-    //kpr($pages);
     $items = array();
     if (!empty($pages)) {
         $i = 0;
@@ -801,24 +791,17 @@ function _pagerer_item_links($variables, $markers, $pages, $listProgressive = fa
             $text = $page_data['text'];
             // link to page before the current
             if ($page_data['interval'] < 0) {
-                if ($listProgressive) {
-                    if (isset($page_data['page_pl'])) {
-                        $variables['parameters']['page_pl'] = $page_data['page_pl'];
-                        $variables['parameters']['page_pr'] = $page_data['page_pr'];
-                    } else {
-                        unset($variables['parameters']['page_pl']);
-                        unset($variables['parameters']['page_pr']);
-                    }
-                    if (isset($page_data['page_nbhl'])) {
-                        $variables['parameters']['page_nbhl'] = $page_data['page_nbhl'];
-                    } else {
-                        unset($variables['parameters']['page_nbhl']);
-                    }
-                    if (isset($page_data['page_nbhr'])) {
-                        $variables['parameters']['page_nbhr'] = $page_data['page_nbhr'];
-                    } else {
-                        unset($variables['parameters']['page_nbhr']);
-                    }
+                if (isset($page_data['page_pl'])) {
+                    $variables['parameters']['page_pl'] = $page_data['page_pl'];
+                    $variables['parameters']['page_pr'] = $page_data['page_pr'];
+                } else {
+                    unset($variables['parameters']['page_pl']);
+                    unset($variables['parameters']['page_pr']);
+                }
+                if (isset($page_data['page_pc'])) {
+                    $variables['parameters']['page_pc'] = $page_data['page_pc'];
+                } else {
+                    unset($variables['parameters']['page_pc']);
                 }
                 $items[] = array(
                     'class' => array('pager-item'),
@@ -849,24 +832,17 @@ function _pagerer_item_links($variables, $markers, $pages, $listProgressive = fa
             }
             // link to page after the current
             else if ($page_data['interval'] > 0){
-                if ($listProgressive) {
-                    if (isset($page_data['page_pl'])) {
-                        $variables['parameters']['page_pl'] = $page_data['page_pl'];
-                        $variables['parameters']['page_pr'] = $page_data['page_pr'];
-                    } else {
-                        unset($variables['parameters']['page_pl']);
-                        unset($variables['parameters']['page_pr']);
-                    }
-                    if (isset($page_data['page_nbhl'])) {
-                        $variables['parameters']['page_nbhl'] = $page_data['page_nbhl'];
-                    } else {
-                        unset($variables['parameters']['page_nbhl']);
-                    }
-                    if (isset($page_data['page_nbhr'])) {
-                        $variables['parameters']['page_nbhr'] = $page_data['page_nbhr'];
-                    } else {
-                        unset($variables['parameters']['page_nbhr']);
-                    }
+                if (isset($page_data['page_pl'])) {
+                    $variables['parameters']['page_pl'] = $page_data['page_pl'];
+                    $variables['parameters']['page_pr'] = $page_data['page_pr'];
+                } else {
+                    unset($variables['parameters']['page_pl']);
+                    unset($variables['parameters']['page_pr']);
+                }
+                if (isset($page_data['page_pc'])) {
+                    $variables['parameters']['page_pc'] = $page_data['page_pc'];
+                } else {
+                    unset($variables['parameters']['page_pc']);
                 }
                 $items[] = array(
                     'class' => array('pager-item'),
@@ -921,7 +897,7 @@ function _pagerer_get_neighborhood_pages($variables, $markers)
     return $pages;
 }
 
-function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_factor, $ratio, $limit = 0, $l_limit = null, $r_limit = null)
+function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_factor, $ratio, $limit = 0)
 {
     global $pager_limits;
 
@@ -950,7 +926,7 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
         // negative offset
         if ($c - $offset > 0
             and !isset($pages[$c - $offset])
-            and (!$l_limit or ($l_limit and (($c - $offset) > $l_limit)))){
+            /*and (!$l_limit or ($l_limit and (($c - $offset) > $l_limit)))*/){
             $pages[$c - $offset]['progressive'] = true;
             $pages[$c - $offset]['interval'] = -$offset;
             $pages[$c - $offset]['text'] = _pagerer_get_page_text($variables, $markers, $c, -$offset, $variables['prog_links']);
@@ -958,7 +934,7 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
         // positive offset
         if ($c + $offset < $markers['pager_max']
             and !isset($pages[$c + $offset])
-            and (!$r_limit or ($r_limit and (($c + $offset) < $r_limit)))) {
+            /*and (!$r_limit or ($r_limit and (($c + $offset) < $r_limit)))*/) {
             $pages[$c + $offset]['progressive'] = true;
             $pages[$c + $offset]['interval'] = $offset;
             $pages[$c + $offset]['text'] = _pagerer_get_page_text($variables, $markers, $c, $offset, $variables['prog_links']);
