@@ -20,7 +20,6 @@ table.pagerer tbody tr td div li.pager-next {
 table.pagerer {
 	margin: 0.5em 0;
 }
-
 .pagerer-left .item-list .pager{
 	text-align: left;
 }
@@ -30,7 +29,7 @@ table.pagerer {
 .pagerer-right .item-list .pager{
 	text-align: right;
 }
-.drpager-page {
+.pagerer-page {
 	width: 1em;
 	text-align: center;
 	border: 1px;
@@ -39,6 +38,6 @@ table.pagerer {
 	margin: 0;
 	padding: 0;
 }
-.drpager-page-has-focus {
+.pagerer-page-has-focus {
 	background-color: Gainsboro;
 }

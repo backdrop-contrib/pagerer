@@ -2,23 +2,23 @@
 
 Drupal.Drpager = {};
 
-Drupal.behaviors.drpager = {
+Drupal.behaviors.pagerer = {
   attach: function(context, settings) {
-      // on document ready, adjust all the widths of drpager to corresponding max
+      // on document ready, adjust all the widths of pagerer-page to corresponding max
 	  // width expected
 	  $(document).ready(function(){
-		$('.drpager-page').each(function(index) {
+		$('.pagerer-page').each(function(index) {
 			var state = eval('(' + $(this).attr('name') + ');');
 			$(this).width(String(state.total).length + 'em');
 		});
       });
-      $(".drpager-page", context)
+      $(".pagerer-page", context)
 	  .bind('focus', function(e) {
         this.select();
-        $(this).addClass('drpager-page-has-focus');
+        $(this).addClass('pagerer-page-has-focus');
       })
       .bind('blur', function(e) {
-        $(this).removeClass('drpager-page-has-focus');
+        $(this).removeClass('pagerer-page-has-focus');
       })
       .bind('keydown', function(e) {
         switch(e.keyCode) {
@@ -46,9 +46,9 @@ Drupal.behaviors.drpager = {
             if (viewContext) {								// Views
               Drupal.Drpager.doAjaxView(self.next(), page, viewContext);
             } else if (window.Drupal.overlayChild) {		// Drupal admin overlay
-			  window.parent.jQuery.bbq.pushState({'overlay': state.url.replace(/drpagerpage/, page)});
+			  window.parent.jQuery.bbq.pushState({'overlay': state.url.replace(/pagererpage/, page)});
 			} else {										// Normal page
-			  document.location = state.url.replace(/drpagerpage/, page);
+			  document.location = state.url.replace(/pagererpage/, page);
 			}
             e.preventDefault();
             return false;
