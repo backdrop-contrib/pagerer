@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * Pagerer
  *
  * A set of pager themes to enhance on Drupal standard pager.
@@ -13,230 +14,236 @@
 /**
  * Implements hook_theme().
  */
-function pagerer_theme()
-{
-    $commonTheme = drupal_common_theme();
+function pagerer_theme() {
+    $common_theme = drupal_common_theme();
     $theme = array(
-        'pagerer' => array(
-            'variables' => array(
-                'tags'            => _pagerer_tags_merge_default('pagerer'),
-                'element'         => $commonTheme['pager']['variables']['element'],
-                'parameters'      => $commonTheme['pager']['variables']['parameters'],
-                'quantity'        => $commonTheme['pager']['variables']['quantity'],
-            ),
+      'pagerer' => array(
+        'variables' => array(
+          'tags'            => _pagerer_tags_merge_default('pagerer'),
+          'element'         => $common_theme['pager']['variables']['element'],
+          'parameters'      => $common_theme['pager']['variables']['parameters'],
+          'quantity'        => $common_theme['pager']['variables']['quantity'],
         ),
-        'pagerer_standard' => array(
-            'variables' => array(
-                'tags'            => _pagerer_tags_merge_default('pagerer_standard'),
-                'element'         => $commonTheme['pager']['variables']['element'],
-                'parameters'      => $commonTheme['pager']['variables']['parameters'],
-                'quantity'        => $commonTheme['pager']['variables']['quantity'],
-                'display'         => 'pages',              // pages|items|item_ranges
-                'label_display'   => 'none',               // none|before_current|left|right
-                'current_display' => 'normal',             // none|normal|widget
-                'max_display'     => 'none',               // none|after_current|left|right
-                'first_link'      => 'not_on_first',       // not_on_first|always|never
-                'previous_link'   => 'not_on_first',       // not_on_first|always|never
-                'next_link'       => 'not_on_last',        // not_on_last|always|never
-                'last_link'       => 'not_on_last',        // not_on_last|always|never
-                'progr_links'     => 'absolute',           // absolute|relative
-            ),
+      ),
+      'pagerer_standard' => array(
+        'variables' => array(
+          'tags'            => _pagerer_tags_merge_default('pagerer_standard'),
+          'element'         => $common_theme['pager']['variables']['element'],
+          'parameters'      => $common_theme['pager']['variables']['parameters'],
+          'quantity'        => $common_theme['pager']['variables']['quantity'],
+          // pages|items|item_ranges
+          'display'         => 'pages',
+          // none|before_current|left|right
+          'label_display'   => 'none',
+          // none|normal|widget
+          'current_display' => 'normal',
+          // none|after_current|left|right
+          'max_display'     => 'none',
+          // not_on_first|always|never
+          'first_link'      => 'not_on_first',
+          // not_on_first|always|never
+          'previous_link'   => 'not_on_first',
+          // not_on_last|always|never
+          'next_link'       => 'not_on_last',
+          // not_on_last|always|never
+          'last_link'       => 'not_on_last',
+          // absolute|relative
+          'progr_links'     => 'absolute',
         ),
-        'pagerer_progressive' => array(
-            'variables' => array(
-                'tags'            => _pagerer_tags_merge_default('pagerer_progressive'),
-                'element'         => $commonTheme['pager']['variables']['element'],
-                'parameters'      => $commonTheme['pager']['variables']['parameters'],
-                'quantity'        => 5,
-                'display'         => 'pages',              // pages|items|item_ranges
-                'label_display'   => 'none',               // none|before_current|left|right
-                'current_display' => 'normal',             // none|normal|widget
-                'max_display'     => 'none',               // none|after_current|left|right
-                'first_link'      => 'never',              // not_on_first|always|never
-                'previous_link'   => 'never',              // not_on_first|always|never
-                'next_link'       => 'never',              // not_on_last|always|never
-                'last_link'       => 'never',              // not_on_last|always|never
-                'progr_links'     => 'relative',           // absolute|relative
-                'factors'         => '2.5,5,10',           // comma delimited string of factors to use
-            ),
+      ),
+      'pagerer_progressive' => array(
+        'variables' => array(
+          'tags'            => _pagerer_tags_merge_default('pagerer_progressive'),
+          'element'         => $common_theme['pager']['variables']['element'],
+          'parameters'      => $common_theme['pager']['variables']['parameters'],
+          'quantity'        => 5,
+          'display'         => 'pages',
+          'label_display'   => 'none',
+          'current_display' => 'normal',
+          'max_display'     => 'none',
+          'first_link'      => 'never',
+          'previous_link'   => 'never',
+          'next_link'       => 'never',
+          'last_link'       => 'never',
+          'progr_links'     => 'relative',
+          // Comma delimited string of factors to use.
+          'factors'         => '2.5,5,10',
         ),
-        'pagerer_adaptive' => array(
-            'variables' => array(
-                'tags'            => _pagerer_tags_merge_default('pagerer_adaptive'),
-                'element'         => $commonTheme['pager']['variables']['element'],
-                'parameters'      => $commonTheme['pager']['variables']['parameters'],
-                'quantity'        => 5,
-                'display'         => 'pages',              // pages|items|item_ranges
-                'label_display'   => 'none',               // none|before_current|left|right
-                'current_display' => 'normal',             // none|normal|widget
-                'max_display'     => 'none',               // none|after_current|left|right
-                'first_link'      => 'never',              // not_on_first|always|never
-                'previous_link'   => 'never',              // not_on_first|always|never
-                'next_link'       => 'never',              // not_on_last|always|never
-                'last_link'       => 'never',              // not_on_last|always|never
-                'progr_links'     => 'relative',           // absolute|relative
-            ),
+      ),
+      'pagerer_adaptive' => array(
+        'variables' => array(
+          'tags'            => _pagerer_tags_merge_default('pagerer_adaptive'),
+          'element'         => $common_theme['pager']['variables']['element'],
+          'parameters'      => $common_theme['pager']['variables']['parameters'],
+          'quantity'        => 5,
+          'display'         => 'pages',
+          'label_display'   => 'none',
+          'current_display' => 'normal',
+          'max_display'     => 'none',
+          'first_link'      => 'never',
+          'previous_link'   => 'never',
+          'next_link'       => 'never',
+          'last_link'       => 'never',
+          'progr_links'     => 'relative',
         ),
-        'pagerer_mini' => array(
-            'variables' => array(
-                'tags'            => _pagerer_tags_merge_default('pagerer_mini'),
-                'element'         => $commonTheme['pager']['variables']['element'],
-                'parameters'      => $commonTheme['pager']['variables']['parameters'],
-                'quantity'        => $commonTheme['pager']['variables']['quantity'],
-                'display'         => 'pages',              // pages|items|item_ranges
-                'label_display'   => 'before_current',     // none|before_current|left|right
-                'current_display' => 'widget',             // none|normal|widget
-                'max_display'     => 'after_current',      // none|after_current|left|right
-                'first_link'      => 'always',             // not_on_first|always|never
-                'previous_link'   => 'always',             // not_on_first|always|never
-                'next_link'       => 'always',             // not_on_last|always|never
-                'last_link'       => 'always',             // not_on_last|always|never
-                'progr_links'     => 'relative',           // absolute|relative
-            ),
+      ),
+      'pagerer_mini' => array(
+        'variables' => array(
+          'tags'            => _pagerer_tags_merge_default('pagerer_mini'),
+          'element'         => $common_theme['pager']['variables']['element'],
+          'parameters'      => $common_theme['pager']['variables']['parameters'],
+          'quantity'        => $common_theme['pager']['variables']['quantity'],
+          'display'         => 'pages',
+          'label_display'   => 'before_current',
+          'current_display' => 'widget',
+          'max_display'     => 'after_current',
+          'first_link'      => 'always',
+          'previous_link'   => 'always',
+          'next_link'       => 'always',
+          'last_link'       => 'always',
+          'progr_links'     => 'relative',
         ),
+      ),
     );
     return $theme;
 }
 
-function _pagerer_tags_merge_default($theme, $tags = null)
-{
-    switch($theme) {
+/**
+ * De
+ */
+function _pagerer_tags_merge_default($theme, $tags = NULL) {
+  switch ($theme) {
     case 'pagerer_standard':
         $default_tags = array(
-            'first'           => '« first',
-            'previous'        => '‹ previous',
-            'next'            => 'next ›',
-            'last'            => 'last »',
-            'max'             => t('of @pages'),
-            'previous_progr'  => '‹ previous',
-            'next_progr'      => 'next ›',
-            'label'           => 'Pages:',
-            'pager_breaker'   => t('…'),
-            'pager_separator' => t('&nbsp'),
-            'range_separator' => t('-'),
+          'first'           => '« first',
+          'previous'        => '‹ previous',
+          'next'            => 'next ›',
+          'last'            => 'last »',
+          'max'             => t('of @pages'),
+          'previous_progr'  => '‹ previous',
+          'next_progr'      => 'next ›',
+          'label'           => 'Pages:',
+          'pager_breaker'   => t('…'),
+          'pager_separator' => t('&nbsp'),
+          'range_separator' => t('-'),
         );
-        break;
+      break;
     case 'pagerer_mini':
         $default_tags = array(
-            'first'           => '«',
-            'previous'        => '<',
-            'next'            => '>',
-            'last'            => '»',
-            'max'             => t('of @pages'),
-            'previous_progr'  => '-',
-            'next_progr'      => '+',
-            'label'           => 'Page',
-            'pager_breaker'   => t('…'),
-            'pager_separator' => t('&nbsp'),
-            'range_separator' => t('-'),
+          'first'           => '«',
+          'previous'        => '<',
+          'next'            => '>',
+          'last'            => '»',
+          'max'             => t('of @pages'),
+          'previous_progr'  => '-',
+          'next_progr'      => '+',
+          'label'           => 'Page',
+          'pager_breaker'   => t('…'),
+          'pager_separator' => t('&nbsp'),
+          'range_separator' => t('-'),
         );
-        break;
+      break;
     default:
         $default_tags = array(
-            'first'           => '« @num',
-            'previous'        => '‹ @num',
-            'next'            => '@num ›',
-            'last'            => '@num »',
-            'max'             => t('of @pages'),
-            'previous_progr'  => '-@num',
-            'next_progr'      => '+@num',
-            'label'           => 'Pages:',
-            'pager_breaker'   => t('…'),
-            'pager_separator' => t('&nbsp'),
-            'range_separator' => t('-'),
+          'first'           => '« @num',
+          'previous'        => '‹ @num',
+          'next'            => '@num ›',
+          'last'            => '@num »',
+          'max'             => t('of @pages'),
+          'previous_progr'  => '-@num',
+          'next_progr'      => '+@num',
+          'label'           => 'Pages:',
+          'pager_breaker'   => t('…'),
+          'pager_separator' => t('&nbsp'),
+          'range_separator' => t('-'),
         );
-        break;
-    }
-    if ($tags) {
-        return array_merge($default_tags, $tags);
-    } else {
-        return $default_tags;
-    }
+      break;
+  }
+  if ($tags) {
+    return array_merge($default_tags, $tags);
+  }
+  else {
+    return $default_tags;
+  }
 }
 
 /**
  * This is Pagerer's wrapper for overriden standard 'pager' theme calls
  */
-function theme_pagerer($variables)
-{
-    global $pager_total, $pager_limits;
+function theme_pagerer($variables) {
+  global $pager_total, $pager_limits;
 
-    // check if pager is needed; if not, return immediately
-    if ($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0) {
-        return null;
-    }
+  // Check if pager is needed; if not, return immediately.
+  if ($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0) {
+    return NULL;
+  }
 
-    // table
-    $rows = array();
-    $row = array();
-    $variables['tags'] = array();
+  // Prepare table row.
+  $rows = array();
+  $row = array();
+  $variables['tags'] = array();
 
-    //unset($variables['']);
-    //unset($variables['']);
-    //$variables['display'] = 'items';
-    //$variables['tags']['label'] = t('Item');
-    //$cell1 = array( 'data' => theme('pagerer_mini', $variables), 'class' => array('pagerer', 'pagerer-left'), );
-    //$cell1 = null;
 
-    $variables['display'] = 'pages';
-    //$variables['current_display'] = 'widget';
-    $variables['quantity'] = 5;
-    $variables['progr_links'] = 'relative';
-    //$variables[''] = 'always';
-    //$variables[''] = 'always';
-    $cell1 = array( 'data' => theme('pagerer_adaptive', $variables), 'class' => array('pagerer', 'pagerer-left'), );
-    $cell2 = null;
+  $variables['display'] = 'pages';
+  // $variables['current_display'] = 'widget';
+  $variables['quantity'] = 5;
+  $variables['progr_links'] = 'relative';
 
-    unset($variables['first_link']);
-    unset($variables['previous_link']);
-    unset($variables['next_link']);
-    unset($variables['last_link']);
-    $variables['display'] = 'pages';
-    //$variables['tags']['label'] = t('Item');
-    $cell3 = array( 'data' => theme('pagerer_mini', $variables), 'class' => array('pagerer', 'pagerer-right'), );
+  // $variables[''] = 'always';
+  // $variables[''] = 'always';
+  $cell1 = array('data' => theme('pagerer_adaptive', $variables), 'class' => array('pagerer', 'pagerer-left'));
+  $cell2 = NULL;
+  unset($variables['first_link']);
+  unset($variables['previous_link']);
+  unset($variables['next_link']);
+  unset($variables['last_link']);
+  $variables['display'] = 'pages';
+  // $variables['tags']['label'] = t('Item');
+  $cell3 = array('data' => theme('pagerer_mini', $variables), 'class' => array('pagerer', 'pagerer-right'));
 
-    $row = array(
-        'data' => array(
-            $cell1,
-            $cell2,
-            $cell3,
-        ),
-        'no_striping' => true,
-    );
-    $rows[] = $row;
+  $row = array(
+    'data' => array(
+      $cell1,
+      $cell2,
+      $cell3,
+    ),
+    'no_striping' => TRUE,
+  );
+  $rows[] = $row;
 
-    $output = theme_table(array(
-        'header' => array(),
-        'rows' => $rows,
-        'attributes' => array( 'class' => array('pagerer',), ),
-        'caption' => null,
-        'colgroups' => null,
-        'sticky' => false,
-        'empty' => null,
-    ));
+  $output = theme_table(array(
+      'header' => array(),
+      'rows' => $rows,
+      'attributes' => array('class' => array('pagerer')),
+      'caption' => NULL,
+      'colgroups' => NULL,
+      'sticky' => FALSE,
+      'empty' => NULL,
+  ));
 
-    return $output;
+  return $output;
 }
 
 /**
  * This theme is alike standard Drupal pager theme.
  *
- * Provides links to the 'neigborhood' of current page, plus first/previous/next/last page.
- * Extended control on the pager is available through Pagerer's specific $variables.
+ * Provides links to the 'neigborhood' of current page, plus first/previous
+ * /next/last page. Extended control on the pager is available through
+ * Pagerer's specific $variables.
  */
-function theme_pagerer_standard($variables)
-{
-    return _pagerer_theme_handler('pagerer_standard', $variables);
+function theme_pagerer_standard($variables) {
+  return _pagerer_theme_handler('pagerer_standard', $variables);
 }
 
 /**
  * This theme provides links to pages progressively more distant from current.
  *
- * Besides links to the 'neigborhood' of current page, creates a list of links which are progressively
- * more distant from current page, displaying either a page number or an offset from current page.
+ * Besides links to the 'neigborhood' of current page, creates a list of links
+ * which are progressively more distant from current page, displaying either a
+ * page number or an offset from current page.
  *
- * This is controlled via the 'progr_links' theme variable, which can take a value either 'absolute'
- * or 'relative'.
+ * This is controlled via the 'progr_links' theme variable, which can take a
+ * value either 'absolute' or 'relative'.
  *
  * Examples:
  *
@@ -250,9 +257,9 @@ function theme_pagerer_standard($variables)
  * 1  ... -5  ...  7  8  [9]  10  11  ...  +5  ...  +10  ... +50  ... +100  ... 212
  * -----------------------------------------------------------------------------------------
  *
- * The 'factors' theme variable controls the quantity of progressive links generated. Each
- * value in the comma delimited string will be used as a scale factor for a progressive series
- * of pow(10, n).
+ * The 'factors' theme variable controls the quantity of progressive links
+ * generated. Each value in the comma delimited string will be used as a
+ * scale factor for a progressive series of pow(10, n).
  *
  * Examples:
  * 'factors' => '10'    will generate links for page offsets
@@ -265,21 +272,19 @@ function theme_pagerer_standard($variables)
  *
  * etc.
  */
-function theme_pagerer_progressive($variables)
-{
-    return _pagerer_theme_handler('pagerer_progressive', $variables);
+function theme_pagerer_progressive($variables) {
+  return _pagerer_theme_handler('pagerer_progressive', $variables);
 }
 
 /**
-* This is the standard pager + extensions
-*/
-function theme_pagerer_adaptive($variables)
-{
-    return _pagerer_theme_handler('pagerer_adaptive', $variables);
+ * This is the standard pager + extensions
+ */
+function theme_pagerer_adaptive($variables) {
+  return _pagerer_theme_handler('pagerer_adaptive', $variables);
 }
 
 /**
- * This theme displays current page (or item) within the range, and navigation links.
+ * This theme displays current page (or item) within the range.
  *
  * Examples:
  *
@@ -293,9 +298,8 @@ function theme_pagerer_adaptive($variables)
  * «  <  Item 401 of 47731  >  »
  * -----------------------------------------------------------
  */
-function theme_pagerer_mini($variables)
-{
-    return _pagerer_theme_handler('pagerer_mini', $variables);
+function theme_pagerer_mini($variables) {
+  return _pagerer_theme_handler('pagerer_mini', $variables);
 }
 
 /**
@@ -303,39 +307,41 @@ function theme_pagerer_mini($variables)
  *
  * Calls to any theme_pagerer_xxx() function are channeled to this handler.
  *
- * @param string $theme     theme name
- * @param array  $variables theme's variables
+ * @param string $theme
+ *   theme name
+ * @param array  $variables
+ *   theme's variables
  *
- * @return string HTML item list
+ * @return string
+ *   HTML item list
  */
-function _pagerer_theme_handler($theme, $variables)
-{
-    global $pager_total, $pager_limits;
+function _pagerer_theme_handler($theme, $variables) {
+  global $pager_total, $pager_limits;
 
-    // check if pager is needed; if not, return immediately
-    if (($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0)
+  // Check if pager is needed; if not, return immediately.
+  if (($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0)
         and $variables['first_link'] <> 'always'
         and $variables['previous_link'] <> 'always'
         and $variables['next_link'] <> 'always'
         and $variables['last_link'] <> 'always') {
-        return null;
-    }
-    // add Pagerer's css
-    drupal_add_css(drupal_get_path('module', 'pagerer') .'/pagerer.css');
-    // resolve default tags
-    $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['tags']);
-    // resolve markers
-    $markers = _pagerer_resolve_markers($variables);
+    return NULL;
+  }
+  // Add Pagerer's css.
+  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  // Resolve default tags.
+  $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['tags']);
+  // Resolve markers.
+  $markers = _pagerer_resolve_markers($variables);
 
-    // determine pager items needed
+  // Determine pager items needed.
     $pages = array();
     $c = $markers['pager_current'] - 1;
     $m = $markers['pager_max'] - 1;
     switch ($theme) {
     case 'pagerer_adaptive':
-    
-    
-    
+
+
+
         // determine adaptive keys coming from query parameters
         $qps = drupal_get_query_parameters();
         if (isset($qps['page_ak'])) {
@@ -416,7 +422,7 @@ function _pagerer_theme_handler($theme, $variables)
                 }
             }
         }
-        
+
 
     case 'pagerer_progressive':
         // first
@@ -446,7 +452,7 @@ function _pagerer_theme_handler($theme, $variables)
         // neighborhood
         $pages += _pagerer_get_neighborhood_pages($variables, $markers);
     }
-    
+
     // compose pager
     $items = array();
     // 1. left
@@ -494,7 +500,7 @@ function _pagerer_theme_handler($theme, $variables)
 
     // @todo remove
     $output = isset($output) ? $output : null;
-    
+
     return $output. '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
         'items' => $items,
         'attributes' => array('class' => array('pager')),
@@ -545,7 +551,7 @@ function _pagerer_widget($variables, $markers)
     } else {
     // no clean urls
         $query = array('q' => $_GET['q']);
-        $query += $variables['parameters']; 
+        $query += $variables['parameters'];
         $path = '?' . drupal_http_build_query($query);
     }
     // prepare js wdget state and title
@@ -624,7 +630,7 @@ function _pagerer_resolve_markers($variables)
  * @param array $variables theme's variables
  * @param array $markers   precalculated markers for the pager
  *
- * @return array pre-rendered items 
+ * @return array pre-rendered items
  */
 function _pagerer_itemize_first_link($variables, $markers)
 {
@@ -656,7 +662,7 @@ function _pagerer_itemize_first_link($variables, $markers)
  * @param array $variables theme's variables
  * @param array $markers   precalculated markers for the pager
  *
- * @return array pre-rendered items 
+ * @return array pre-rendered items
  */
 function _pagerer_itemize_previous_link($variables, $markers)
 {
@@ -688,7 +694,7 @@ function _pagerer_itemize_previous_link($variables, $markers)
  * @param array $variables theme's variables
  * @param array $markers   precalculated markers for the pager
  *
- * @return array pre-rendered items 
+ * @return array pre-rendered items
  */
 function _pagerer_itemize_next_link($variables, $markers)
 {
@@ -720,7 +726,7 @@ function _pagerer_itemize_next_link($variables, $markers)
  * @param array $variables theme's variables
  * @param array $markers   precalculated markers for the pager
  *
- * @return array pre-rendered items 
+ * @return array pre-rendered items
  */
 function _pagerer_itemize_last_link($variables, $markers)
 {
@@ -752,11 +758,11 @@ function _pagerer_itemize_last_link($variables, $markers)
  *
  * @param array   $variables   theme's variables
  * @param array   $markers     precalculated markers for the pager
- * @param array   $pages       the pages that are to be displayed in the pager 
- * @param boolean $fl_breakers if true, breakers are put before and after the pager's page list if 
- *                             first/last page in the pager list do not coincide with overall first/last page 
+ * @param array   $pages       the pages that are to be displayed in the pager
+ * @param boolean $fl_breakers if true, breakers are put before and after the pager's page list if
+ *                             first/last page in the pager list do not coincide with overall first/last page
  *
- * @return array pre-rendered items 
+ * @return array pre-rendered items
  */
 function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers = true)
 {
@@ -936,7 +942,7 @@ function _pagerer_get_neighborhood_pages($variables, $markers)
  *
  * @return array associative array of pages, with key = page and value an array having 'text' and 'interval'
  *               (the offset from current page) keys/values; a key 'progressive' set to true is also added as
- *               a marker 
+ *               a marker
  */
 function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_factor, $ratio, $limit = null)
 {
@@ -1027,7 +1033,7 @@ function _pagerer_get_adaptive_pages($variables, $markers, $pages, $l, $r, $x, &
  * @param string  $tag       tag to be used to render the text
  * @param string  $mode      ['absolute'|'relative']
  *                           - 'absolute' returns the page/item/item range at offset
- *                           - 'relative' returns the offset (pages/items) from current 
+ *                           - 'relative' returns the offset (pages/items) from current
  *
  * @return string fully qualified page text
  */
