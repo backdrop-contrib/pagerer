@@ -41,3 +41,10 @@ table.pagerer {
 .pagerer-page-has-focus {
 	background-color: Gainsboro;
 }
+
+/* Admin */
+table.pagerer_admin_panes_config {
+	margin: 0;
+	border: 0;
+	padding: 0;
+}

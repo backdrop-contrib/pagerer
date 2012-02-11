@@ -2,4 +2,8 @@ name = Pagerer
 description = "Extended pager theme."
 package = User interface
 core = 7.x
+
 files[] = pagerer.module
+files[] = pagerer.admin.inc
+configure = admin/config/user-interface/pagerer
+

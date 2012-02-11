@@ -1,97 +1,98 @@
 (function ($) {
 
-Drupal.Drpager = {};
+Drupal.Pagerer = {};
 
 Drupal.behaviors.pagerer = {
   attach: function(context, settings) {
-      // on document ready, adjust all the widths of pagerer-page to corresponding max
-	  // width expected
-	  $(document).ready(function(){
-		$('.pagerer-page').each(function(index) {
-			var state = eval('(' + $(this).attr('name') + ');');
-			$(this).width(String(state.total).length + 'em');
-		});
+    // on document ready, adjust all the widths of pagerer-page to corresponding max
+    // width expected
+    $(document).ready(function(){
+      $('.pagerer-page').each(function(index) {
+        var state = eval('(' + $(this).attr('name') + ');');
+        $(this).width(String(state.total).length + 'em');
       });
-      $(".pagerer-page", context)
-	  .bind('focus', function(e) {
-        this.select();
-        $(this).addClass('pagerer-page-has-focus');
-      })
-      .bind('blur', function(e) {
-        $(this).removeClass('pagerer-page-has-focus');
-      })
-      .bind('keydown', function(e) {
-        switch(e.keyCode) {
-          case 13:
-          case 10:   // iPhone <return>
-            var self = $(this);
-            var state = eval('(' + self.attr('name') + ');');
-			if (state.display == 'pages') {
-				var page = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
-				if (page < 0) {
-				  page = 0;
-				} else if (page >= state.total) {
-				  page = state.total - 1;
-				}
-			} else {
-				var item = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
-				if (item < 0) {
-				  item = 0;
-				} else if (item >= state.total) {
-				  item = state.total - 1;
-				}
-				page = parseInt(item / parseInt(state.interval));
-			}
-            var viewContext = Drupal.Drpager.getAjaxViewContext(this);
-            if (viewContext) {								// Views
-              Drupal.Drpager.doAjaxView(self.next(), page, viewContext);
-            } else if (window.Drupal.overlayChild) {		// Drupal admin overlay
-			  window.parent.jQuery.bbq.pushState({'overlay': state.url.replace(/pagererpage/, page)});
-			} else {										// Normal page
-			  document.location = state.url.replace(/pagererpage/, page);
-			}
-            e.preventDefault();
-            return false;
-          case 38:    // up key
-            Drupal.Drpager.pageStep(this, -1);
-            return true;
-          case 40:    // down key
-            Drupal.Drpager.pageStep(this, 1);
-            return true;
-          case 33:    // page up
-            Drupal.Drpager.pageStep(this, -5);
-            return true;
-          case 34:    // page down
-            Drupal.Drpager.pageStep(this, 5);
-            return true;
-        }
-      });
-      // patch up first/previous/next/last link title attribute
-      // if they are not set.
-      $(".pager .pager-first a", context).each(function(){
-        if (!this.title) {
-          this.title = Drupal.t("Go to first page");
-        }
-      });
-      $(".pager .pager-previous a", context).each(function(){
-        if (!this.title) {
-          this.title = Drupal.t("Go to previous page");
-        }
-      });
-      $(".pager .pager-next a", context).each(function(){
-        if (!this.title) {
-          this.title = Drupal.t("Go to next page");
-        }
-      });
-      $(".pager .pager-last a", context).each(function(){
-        if (!this.title) {
-          this.title = Drupal.t("Go to last page");
-        }
-      });
+    });
+    // pagerer-page event binding
+    $(".pagerer-page", context)
+    .bind('focus', function(e) {
+      this.select();
+      $(this).addClass('pagerer-page-has-focus');
+    })
+    .bind('blur', function(e) {
+      $(this).removeClass('pagerer-page-has-focus');
+    })
+    .bind('keydown', function(e) {
+      switch(e.keyCode) {
+        case 13:
+        case 10:   // iPhone <return>
+          var self = $(this);
+          var state = eval('(' + self.attr('name') + ');');
+          if (state.display == 'pages') {
+            var page = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
+            if (page < 0) {
+              page = 0;
+            } else if (page >= state.total) {
+              page = state.total - 1;
+            }
+          } else {
+            var item = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
+            if (item < 0) {
+              item = 0;
+            } else if (item >= state.total) {
+              item = state.total - 1;
+            }
+            page = parseInt(item / parseInt(state.interval));
+          }
+          var viewContext = Drupal.Pagerer.getAjaxViewContext(this);
+          if (viewContext) {                // Views
+            Drupal.Pagerer.doAjaxView(self.next(), page, viewContext);
+          } else if (window.Drupal.overlayChild) {    // Drupal admin overlay
+            window.parent.jQuery.bbq.pushState({'overlay': state.path.replace(/pagererpage/, page)});
+          } else {                    // Normal page
+            document.location = state.path.replace(/pagererpage/, page);
+          }
+          e.preventDefault();
+          return false;
+        case 38:    // up key
+          Drupal.Pagerer.pageStep(this, -1);
+          return true;
+        case 40:    // down key
+          Drupal.Pagerer.pageStep(this, 1);
+          return true;
+        case 33:    // page up
+          Drupal.Pagerer.pageStep(this, -5);
+          return true;
+        case 34:    // page down
+          Drupal.Pagerer.pageStep(this, 5);
+          return true;
+      }
+    });
+    // patch up first/previous/next/last link title attribute
+    // if they are not set.
+    $(".pager .pager-first a", context).each(function(){
+      if (!this.title) {
+        this.title = Drupal.t("Go to first page");
+      }
+    });
+    $(".pager .pager-previous a", context).each(function(){
+      if (!this.title) {
+        this.title = Drupal.t("Go to previous page");
+      }
+    });
+    $(".pager .pager-next a", context).each(function(){
+      if (!this.title) {
+        this.title = Drupal.t("Go to next page");
+      }
+    });
+    $(".pager .pager-last a", context).each(function(){
+      if (!this.title) {
+        this.title = Drupal.t("Go to last page");
+      }
+    });
   }
 };
 
-Drupal.Drpager.getAjaxViewContext = function(element) {
+Drupal.Pagerer.getAjaxViewContext = function(element) {
   if (Drupal.settings && Drupal.settings.views && Drupal.settings.views.ajaxViews) {
     for (i = 0 ; i < Drupal.settings.views.ajaxViews.length ; ++i) {
       var view = '.view-dom-id-' + Drupal.settings.views.ajaxViews[i].view_dom_id;
@@ -106,7 +107,7 @@ Drupal.Drpager.getAjaxViewContext = function(element) {
   }
 };
 
-Drupal.Drpager.doAjaxView = function(throbberElement, page, viewContext) {
+Drupal.Pagerer.doAjaxView = function(throbberElement, page, viewContext) {
   throbberElement.addClass('views-throbbing');
   var viewData = { 'js': 1, 'page': page };
   $.extend(
@@ -123,7 +124,7 @@ Drupal.Drpager.doAjaxView = function(throbberElement, page, viewContext) {
     ajax_path = ajax_path[0];
   }
   $.ajax({
-    url: ajax_path,
+    path: ajax_path,
     type: 'GET',
     data: viewData,
     success: function(response) {
@@ -156,7 +157,7 @@ Drupal.Drpager.doAjaxView = function(throbberElement, page, viewContext) {
   });
 };
 
-Drupal.Drpager.pageStep = function(el, step) {
+Drupal.Pagerer.pageStep = function(el, step) {
   var self = $(el);
   var state = eval('(' + self.attr('name') + ');');
   var page = isNaN(self.val()) ? 1 : parseInt(self.val());

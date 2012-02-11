@@ -1,0 +1,549 @@
+<?php
+/**
+ * @file
+ *
+ * Pagerer administration
+ *
+ * Drupal core 7.x
+ *
+ * @package  User interface
+ * @author   mondrake <mondrake@mondrake.org>
+ */
+
+/**
+ * Main Pagerer settings admin form.
+ */
+function pagerer_settings_form($form, &$form_state) {
+  // Add Pagerer's css.
+  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  drupal_theme_initialize();
+  $theme_registry = theme_get_registry();
+  $vars = _pagerer_get_variables();
+
+// @todo check - routine in its own safe_override  -  check module not only function
+
+/*  if (isset($form_state['post'])) {
+      if ($form_state['post']['pagerer_override_pager'] !== '1' && !$vars['pagerer_override_pager'] &&
+        $theme_registry['pager']['function'] != '....pagerere override....' &&
+        $theme_registry['pager']['function'] != 'theme_pager') {
+        drupal_set_message(t('The \'pager\' theme hook is currently overriden by \'%function\' from \'%path\'. Selecting "Override pager with pagerer" below will override it.',
+                 array('%function' => isset($theme_registry['pager']['function']) ? $theme_registry['pager']['function'] .'()' : $theme_registry['pager']['template'] .'.tpl.php',
+                       '%path' => $theme_registry['pager']['theme path'])
+                ), 'warning', FALSE);
+      }
+  }*/  
+
+  // @todo quantity
+  
+  // Global option for pager override.
+  // @todo disable if not safe
+  $form['pagerer_override_pager'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Replace standard pager with Pagerer'),
+    '#description' => t('Check to enable Pagerer\'s features on any pager served by Drupal core.'),
+    '#default_value' => $vars['pagerer_override_pager'],
+  );
+
+  // Global option to enable adaptive pager.
+  // @todo disable if not safe
+  $form['pagerer_enable_adaptive'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable adaptive pager'),
+    '#description' => t('Check to enable Pagerer\'s adaptive pager theme.'),
+    '#default_value' => $vars['pagerer_enable_adaptive'],
+  );
+
+  // List of the themes available for panes; pagerer_adaptive is listed only if global option
+  // 'pagerer_enable_adaptive' is enabled.
+  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_progressive');
+  if ($vars['pagerer_enable_adaptive']) {
+    $options[] = 'pagerer_adaptive';
+  }
+  $options = drupal_map_assoc($options);
+
+  // Panes configuration.
+  $form['panes_container'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Pagerer panes configuration'),
+    '#description' => t('Select the themes to be rendered in each Pagerer\'s pane. Click Configure to change each theme\'s behaviour.'),
+  );
+
+  // Table container to render the 3 pane config boxes inline.
+  $form['panes_container']['panes'] = array(
+    '#tree'          => TRUE,
+    '#title'         =>  t('Panes'),
+		'#theme'         => 'table',
+    '#header'        => array(),
+    '#rows'          => array(),
+    '#attributes'    => array('class' => array('pagerer_admin_panes_config')),
+  );
+  // Left pane.
+  $left_pane = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Left pane'),
+  );
+  $left_pane['theme_name'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Theme'),
+    '#options' =>  $options,
+    '#default_value' => $vars['left_pane']['theme_name'],
+  );
+	$left_pane['configure'] = array(
+		'#type' => 'submit',
+    '#name' => 'config_left',
+		'#value' => t('Configure'),
+  );
+  // Center pane.
+  $center_pane = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Center pane'),
+  );
+  $center_pane['theme_name'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Theme'),
+    '#options' =>  $options,
+    '#default_value' => $vars['center_pane']['theme_name'],
+  );
+	$center_pane['configure'] = array(
+		'#type' => 'submit',
+    '#name' => 'config_center',
+		'#value' => t('Configure'),
+  );
+  // Right pane.
+  $right_pane = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Right pane'),
+  );
+  $right_pane['theme_name'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Theme'),
+    '#options' =>  $options,
+    '#default_value' => $vars['right_pane']['theme_name'],
+  );
+	$right_pane['configure'] = array(
+		'#type' => 'submit',
+    '#name' => 'config_right',
+		'#value' => t('Configure'),
+  );
+  // Container elements - FAPI accessible.
+  $form['panes_container']['panes']['e'] = array(
+    'left' => array('data' => &$left_pane),
+    'center' => array('data' => &$center_pane),
+    'right' => array('data' => &$right_pane),
+  );
+  // Container elements - to render the table.
+  $form['panes_container']['panes']['#rows'][0] = array(
+    array('data' => &$left_pane),
+    array('data' => &$center_pane),
+    array('data' => &$right_pane),
+  );
+
+  // @todo
+  // Pagerer's preview.
+  $form['preview'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Pagerer preview'),
+  );
+
+  // Save configuration.
+	$form['save'] = array(
+		'#type' => 'submit',
+    '#name' => 'save',
+		'#value' => t('Save configuration'),
+  );
+  
+  return $form;
+}
+
+/**
+ * Main Pagerer settings admin form - validation.
+ */
+function pagerer_settings_form_validate($form, &$form_state) {
+  $v = &$form_state['values'];
+  // Remove 'pagerer_adaptive' from panes if global option not enabled.
+  if (!$v['pagerer_enable_adaptive']) {
+    if ($v['panes']['e']['left']['data']['theme_name'] == 'pager_adaptive') {
+      drupal_set_message(
+        t('Turn on the \'Enable adaptive pager\' option to select the adaptive pager.', array()), 
+        'warning', 
+        FALSE         // @todo ???
+      );
+      $v['panes']['e']['left']['data']['theme_name'] = 'none';
+    }
+    if ($v['panes']['e']['center']['data']['theme_name'] == 'pager_adaptive') {
+      drupal_set_message(
+        t('Turn on the \'Enable adaptive pager\' option to select the adaptive pager.', array()), 
+        'warning', 
+        FALSE         // @todo ???
+      );
+      $v['panes']['e']['center']['data']['theme_name'] = 'none';
+    }
+    if ($v['panes']['e']['right']['data']['theme_name'] == 'pager_adaptive') {
+      drupal_set_message(
+        t('Turn on the \'Enable adaptive pager\' option to select the adaptive pager.', array()), 
+        'warning', 
+        FALSE         // @todo ???
+      );
+      $v['panes']['e']['right']['data']['theme_name'] = 'none';
+    }
+  }
+  // Check 'Config' was invoked without selecting a theme.
+  // @todo prevent continuing
+  if (strpos($form_state['triggering_element']['#name'], 'config', 0) === 0) {
+    $e = explode('_', $form_state['triggering_element']['#name']);
+    $pane = $e[1];
+    if ($v['panes']['e'][$pane]['data']['theme_name'] == 'none') {
+      drupal_set_message(
+        t('Select a theme before clicking \'Configure\'.', array()), 
+        'error', 
+        FALSE         // @todo ???
+      );
+    }
+  }
+}
+
+/**
+ * Main Pagerer settings admin form - submission.
+ */
+function pagerer_settings_form_submit($form, &$form_state) {
+  $vars = _pagerer_get_variables();
+  $v = $form_state['values'];
+  
+  // Check if theme registry rebuild is needed.
+  if ($vars['pagerer_override_pager'] <> $v['pagerer_override_pager']) {
+    if ($vars['pagerer_override_pager']) {
+      drupal_set_message(t('Pagerer will replace Drupal\'s core pager.'));
+      // @todo watchdog?
+    }
+    else {
+      drupal_set_message(t('Drupal\'s core pager will be restored.'));
+    }
+    $theme_rebuild = TRUE;
+  }
+  else if ($vars['pagerer_enable_adaptive'] <> $v['pagerer_enable_adaptive']) {
+    if ($vars['pagerer_enable_adaptive']) {
+      drupal_set_message(t('Pagerer adaptive pager will be enabled.'));
+      // @todo watchdog?
+    }
+    else {
+      drupal_set_message(t('Pagerer adaptive pager will be disabled.'));
+    }
+    $theme_rebuild = TRUE;
+  }
+  else {
+    $theme_rebuild = FALSE;
+  }
+  
+  // Set variable.
+  $vars['pagerer_override_pager'] = $v['pagerer_override_pager'];
+  $vars['pagerer_enable_adaptive'] = $v['pagerer_enable_adaptive'];
+  $vars['left_pane']['theme_name'] = $v['panes']['e']['left']['data']['theme_name'];
+  $vars['center_pane']['theme_name'] = $v['panes']['e']['center']['data']['theme_name'];
+  $vars['right_pane']['theme_name'] = $v['panes']['e']['right']['data']['theme_name'];
+  variable_set('pagerer', $vars);
+  drupal_set_message(t('The configuration options have been saved.'), 'status');
+  
+  // Theme registry rebuild.
+  if ($theme_rebuild) {
+    drupal_theme_initialize(); // @todo serve??
+    drupal_theme_rebuild(); //@todo correct??
+  }
+  
+  // Hands over to pane configuration if a pane configuration button was invoked.
+  if (strpos($form_state['triggering_element']['#name'], 'config', 0) === 0) {
+    $e = explode('_', $form_state['triggering_element']['#name']);
+    $pane = $e[1];
+    drupal_goto("admin/config/user-interface/pagerer/pane/$pane");
+  }
+}
+
+/**
+ * Title callback for pagerer_pane_settings_form().
+ */
+function _pagerer_pane_settings_title($pane)
+{
+  switch ($pane) {
+      case 'left':
+        $text = t('Left');
+        break;
+      case 'center':
+        $text = t('Center');
+        break;
+      case 'right':
+        $text = t('Right');
+        break;
+  }
+  return t('@pane pane settings', array('@pane' => $text));
+}
+
+/**
+ * Pagerer pane level settings admin form.
+ */
+function pagerer_pane_settings_form($form, &$form_state) {
+  drupal_theme_initialize();  // @todo serve???
+  
+  // Pane to be configured.
+  $pane = $form_state['build_info']['args'][0];
+  
+  // Merge configuration variables with those coming from default theme variables.
+  $vars = _pagerer_get_variables();
+  $theme = $vars[$pane . '_pane']['theme_name'];
+  $theme_vars = $vars[$pane . '_pane']['theme_variables'];
+  $theme_registry = theme_get_registry();
+  $default_theme_vars = $theme_registry[$theme]['variables'];
+  $v = $theme_vars + $default_theme_vars;
+  
+  //kpr($theme_registry[$theme]);
+  //kpr($v);
+  
+  $options = drupal_map_assoc(array('pages', 'items', 'item_ranges'));
+  $form['display'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Display'),
+    '#options' =>  $options,
+    '#default_value' => $v['display'],
+    '#description' => t('Select whether to display pages, or items, or item ranges.'),
+    '#required' => TRUE,
+ );
+
+  if ($theme == 'pagerer_progressive') {
+    $form['factors'] = array( 
+      '#type' => 'textfield',
+      '#title' =>  t('Scale factors'),
+      '#default_value' => $v['factors'],
+      '#description' => t('Comma delimited string of factors to use to determine progressive links.'),
+      '#required' => TRUE,
+   );
+ }
+ 
+ // @todo wuantity
+
+  // Display configuration.
+  $form['display_container'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Basic elements'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('Configure basic pager elements as \'label\', \'current page\' and \'total\'.'),
+  );
+  $options = drupal_map_assoc(array('none', 'before_current', 'left' , 'right'));
+  $form['display_container']['label_display'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Label'),
+    '#options' =>  $options,
+    '#default_value' => $v['label_display'],
+    '#description' => t('Select whether and where to render a text \'label\' element (e.g. \'Page:\'). Options are \'none\' (not displayed), \'before_current\' (in front of current page), \'left\' (left hand side), \'right\' (right hand side). The actual text rendered can be set via the \'Label\' tag.'),
+    '#required' => TRUE,
+ );
+  $options = drupal_map_assoc(array('none', 'normal' , 'widget'));
+  $form['display_container']['current_display'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Current page'),
+    '#options' =>  $options,
+    '#default_value' => $v['current_display'],
+    '#description' => t('Select how the current page is rendered in the pager. Options are \'none\' (not displayed), \'normal\' (as a text), \'widget\' (an active input box from where users can enter directly a page to go to).'),
+    '#required' => TRUE,
+  );
+  $options = drupal_map_assoc(array('none', 'after_current', 'left' , 'right'));
+  $form['display_container']['total_display'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Total pages/items'),
+    '#options' =>  $options,
+    '#default_value' => $v['total_display'],
+    '#description' => t('Select whether and where to render a text element indicating the total pages (or items). Options are \'none\' (not displayed), \'after_current\' (just after current page), \'left\' (left hand side), \'right\' (right hand side). The actual text rendered can be set via the \'Total\' tag.'),
+    '#required' => TRUE,
+ );
+
+  // Links configuration.
+  $form['links_container'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Links'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('Configure link elements like \'<< first\', \'< previous\', \'next >\' and \'last >>\'.'),
+  );
+  $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
+  $form['links_container']['first_link'] = array(
+    '#type' => 'select',
+    '#title' =>  t('First'),
+    '#options' =>  $options,
+    '#default_value' => $v['first_link'],
+    '#description' => t('Select when to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). The actual text rendered can be set via the \'First\' tag.'),
+    '#required' => TRUE,
+  );
+  $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
+  $form['links_container']['previous_link'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Previous'),
+    '#options' =>  $options,
+    '#default_value' => $v['previous_link'],
+    '#description' => t('Select when to render a link to the previous page (e.g. \'<< previous\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). The actual text rendered can be set via the \'Previous\' tag.'),
+    '#required' => TRUE,
+  );
+  $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
+  $form['links_container']['next_link'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Next'),
+    '#options' =>  $options,
+    '#default_value' => $v['next_link'],
+    '#description' => t('Select when to render a link to the next page (e.g. \'next >\'). Options are \'never\' (not displayed), \'not_on_last\' (not displayed if current page is the last), \'always\' (always displayed). The actual text rendered can be set via the \'Next\' tag.'),
+    '#required' => TRUE,
+  );
+  $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
+  $form['links_container']['last_link'] = array(
+    '#type' => 'select',
+    '#title' =>  t('Last'),
+    '#options' =>  $options,
+    '#default_value' => $v['last_link'],
+    '#description' => t('Select when to render a link to the last page (e.g. \'last >>\'). Options are \'never\' (not displayed), \'not_on_last\' (not displayed if current page is the last), \'always\' (always displayed). The actual text rendered can be set via the \'Last\' tag.'),
+    '#required' => TRUE,
+  );
+  if ($theme == 'pagerer_adaptive' or $theme == 'pagerer_progressive') {
+    $options = drupal_map_assoc(array('relative', 'absolute'));
+    $form['links_container']['progr_links'] = array( 
+      '#type' => 'select',
+      '#title' =>  t('Outer pages'),
+      '#options' =>  $options,
+      '#default_value' => $v['progr_links'],
+      '#description' => t('Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as \'absolute\' page numbers (or items/item ranges) or to \'relative\' offsets from current (e.g. \'+10 +100 +1000\'). The text to be used for relative links can be set via the \'Previous progressive\' and \'Next progressive\' tags.'),
+      '#required' => TRUE,
+   );
+ }
+
+  // Tags configuration.
+  $form['tags_container'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Tags'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('Configure text tags.'),
+  );
+  $form['tags_container']['label'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Label'),
+    '#default_value' => $v['tags']['label'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+  $form['tags_container']['total'] = array(
+    '#type' => 'textfield', 
+    '#title' =>  t('Total'),
+    '#default_value' => $v['tags']['total'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+  $form['tags_container']['first'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('First'),
+    '#default_value' => $v['tags']['first'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+  $form['tags_container']['previous'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Previous'),
+    '#default_value' => $v['tags']['previous'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+  $form['tags_container']['next'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Next'),
+    '#default_value' => $v['tags']['next'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+  $form['tags_container']['last'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Last'),
+    '#default_value' => $v['tags']['last'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+ );
+
+  // Separators configuration.
+  $form['separators_container'] = array(
+    '#type' => 'fieldset', 
+    '#title' => t('Separators'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('Configure separators text.'),
+  );
+
+  $form['separators_container']['pager_breaker'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Breaker'),
+    '#default_value' => $v['tags']['pager_breaker'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+
+  $form['separators_container']['pager_separator'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Element separator'),
+    '#default_value' => $v['tags']['pager_separator'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+
+  $form['separators_container']['range_separator'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Range separator'),
+    '#default_value' => $v['tags']['range_separator'],
+    '#description' => t('Enter text to use to render a link to the first page (e.g. \'<< first\'). Options are \'never\' (not displayed), \'not_on_first\' (not displayed if current page is the first), \'always\' (always displayed). \'@num\' will be replaced at runtime with actual page/item/item range'),
+  );
+
+  // Save configuration.
+	$form['save'] = array(
+		'#type' => 'submit',
+    '#name' => 'save',
+		'#value' => t('Save configuration'),
+  );
+
+  return $form;
+}
+
+/**
+ * Pagerer pane level settings admin form - validation.
+ */
+function pagerer_pane_settings_form_validate($form, $form_state) {
+}
+
+/**
+ * Pagerer pane level settings admin form - submission.
+ */
+function pagerer_pane_settings_form_submit($form, $form_state) {
+  $pane = $form_state['build_info']['args'][0];
+  $p = $pane . '_pane';
+kpr($form_state['build_info']); 
+  $vars = _pagerer_get_variables();
+kpr($vars); 
+
+  $v = $form_state['values'];
+kpr($v); 
+  $vars[$p]['theme_variables']['tags']['label'] = $v['label'];
+  $vars[$p]['theme_variables']['tags']['total'] = $v['total'];
+  $vars[$p]['theme_variables']['tags']['first'] = $v['first'];
+  $vars[$p]['theme_variables']['tags']['previous'] = $v['previous'];
+  $vars[$p]['theme_variables']['tags']['next'] = $v['next'];
+  $vars[$p]['theme_variables']['tags']['last'] = $v['last'];
+  if (isset($v['previous_progr'])) {
+    $vars[$p]['theme_variables']['tags']['previous_progr'] = $v['previous_progr'];
+  }
+  if (isset($v['next_progr'])) {
+    $vars[$p]['theme_variables']['tags']['next_progr'] = $v['next_progr'];
+  }
+  $vars[$p]['theme_variables']['tags']['pager_breaker'] = $v['pager_breaker'];
+  $vars[$p]['theme_variables']['tags']['pager_separator'] = $v['pager_separator'];
+  $vars[$p]['theme_variables']['tags']['range_separator'] = $v['range_separator'];
+  $vars[$p]['theme_variables']['display'] = $v['display'];
+  $vars[$p]['theme_variables']['label_display'] = $v['label_display'];
+  $vars[$p]['theme_variables']['current_display'] = $v['current_display'];
+  $vars[$p]['theme_variables']['total_display'] = $v['total_display'];
+  $vars[$p]['theme_variables']['first_link'] = $v['first_link'];
+  $vars[$p]['theme_variables']['previous_link'] = $v['previous_link'];
+  $vars[$p]['theme_variables']['next_link'] = $v['next_link'];
+  $vars[$p]['theme_variables']['last_link'] = $v['last_link'];
+  if (isset($v['progr_links'])) {
+    $vars[$p]['theme_variables']['progr_links'] = $v['progr_links'];
+  }
+  if (isset($v['factors'])) {
+    $vars[$p]['theme_variables']['factors'] = $v['factors'];
+  }
+  variable_set('pagerer', $vars);
+  drupal_set_message(t('The configuration options have been saved.'), 'status');
+  drupal_goto("admin/config/user-interface/pagerer");
+}
+
