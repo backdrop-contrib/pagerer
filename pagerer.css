@@ -43,7 +43,10 @@ table.pagerer {
 }
 
 /* Admin */
-table.pagerer_admin_panes_config {
+table.pagerer_admin_panes_config,
+table.pagerer_admin_panes_config tbody, 
+table.pagerer_admin_panes_config tbody tr,
+table.pagerer_admin_panes_config tbody tr td {
 	margin: 0;
 	border: 0;
 	padding: 0;
