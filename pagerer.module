@@ -39,21 +39,35 @@ function pagerer_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'pagerer.admin.inc',
   );
-  $items['admin/config/user-interface/pagerer/pane'] = array(
-    'title' => 'Pane settings',
-    'type' => MENU_CALLBACK,
-  );
-  $items['admin/config/user-interface/pagerer/pane/%'] = array(
+  $items['admin/config/user-interface/pagerer/%'] = array(
     'title callback' => '_pagerer_pane_settings_title',
-    'title arguments' => array(5),
-    'description' => t('Configure Pagerer panes.'),
+    'title arguments' => array(4),
+    'description' => 'Configure Pagerer panes.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('pagerer_pane_settings_form', 5),
+    'page arguments' => array('pagerer_pane_settings_form', 4),
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'pagerer.admin.inc',
   );
   return $items;
+}
+
+/**
+ * Title callback for pagerer_pane_settings_form().
+ */
+function _pagerer_pane_settings_title($pane) {
+  switch ($pane) {
+    case 'left':
+      $text = t('Left');
+      break;
+    case 'center':
+      $text = t('Center');
+      break;
+    case 'right':
+      $text = t('Right');
+      break;
+  }
+  return t('@pane pane settings', array('@pane' => $text));
 }
 
 /**
@@ -235,10 +249,8 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
  * configuration setup in the pagerer variable via admin.
  */
 function _pagerer_override_theme_pager($v) {
-
   // Get Pagerer configuration.
   $config_vars = _pagerer_get_variables();
-
   // Pass incoming and configuration variables to 'pagerer' theme $variables.
   $variables = array();
   $variables['element']  = $v['element'];
@@ -282,7 +294,6 @@ function _pagerer_override_theme_pager($v) {
       $variables['right_pane']['theme_variables']['tags']['last'] = $v['tags'][4];
     }
   }
-
   // Need to call directly the pagerer theming function to avoid recursion.
   return theme_pagerer($variables);
 }
@@ -304,13 +315,25 @@ function theme_pagerer($variables) {
   if ($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0) {
     return NULL;
   }
-
   // Left pane.
   if ($variables['left_pane']['theme_name'] <> 'none') {
+    $left_pane_vars = isset($variables['left_pane']['theme_variables']) ? $variables['left_pane']['theme_variables'] : array();
+    if (isset($variables['tags'])) {
+      $left_pane_vars['tags'] = $variables['tags'];
+    }
+    if (isset($variables['element'])) {
+      $left_pane_vars['element'] = $variables['element'];
+    }
+    if (isset($variables['parameters'])) {
+      $left_pane_vars['parameters'] = $variables['parameters'];
+    }
+    if (isset($variables['quantity'])) {
+      $left_pane_vars['quantity'] = $variables['quantity'];
+    }
     $left_pane = array(
       'data' => theme(
         $variables['left_pane']['theme_name'],
-        isset($variables['left_pane']['theme_variables']) ? $variables['left_pane']['theme_variables'] : NULL
+        $left_pane_vars
       ),
       'class' => array('pagerer', 'pagerer-left'),
     );
@@ -318,13 +341,25 @@ function theme_pagerer($variables) {
   else {
     $left_pane = NULL;
   }
-
   // Center pane.
   if ($variables['center_pane']['theme_name'] <> 'none') {
+    $center_pane_vars = isset($variables['center_pane']['theme_variables']) ? $variables['center_pane']['theme_variables'] : array();
+    if (isset($variables['tags'])) {
+      $center_pane_vars['tags'] = $variables['tags'];
+    }
+    if (isset($variables['element'])) {
+      $center_pane_vars['element'] = $variables['element'];
+    }
+    if (isset($variables['parameters'])) {
+      $center_pane_vars['parameters'] = $variables['parameters'];
+    }
+    if (isset($variables['quantity'])) {
+      $center_pane_vars['quantity'] = $variables['quantity'];
+    }
     $center_pane = array(
       'data' => theme(
         $variables['center_pane']['theme_name'],
-        isset($variables['center_pane']['theme_variables']) ? $variables['center_pane']['theme_variables'] : NULL
+        $center_pane_vars
       ),
       'class' => array('pagerer', 'pagerer-center'),
     );
@@ -332,13 +367,25 @@ function theme_pagerer($variables) {
   else {
     $center_pane = NULL;
   }
-
   // Right pane.
   if ($variables['right_pane']['theme_name'] <> 'none') {
+    $right_pane_vars = isset($variables['right_pane']['theme_variables']) ? $variables['right_pane']['theme_variables'] : array();
+    if (isset($variables['tags'])) {
+      $right_pane_vars['tags'] = $variables['tags'];
+    }
+    if (isset($variables['element'])) {
+      $right_pane_vars['element'] = $variables['element'];
+    }
+    if (isset($variables['parameters'])) {
+      $right_pane_vars['parameters'] = $variables['parameters'];
+    }
+    if (isset($variables['quantity'])) {
+      $right_pane_vars['quantity'] = $variables['quantity'];
+    }
     $right_pane = array(
       'data' => theme(
         $variables['right_pane']['theme_name'],
-        isset($variables['right_pane']['theme_variables']) ? $variables['right_pane']['theme_variables'] : NULL
+        $right_pane_vars
       ),
       'class' => array('pagerer', 'pagerer-right'),
     );
@@ -346,7 +393,6 @@ function theme_pagerer($variables) {
   else {
     $right_pane = NULL;
   }
-
   // Render a 1 row * 3 columns table, where each cell is a 'pane'
   // holding a rendered pager. See pagerer.css for specific styling.
   $row = array(
@@ -367,7 +413,6 @@ function theme_pagerer($variables) {
       'empty'      => NULL,
     )
   );
-
   return $output;
 }
 
@@ -461,7 +506,7 @@ function theme_pagerer_mini($variables) {
  */
 function _pagerer_theme_handler($theme, $variables) {
   global $pager_total, $pager_limits;
-
+  
   // Check if pager is needed; if not, return immediately.
   if (($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0)
         and $variables['first_link'] <> 'always'
@@ -490,9 +535,9 @@ function _pagerer_theme_handler($theme, $variables) {
       $qps = drupal_get_query_parameters();
       if (isset($qps['page_ak'])) {
         $tmp = explode('.', $qps['page_ak']);
-        $pl = $tmp[0];
-        $pr = $tmp[1];
-        $px = isset($tmp[2]) ? $tmp[2] : NULL;
+        $pl = $tmp[1];
+        $pr = $tmp[2];
+        $px = isset($tmp[3]) ? $tmp[3] : NULL;
       }
       else {
         list($pl, $pr, $px) = array(NULL, NULL, NULL);
@@ -905,10 +950,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       if ($page_data['interval'] < 0) {
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
-            $variables['parameters']['page_ak'] = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
+            $variables['parameters']['page_ak'] = implode('.', array($variables['element'], $page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
           }
           else {
-            $variables['parameters']['page_ak'] = implode('.', array($page_data['page_pl'], $page_data['page_pr']));
+            $variables['parameters']['page_ak'] = implode('.', array($variables['element'], $page_data['page_pl'], $page_data['page_pr']));
           }
         }
         else {
@@ -962,10 +1007,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       elseif ($page_data['interval'] > 0) {
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
-            $variables['parameters']['page_ak'] = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
+            $variables['parameters']['page_ak'] = implode('.', array($variables['element'], $page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
           }
           else {
-            $variables['parameters']['page_ak'] = implode('.', array($page_data['page_pl'], $page_data['page_pr']));
+            $variables['parameters']['page_ak'] = implode('.', array($variables['element'], $page_data['page_pl'], $page_data['page_pr']));
           }
         }
         else {
@@ -1336,13 +1381,12 @@ function _pagerer_get_variables() {
 
   // If nothing in Drupal's variable, then set default.
   if (empty($vars)) {
-    $theme_registry = theme_get_registry();
     $vars = array(
       'pagerer_override_pager'    => FALSE,
       'pagerer_enable_adaptive'   => FALSE,
-      'left_pane'                 => $theme_registry['pagerer']['variables']['left_pane'],
-      'center_pane'                 => $theme_registry['pagerer']['variables']['center_pane'],
-      'right_pane'                 => $theme_registry['pagerer']['variables']['right_pane'],
+      'left_pane'                 => array('theme_name' => 'none'),
+      'center_pane'               => array('theme_name' => 'pagerer_standard'),
+      'right_pane'                => array('theme_name' => 'none'),
     );
     variable_set('pagerer', $vars);
   }

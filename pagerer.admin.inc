@@ -33,8 +33,6 @@ function pagerer_settings_form($form, &$form_state) {
       }
   }*/
 
-  // @todo quantity
-
   // Global option for pager override.
   // @todo disable if not safe
   $form['pagerer_override_pager'] = array(
@@ -53,19 +51,15 @@ function pagerer_settings_form($form, &$form_state) {
     '#default_value' => $vars['pagerer_enable_adaptive'],
   );
 
-  // List of the themes available for panes; pagerer_adaptive is listed 
-  // only if global option 'pagerer_enable_adaptive' is enabled.
-  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_progressive');
-  if ($vars['pagerer_enable_adaptive']) {
-    $options[] = 'pagerer_adaptive';
-  }
+  // List of the themes available for panes.
+  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_progressive', 'pagerer_adaptive');
   $options = drupal_map_assoc($options);
 
   // Panes configuration.
   $form['panes_container'] = array(
     '#type' => 'fieldset',
     '#title' => t('Pagerer panes configuration'),
-    '#description' => t('Select the themes to be rendered in each Pagerer pane. Click Configure to change each theme behaviour.'),
+    '#description' => t('Select the themes to be rendered in each Pagerer pane. Click "Configure" to change each theme behaviour.'),
   );
 
   // Table container to render the 3 pane config boxes inline.
@@ -160,43 +154,35 @@ function pagerer_settings_form($form, &$form_state) {
  */
 function pagerer_settings_form_validate($form, &$form_state) {
   $v = &$form_state['values'];
-  // Remove 'pagerer_adaptive' from panes if global option not enabled.
+  // Checks 'pagerer_adaptive' selected from panes if global option not enabled.
   if (!$v['pagerer_enable_adaptive']) {
-    if ($v['panes']['e']['left']['data']['theme_name'] == 'pager_adaptive') {
-      drupal_set_message(
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array()),
-        'warning',
-        FALSE         // @todo ???
+    if ($v['panes']['e']['left']['data']['theme_name'] == 'pagerer_adaptive') {
+      form_set_error(
+        'panes][e][left][data',
+        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
       );
-      $v['panes']['e']['left']['data']['theme_name'] = 'none';
     }
-    if ($v['panes']['e']['center']['data']['theme_name'] == 'pager_adaptive') {
-      drupal_set_message(
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array()),
-        'warning',
-        FALSE         // @todo ???
+    if ($v['panes']['e']['center']['data']['theme_name'] == 'pagerer_adaptive') {
+      form_set_error(
+        'panes][e][center][data',
+        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
       );
-      $v['panes']['e']['center']['data']['theme_name'] = 'none';
     }
-    if ($v['panes']['e']['right']['data']['theme_name'] == 'pager_adaptive') {
-      drupal_set_message(
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array()),
-        'warning',
-        FALSE         // @todo ???
+    if ($v['panes']['e']['right']['data']['theme_name'] == 'pagerer_adaptive') {
+      form_set_error(
+        'panes][e][right][data',
+        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
       );
-      $v['panes']['e']['right']['data']['theme_name'] = 'none';
     }
   }
   // Check 'Config' was invoked without selecting a theme.
-  // @todo prevent continuing
   if (strpos($form_state['triggering_element']['#name'], 'config', 0) === 0) {
     $e = explode('_', $form_state['triggering_element']['#name']);
     $pane = $e[1];
     if ($v['panes']['e'][$pane]['data']['theme_name'] == 'none') {
-      drupal_set_message(
-        t('Select a theme before clicking "Configure".', array()),
-        'error',
-        FALSE         // @todo ???
+      form_set_error(
+        'panes][e][' . $pane . '][data',
+        t('Select a theme before clicking "Configure".', array())
       );
     }
   }
@@ -254,27 +240,10 @@ function pagerer_settings_form_submit($form, &$form_state) {
   if (strpos($form_state['triggering_element']['#name'], 'config', 0) === 0) {
     $e = explode('_', $form_state['triggering_element']['#name']);
     $pane = $e[1];
-    drupal_goto('admin/config/user-interface/pagerer/pane/$pane');
+    drupal_goto('admin/config/user-interface/pagerer/' . $pane);
   }
 }
 
-/**
- * Title callback for pagerer_pane_settings_form().
- */
-function _pagerer_pane_settings_title($pane) {
-  switch ($pane) {
-    case 'left':
-      $text = t('Left');
-      break;
-    case 'center':
-      $text = t('Center');
-      break;
-    case 'right':
-      $text = t('Right');
-      break;
-  }
-  return t('@pane pane settings', array('@pane' => $text));
-}
 
 /**
  * Pagerer pane level settings admin form.
@@ -284,14 +253,42 @@ function pagerer_pane_settings_form($form, &$form_state) {
 
   // Pane to be configured.
   $pane = $form_state['build_info']['args'][0];
+  switch ($pane) {
+    case 'left':
+      $pane_t = t('Left');
+      break;
+    case 'center':
+      $pane_t = t('Center');
+      break;
+    case 'right':
+      $pane_t = t('Right');
+      break;
+  }
 
   // Merge configuration variables with those coming from default theme variables.
   $vars = _pagerer_get_variables();
   $theme = $vars[$pane . '_pane']['theme_name'];
-  $theme_vars = $vars[$pane . '_pane']['theme_variables'];
+  // @todo no theme_variables
+  $theme_vars = $vars[$pane . '_pane']['theme_variables'] ? $vars[$pane . '_pane']['theme_variables'] : array();
   $theme_registry = theme_get_registry();
   $default_theme_vars = $theme_registry[$theme]['variables'];
+//  kpr($theme_vars);
+//  kpr($default_theme_vars);
   $v = $theme_vars + $default_theme_vars;
+  
+  // Pane theme.
+  $form['theme_name'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('@pane_t pane theme', array('@pane_t' => $pane_t)),
+    '#default_value' => $theme,
+    '#description' => t('To change the pane theme, go back to main Pagerer configuration.'),
+    '#disabled' => TRUE,
+  );
+  $form['reset_theme'] = array(
+    '#type' => 'submit',
+    '#name' => 'reset_theme',
+    '#value' => t('Reset theme defaults'),
+  );
 
   $options = drupal_map_assoc(array('pages', 'items', 'item_ranges'));
   $form['display'] = array(
@@ -302,7 +299,15 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#description' => t('Select whether to display pages, or items, or item ranges.'),
     '#required' => TRUE,
   );
-
+  $form['quantity'] = array(
+    '#type' => 'textfield',
+    '#title' =>  t('Quantity'),
+    '#default_value' => $v['quantity'],
+    '#description' => t('The number of pages in the pager list.'),
+    '#required' => TRUE,
+    '#size' => 3,
+    '#maxlength' => 3,
+  );
   if ($theme == 'pagerer_progressive') {
     $form['factors'] = array(
       '#type' => 'textfield',
@@ -312,8 +317,6 @@ function pagerer_pane_settings_form($form, &$form_state) {
       '#required' => TRUE,
     );
   }
-
-  // @todo wuantity
 
   // Display configuration.
   $form['display_container'] = array(
@@ -402,12 +405,13 @@ function pagerer_pane_settings_form($form, &$form_state) {
       '#title' =>  t('Outer pages'),
       '#options' =>  $options,
       '#default_value' => $v['progr_links'],
-      '#description' => t('Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as "absolute" page numbers (or items/item ranges) or to "relative" offsets from current (e.g. "+10 +100 +1000"). The text to be used for relative links can be set via the "Previous progressive" and "Next progressive" tags.'),
+      '#description' => t('Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as "absolute" page numbers (or items/item ranges) or as "relative" offsets from current (e.g. "+10 +100 +1000"). The text to be used for relative links can be set via the "Previous progressive" and "Next progressive" tags.'),
       '#required' => TRUE,
     );
   }
 
   // Tags configuration.
+  // @todo previous_progr ... and descriptions
   $form['tags_container'] = array(
     '#type' => 'fieldset',
     '#title' => t('Tags'),
@@ -453,6 +457,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   );
 
   // Separators configuration.
+  // @todo descriptions
   $form['separators_container'] = array(
     '#type' => 'fieldset',
     '#title' => t('Separators'),
@@ -460,21 +465,18 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#collapsed' => TRUE,
     '#description' => t('Configure separators text.'),
   );
-
   $form['separators_container']['pager_breaker'] = array(
     '#type' => 'textfield',
     '#title' =>  t('Breaker'),
     '#default_value' => $v['tags']['pager_breaker'],
     '#description' => t('Enter text to use to render a link to the first page (e.g. "<< first"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed). "@num" will be replaced at runtime with actual page/item/item range'),
   );
-
   $form['separators_container']['pager_separator'] = array(
     '#type' => 'textfield',
     '#title' =>  t('Element separator'),
     '#default_value' => $v['tags']['pager_separator'],
     '#description' => t('Enter text to use to render a link to the first page (e.g. "<< first"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed). "@num" will be replaced at runtime with actual page/item/item range'),
   );
-
   $form['separators_container']['range_separator'] = array(
     '#type' => 'textfield',
     '#title' =>  t('Range separator'),
@@ -504,12 +506,20 @@ function pagerer_pane_settings_form_validate($form, $form_state) {
 function pagerer_pane_settings_form_submit($form, $form_state) {
   $pane = $form_state['build_info']['args'][0];
   $p = $pane . '_pane';
-kpr($form_state['build_info']);
   $vars = _pagerer_get_variables();
-kpr($vars);
-
   $v = $form_state['values'];
-kpr($v);
+
+  // Reset theme defaults if button invoked. 
+  if ($form_state['triggering_element']['#name'] == 'reset_theme') {
+    $theme = $v['theme_name'];
+    $theme_registry = theme_get_registry();
+    $default_theme_vars = $theme_registry[$theme]['variables'];
+    $vars[$p]['theme_variables'] = $default_theme_vars;
+    variable_set('pagerer', $vars);
+    drupal_set_message(t('The configuration has been reset to default theme variables.'), 'status');
+    drupal_goto('admin/config/user-interface/pagerer/' . $pane);
+  }
+  
   $vars[$p]['theme_variables']['tags']['label'] = $v['label'];
   $vars[$p]['theme_variables']['tags']['total'] = $v['total'];
   $vars[$p]['theme_variables']['tags']['first'] = $v['first'];
@@ -526,6 +536,7 @@ kpr($v);
   $vars[$p]['theme_variables']['tags']['pager_separator'] = $v['pager_separator'];
   $vars[$p]['theme_variables']['tags']['range_separator'] = $v['range_separator'];
   $vars[$p]['theme_variables']['display'] = $v['display'];
+  $vars[$p]['theme_variables']['quantity'] = $v['quantity'];
   $vars[$p]['theme_variables']['label_display'] = $v['label_display'];
   $vars[$p]['theme_variables']['current_display'] = $v['current_display'];
   $vars[$p]['theme_variables']['total_display'] = $v['total_display'];
