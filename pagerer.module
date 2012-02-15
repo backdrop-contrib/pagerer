@@ -75,20 +75,41 @@ function _pagerer_pane_settings_title($pane) {
  */
 function pagerer_theme_registry_alter(&$theme_registry) {
   $vars = _pagerer_get_variables();
-  // @todo modules/system from drupal get path - safe harbour
-  // Replace the built-in pager only if this option is set and
-  // this theme hook is not overridden.
-  if ($vars['pagerer_override_pager']
-      and $theme_registry['pager']['function'] == 'theme_pager'
-      and $theme_registry['pager']['theme path'] == 'modules/system') {
+  // Replace the built-in pagers only if options are set and
+  // the theme hooks are not alredy overridden.
+  if ($vars['pagerer_override_pager'] 
+      and _pagerer_theme_override_safe($theme_registry, 'pager', 'theme_pager', 'system')) {
     $theme_registry['pager']['theme path'] = drupal_get_path('module', 'pagerer');
     $theme_registry['pager']['function'] = '_pagerer_override_theme_pager';
   }
   if ($vars['pagerer_enable_adaptive']
-      and $theme_registry['pager_link']['function'] == 'theme_pager_link'
-      and $theme_registry['pager_link']['theme path'] == 'modules/system') {
+      and _pagerer_theme_override_safe($theme_registry, 'pager_link', 'theme_pager_link', 'system')) {
     $theme_registry['pager_link']['theme path'] = drupal_get_path('module', 'pagerer');
     $theme_registry['pager_link']['function'] = '_pagerer_override_theme_pager_link';
+  }
+}
+
+function _pagerer_theme_override_safe($theme_registry, $theme, $function, $module) {
+  if (($theme_registry[$theme]['function'] == $function and $theme_registry[$theme]['theme path'] == drupal_get_path('module', $module))
+      or $theme_registry[$theme]['theme path'] == drupal_get_path('module', 'pagerer')) {
+    return TRUE;
+  }
+  else {
+    drupal_set_message(
+      t(
+        'The "!theme" theme is currently overriden by "!function" from "!path". ' .
+        'Remove overrides to Drupal core pager themes by disabling affecting modules/templates ' .
+        'to enable Pagerer.',
+        array(
+          '!theme'    => $theme,
+          '!function' => isset($theme_registry[$theme]['function']) ? $theme_registry[$theme]['function'] . '()' : $theme_registry[$theme]['template'] . '.tpl.php',
+          '!path'     => $theme_registry[$theme]['theme path'],
+         )
+      ), 
+      'warning', 
+      FALSE
+    );
+    return FALSE;
   }
 }
 
@@ -96,6 +117,7 @@ function pagerer_theme_registry_alter(&$theme_registry) {
  * Implements hook_theme().
  */
 function pagerer_theme() {
+  $vars = _pagerer_get_variables();
   $common_theme = drupal_common_theme();
   $theme = array(
     'pagerer' => array(
@@ -147,23 +169,6 @@ function pagerer_theme() {
         'factors'         => '2.5,5,10',
       ),
     ),
-    'pagerer_adaptive' => array(
-      'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_adaptive'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => 5,
-        'display'         => 'pages',
-        'label_display'   => 'none',
-        'current_display' => 'normal',
-        'total_display'   => 'none',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
-        'progr_links'     => 'relative',
-      ),
-    ),
     'pagerer_mini' => array(
       'variables' => array(
         'tags'            => _pagerer_tags_merge_default('pagerer_mini'),
@@ -181,6 +186,25 @@ function pagerer_theme() {
       ),
     ),
   );
+  if ($vars['pagerer_enable_adaptive']) {
+    $theme['pagerer_adaptive'] = array(
+      'variables' => array(
+        'tags'            => _pagerer_tags_merge_default('pagerer_adaptive'),
+        'element'         => $common_theme['pager']['variables']['element'],
+        'parameters'      => $common_theme['pager']['variables']['parameters'],
+        'quantity'        => 5,
+        'display'         => 'pages',
+        'label_display'   => 'none',
+        'current_display' => 'normal',
+        'total_display'   => 'none',
+        'first_link'      => 'never',
+        'previous_link'   => 'never',
+        'next_link'       => 'never',
+        'last_link'       => 'never',
+        'progr_links'     => 'relative',
+      ),
+    );
+  }
   return $theme;
 }
 
@@ -529,7 +553,7 @@ function _pagerer_theme_handler($theme, $variables) {
   switch ($theme) {
     case 'pagerer_adaptive':
 
-
+// @todo ? progressive setup impacting adaptive ?
 
       // Determine adaptive keys coming from query parameters.
       $qps = drupal_get_query_parameters();

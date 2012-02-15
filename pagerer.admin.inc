@@ -14,41 +14,30 @@
  * Main Pagerer settings admin form.
  */
 function pagerer_settings_form($form, &$form_state) {
+  // Initialize theme for safety.
+  drupal_theme_initialize();
   // Add Pagerer's css.
   drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
-  drupal_theme_initialize();
+  // Get theme registry and pagerer variables.
   $theme_registry = theme_get_registry();
   $vars = _pagerer_get_variables();
 
-// @todo check - routine in its own safe_override  -  check module not only function
-
-/*  if (isset($form_state['post'])) {
-      if ($form_state['post']['pagerer_override_pager'] !== '1' && !$vars['pagerer_override_pager'] &&
-        $theme_registry['pager']['function'] != '....pagerere override....' &&
-        $theme_registry['pager']['function'] != 'theme_pager') {
-        drupal_set_message(t('The "pager" theme hook is currently overriden by "%function" from "%path". Selecting "Override pager with pagerer" below will override it.',
-                 array('%function' => isset($theme_registry['pager']['function']) ? $theme_registry['pager']['function'] .'()' : $theme_registry['pager']['template'] .'.tpl.php',
-                       '%path' => $theme_registry['pager']['theme path'])
-                ), 'warning', FALSE);
-      }
-  }*/
-
   // Global option for pager override.
-  // @todo disable if not safe
   $form['pagerer_override_pager'] = array(
     '#type' => 'checkbox',
     '#title' => t('Replace standard pager with Pagerer'),
     '#description' => t('Check to enable Pagerer features on any pager served by Drupal core.'),
     '#default_value' => $vars['pagerer_override_pager'],
+    '#disabled' => !_pagerer_theme_override_safe($theme_registry, 'pager', 'theme_pager', 'system'),
   );
 
   // Global option to enable adaptive pager.
-  // @todo disable if not safe
   $form['pagerer_enable_adaptive'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable adaptive pager'),
     '#description' => t('Check to enable Pagerer adaptive pager theme.'),
     '#default_value' => $vars['pagerer_enable_adaptive'],
+    '#disabled' => !_pagerer_theme_override_safe($theme_registry, 'pager_link', 'theme_pager_link', 'system'),
   );
 
   // List of the themes available for panes.
@@ -132,11 +121,14 @@ function pagerer_settings_form($form, &$form_state) {
     array('data' => &$right_pane),
   );
 
-  // @todo
   // Pagerer's preview.
+  pager_default_initialize(47884, 50);
   $form['preview'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Pagerer preview'),
+    '#title' => t('Pager preview'),
+  );
+  $form['preview']['pagerer'] = array(
+    '#markup' => theme('pager', array()),
   );
 
   // Save configuration.
@@ -231,11 +223,10 @@ function pagerer_settings_form_submit($form, &$form_state) {
 
   // Theme registry rebuild.
   if ($theme_rebuild) {
-    drupal_theme_initialize(); // @todo serve??
-    drupal_theme_rebuild(); //@todo correct??
+    drupal_theme_rebuild();
   }
 
-  // Hands over to pane configuration if a pane configuration button 
+  // Hands over to pane configuration if a pane configuration button
   // was invoked.
   if (strpos($form_state['triggering_element']['#name'], 'config', 0) === 0) {
     $e = explode('_', $form_state['triggering_element']['#name']);
@@ -249,8 +240,6 @@ function pagerer_settings_form_submit($form, &$form_state) {
  * Pagerer pane level settings admin form.
  */
 function pagerer_pane_settings_form($form, &$form_state) {
-  drupal_theme_initialize();  // @todo serve???
-
   // Pane to be configured.
   $pane = $form_state['build_info']['args'][0];
   switch ($pane) {
@@ -275,7 +264,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
 //  kpr($theme_vars);
 //  kpr($default_theme_vars);
   $v = $theme_vars + $default_theme_vars;
-  
+
   // Pane theme.
   $form['theme_name'] = array(
     '#type' => 'textfield',
@@ -509,7 +498,7 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
   $vars = _pagerer_get_variables();
   $v = $form_state['values'];
 
-  // Reset theme defaults if button invoked. 
+  // Reset theme defaults if button invoked.
   if ($form_state['triggering_element']['#name'] == 'reset_theme') {
     $theme = $v['theme_name'];
     $theme_registry = theme_get_registry();
@@ -519,7 +508,7 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
     drupal_set_message(t('The configuration has been reset to default theme variables.'), 'status');
     drupal_goto('admin/config/user-interface/pagerer/' . $pane);
   }
-  
+
   $vars[$p]['theme_variables']['tags']['label'] = $v['label'];
   $vars[$p]['theme_variables']['tags']['total'] = $v['total'];
   $vars[$p]['theme_variables']['tags']['first'] = $v['first'];
