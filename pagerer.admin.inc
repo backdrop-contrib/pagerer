@@ -41,7 +41,7 @@ function pagerer_settings_form($form, &$form_state) {
   );
 
   // List of the themes available for panes.
-  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_progressive', 'pagerer_adaptive');
+  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_slider', 'pagerer_progressive', 'pagerer_adaptive');
   $options = drupal_map_assoc($options);
 
   // Panes configuration.
@@ -212,6 +212,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
     $theme_rebuild = FALSE;
   }
 
+  // @todo has anything changed that requires saving? 
   // Set variable.
   $vars['pagerer_override_pager'] = $v['pagerer_override_pager'];
   $vars['pagerer_enable_adaptive'] = $v['pagerer_enable_adaptive'];
@@ -505,7 +506,7 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
     $default_theme_vars = $theme_registry[$theme]['variables'];
     $vars[$p]['theme_variables'] = $default_theme_vars;
     variable_set('pagerer', $vars);
-    drupal_set_message(t('The configuration has been reset to default theme variables.'), 'status');
+    drupal_set_message(t('The pane configuration has been reset to default %theme theme variables.', array('%theme' => $theme)), 'status');
     drupal_goto('admin/config/user-interface/pagerer/' . $pane);
   }
 

@@ -4,9 +4,11 @@ Drupal.Pagerer = {};
 
 Drupal.behaviors.pagerer = {
   attach: function(context, settings) {
-    // on document ready, adjust all the widths of pagerer-page to corresponding max
-    // width expected
+
+    // document ready
     $(document).ready(function(){
+      // adjust all the widths of pagerer-page to corresponding max
+      // width expected
       $('.pagerer-page').each(function(index) {
         var state = eval('(' + $(this).attr('name') + ');');
         $(this).width(String(state.total).length + 'em');

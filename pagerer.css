@@ -1,25 +1,35 @@
-table.pagerer,
+table.pagerer {
+	border: 0;
+	margin: 0.5em 0;
+	padding: 0;
+}
 table.pagerer tbody,
 table.pagerer tbody tr,
-table.pagerer tbody tr td,
-table.pagerer tbody tr td div,
-table.pagerer tbody tr td div ul,
-table.pagerer tbody tr td div li.pager-item,
-table.pagerer tbody tr td div li.pager-current,
-table.pagerer tbody tr td div li.pager-first,
-table.pagerer tbody tr td div li.pager-last,
-table.pagerer tbody tr td div li.pager-previous,
-table.pagerer tbody tr td div li.pager-next {
+table.pagerer tbody tr td {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+table.pagerer tbody tr td div.item-list,
+table.pagerer tbody tr td div.item-list ul.pager,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-current,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-last,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-previous,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
     list-style-type: none;
     list-style-image:none;
 	margin: 0;
-	border: 0;
 	padding: 0;
 	vertical-align: middle;
+	/*border: 1px dotted;*/		/* @todo remove */
 }
-table.pagerer {
-	margin: 0.5em 0;
-}
+/*table.pagerer tbody tr td div.item-list ul.pager li.pager-item.slider {
+	width: 300px;
+	height: 16px;
+	display: inline;
+}*/
 .pagerer-left .item-list .pager{
 	text-align: left;
 }
@@ -29,18 +39,44 @@ table.pagerer {
 .pagerer-right .item-list .pager{
 	text-align: right;
 }
+
+/* widget */
 .pagerer-page {
 	width: 1em;
 	text-align: center;
-	border: 1px;
-	border-color: black;
-	border-style: dotted;
+	border: 1px black dotted;
 	margin: 0;
 	padding: 0;
 }
 .pagerer-page-has-focus {
 	background-color: Gainsboro;
 }
+
+/* slider */
+table.pagerer-slider-container { 
+	width: 360px;
+	border: 1px dotted;
+	padding: 0;
+	margin: 0;
+}
+table.pagerer-slider-container tbody tr td { 
+	border: 1px dotted;
+	padding: 0;
+	margin: 0;
+}
+table.pagerer-slider-container .ui-icon { 
+}
+table.pagerer-slider-container .ui-slider { 
+	width: 300px;
+	margin-left : 10px;
+	margin-right : 10px;
+}
+.pagerer-slider-callout { 
+	position: absolute; 
+	top: -20px; 
+	text-align: center;
+}
+
 
 /* Admin */
 table.pagerer_admin_panes_config,
