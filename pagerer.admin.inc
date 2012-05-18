@@ -325,13 +325,13 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#description' => t('Select whether and where to render a text "label" element (e.g. "Page:"). Options are "none" (not displayed), "before_current" (in front of current page), "left" (left hand side), "right" (right hand side). The actual text rendered can be set via the "Label" tag.'),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('none', 'normal', 'widget'));
+  $options = drupal_map_assoc(array('none', 'normal', 'widget', 'slider'));
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
     '#title' =>  t('Current page'),
     '#options' =>  $options,
     '#default_value' => $v['current_display'],
-    '#description' => t('Select how the current page is rendered in the pager. Options are "none" (not displayed), "normal" (as a text), "widget" (an active input box from where users can enter directly a page to go to).'),
+    '#description' => t('Select how the current page is rendered in the pager. Options are "none" (not displayed), "normal" (as a text), "widget" (an active input box from where users can enter directly a page to go to), "slider" (as a slider).'),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('none', 'after_current', 'left', 'right'));

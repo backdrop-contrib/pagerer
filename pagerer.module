@@ -129,10 +129,15 @@ function pagerer_theme() {
         'tags'            => _pagerer_tags_merge_default('pagerer_slider'),
         'element'         => $common_theme['pager']['variables']['element'],
         'parameters'      => $common_theme['pager']['variables']['parameters'],
+        'quantity'        => $common_theme['pager']['variables']['quantity'],
         'display'         => 'pages',
         'label_display'   => 'before_current',
-        'current_display' => 'normal',
+        'current_display' => 'slider',
         'total_display'   => 'after_current',
+        'first_link'      => 'never',
+        'previous_link'   => 'never',
+        'next_link'       => 'never',
+        'last_link'       => 'never',
       ),
     ),
   );
@@ -592,24 +597,28 @@ function _pagerer_theme_handler($theme, $variables) {
         }
       }
       else {
-        list($pl, $pr, $px) = array(0, $m, NULL); 
+        list($pl, $pr, $px) = array(0, $m, NULL);
       }
       // First.
       $pages[0]['interval'] = -$c;
       $pages[0]['text'] = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['previous']);
+      $pages[0]['page_pl'] = 0;
+      $pages[0]['page_pr'] = $m;
       // Last.
       $pages[$m]['interval'] = $m - $c;
       $pages[$m]['text'] = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['next']);
+      $pages[$m]['page_pl'] = 0;
+      $pages[$m]['page_pr'] = $m;
       // Neighborhood.
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
-      // Left pointed page.
+      // Adaptive keys left pointed page.
       if (($pl > 0) and !isset($pages[$pl])) {
         $pages[$pl]['interval'] = -$markers['pager_current'] + $pl + 1;
         $pages[$pl]['text'] = _pagerer_get_page_text($variables, $markers, -$markers['pager_current'] + $pl + 1, $variables['tags']['previous_progr'], $variables['progr_links']);
         $pages[$pl]['progressive'] = TRUE;
       }
-      // Right pointed page.
-      if (($pr < $m)  and !isset($pages[$pr])) {
+      // Adaptive keys right pointed page.
+      if (($pr < $m) and !isset($pages[$pr])) {
         $pages[$pr]['interval'] = $pr - $markers['pager_current'] + 1;
         $pages[$pr]['text'] = _pagerer_get_page_text($variables, $markers, $pr - $markers['pager_current'] + 1, $variables['tags']['next_progr'], $variables['progr_links']);
         $pages[$pr]['progressive'] = TRUE;
@@ -636,7 +645,7 @@ function _pagerer_theme_handler($theme, $variables) {
               $ra = $kpages[$x];
               break;
             }
-          } 
+          }
         }
         // Set adaptive markers.
         for ($x = 1; $x < count($kpages) - 1; $x++) {
@@ -646,7 +655,7 @@ function _pagerer_theme_handler($theme, $variables) {
             $d['page_pl'] = $kpages[$x - 1];
             $d['page_pr'] = $kpages[$x + 1];
             continue;
-          } 
+          }
           // Else, neighborhood page.
           // Set left page and right page pointers.
           if (!is_null($px)) {
@@ -658,27 +667,21 @@ function _pagerer_theme_handler($theme, $variables) {
             $d['page_pr'] = !is_null($pr) ? $pr : $m;
           }
           // Set holding marker.
-          // @todo cleanup 
-          $off = NULL; 
+          $off = NULL;
           if ($kpages[$x] < $c) {
-            $off = $la ? $kpages[$x] - $la : NULL; 
+            $off = $la ? $kpages[$x] - $la : NULL;
           }
           else if ($kpages[$x] > $c) {
-            $off = $ra ? $ra - $kpages[$x] : NULL; 
+            $off = $ra ? $ra - $kpages[$x] : NULL;
           }
-          $pufft = NULL; 
           if ($off) {
-            if ($off <= $markers['pager_middle']) {
-              $pufft = 'puff'; 
-            }
-            else {
+            if ($off > $markers['pager_middle']) {
               $d['page_px'] = !is_null($px) ? $px : $c;
             }
           }
           else {
             $d['page_px'] = !is_null($px) ? $px : $c;
           }
-          //$output .= "Page: $kpages[$x] la=$la ra=$ra off=$off $pufft<br/>"; 
         }
       }
     case 'pagerer_progressive':
@@ -700,21 +703,17 @@ function _pagerer_theme_handler($theme, $variables) {
       ksort($pages);
       break;
     case 'pagerer_mini':
+    case 'pagerer_slider':
       // Current.
       $pages[$c]['interval'] = 0;
       $pages[$c]['text'] = _pagerer_get_page_text($variables, $markers, 0);
-      break;
-    case 'pagerer_slider':
-      $pages[$c]['interval'] = 0;
-      $pages[$c]['text'] = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-      //return _pagerer_slider($variables, $markers);
       break;
     case 'pagerer_standard':
     default:
       // Neighborhood.
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
   }
- 
+
   // Compose pager.
   $items = array();
   // 1 - Left.
@@ -739,18 +738,6 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 3 - Pages.
   $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, ($theme == 'pagerer_mini' ? FALSE : TRUE)));
-  /* @todo below remove slider stuff
-  
-    switch ($theme) {
-    case 'pagerer_slider':
-      $items[] = array(
-        'class' => array('pager-item', 'slider'),
-        'data' => _pagerer_slider($variables, $markers),
-      );
-      break;
-    default:
-      $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, ($theme == 'pagerer_mini' ? FALSE : TRUE)));
-  }*/
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
     $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
@@ -1056,7 +1043,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'element' => $variables['element'],
               'interval' => -$page_data['interval'],
               'parameters' => $variables['parameters'],
-              // @todo formatting 
+              // @todo formatting
               'attributes' => array('title' => t('Go to page @number', array('@number' => $page + 1))),
             )
           ),
@@ -1077,6 +1064,12 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
             $items[] = array(
               'class' => array('pager-current'),
               'data' => _pagerer_widget($variables, $markers),
+            );
+            break;
+          case 'slider':
+            $items[] = array(
+              'class' => array('pager-item'),
+              'data' => _pagerer_slider($variables, $markers),
             );
             break;
           case 'normal':
@@ -1116,7 +1109,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         $items[] = array(
           'class' => array('pager-item'),
           'data' => theme(
-            'pager_link',     
+            'pager_link',
             array(
               'text' => $text,
               'page_new' => $page_new,
@@ -1124,7 +1117,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'interval' => $page_data['interval'],
               'parameters' => $variables['parameters'],
               // @todo formatting
-              'attributes' => array('title' => t('Go to page @number', array('@number' => $page + 1))), 
+              'attributes' => array('title' => t('Go to page @number', array('@number' => $page + 1))),
             )
           ),
         );
@@ -1355,17 +1348,35 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
 function _pagerer_widget($variables, $markers) {
   global $pager_page_array, $pager_limits;
   $vars = _pagerer_get_variables();
+  $c = $markers['pager_current'] - 1;
+  $m = $markers['pager_max'] - 1;
 
   // Add pagerer js.
   drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
 
-  // Prepare query parameters, overriding current 'page' with a text that
-  // the js widget will replace with the content of HTML 'value' attribute.
-  $c = $markers['pager_current'] - 1;
+  // Prepare query parameters.
+
+  // 'page' querystring fragment, overriding current 'page' with a text 
+  // that the js widget will then replace with the content of HTML 'value' 
+  // attribute.
   $page_new = pager_load_array($c, $variables['element'], $pager_page_array);
   $page_new[$variables['element']] = 'pagererpage';
+  ksort($page_new);
   $variables['parameters']['page'] = implode(',', $page_new);
-  $query_parameters = $vars['pagerer_enable_adaptive'] ? _pagerer_get_query_parameters() : pager_get_query_parameters();
+
+  // Querystring parameters from url.
+  $query_parameters = drupal_get_query_parameters();
+
+  // Adaptive keys 'page_ak' querystring fragment, if existing.
+  if (isset($query_parameters['page_ak'])) {
+    $aksa = explode(',', $query_parameters['page_ak']);
+    if (isset($aksa[$variables['element']])) {
+      $aksa = _pagerer_load_ak_array("0.$m", $variables['element'], $aksa);
+    }
+    $variables['parameters']['page_ak'] = implode(',', $aksa);
+  }
+  
+  // Any other parameter gets appended here.
   $variables['parameters'] += $query_parameters;
 
   // Are we displaying pages or items; 'value' HTML attribute will bear
@@ -1393,15 +1404,16 @@ function _pagerer_widget($variables, $markers) {
     $query += $variables['parameters'];
     $path = '?' . drupal_http_build_query($query);
   }
-  // @todo doesnt work with multiple lements
-  // Prepare js wdget state and title.
+  // Prepare js widget state and title.
   $state = drupal_json_encode(array(
+    'root'     => url(NULL, array('absolute' => TRUE,) ),
     'path'     => $path,
     'element'  => $variables['element'],
     'total'    => $total,
     'interval' => $interval,
     'display'  => $variables['display'],
   ));
+  // @todo parameterise
   $title = t('Set @text number to go to, then press enter', array('@text' => $text));
   return "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />";
 }
@@ -1409,21 +1421,37 @@ function _pagerer_widget($variables, $markers) {
 function _pagerer_slider($variables, $markers) {
   global $pager_page_array, $pager_limits;
   $vars = _pagerer_get_variables();
+  $c = $markers['pager_current'] - 1;
+  $m = $markers['pager_max'] - 1;
 
   // Add ui.slider library.
   drupal_add_library('system', 'ui.slider');
   // Add Pagerer js.
   drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
-  // Add Pagerer css.
-  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
 
-  // Prepare query parameters, overriding current 'page' with a text that
-  // the js widget will replace with the content of HTML 'value' attribute.
-  $c = $markers['pager_current'] - 1;
+  // Prepare query parameters.
+
+  // 'page' querystring fragment, overriding current 'page' with a text 
+  // that the js widget will then replace with the content of HTML 'value' 
+  // attribute.
   $page_new = pager_load_array($c, $variables['element'], $pager_page_array);
   $page_new[$variables['element']] = 'pagererpage';
+  ksort($page_new);
   $variables['parameters']['page'] = implode(',', $page_new);
-  $query_parameters = $vars['pagerer_enable_adaptive'] ? _pagerer_get_query_parameters() : pager_get_query_parameters();
+
+  // Querystring parameters from url.
+  $query_parameters = drupal_get_query_parameters();
+
+  // Adaptive keys 'page_ak' querystring fragment, if existing.
+  if (isset($query_parameters['page_ak'])) {
+    $aksa = explode(',', $query_parameters['page_ak']);
+    if (isset($aksa[$variables['element']])) {
+      $aksa = _pagerer_load_ak_array("0.$m", $variables['element'], $aksa);
+    }
+    $variables['parameters']['page_ak'] = implode(',', $aksa);
+  }
+  
+  // Any other parameter gets appended here.
   $variables['parameters'] += $query_parameters;
 
   // Are we displaying pages or items; 'value' HTML attribute will bear
@@ -1451,18 +1479,20 @@ function _pagerer_slider($variables, $markers) {
     $query += $variables['parameters'];
     $path = '?' . drupal_http_build_query($query);
   }
-  // Prepare js slider state and title.
   $state = drupal_json_encode(array(
+    'root'     => url(NULL, array('absolute' => TRUE,) ),
     'path'     => $path,
     'element'  => $variables['element'],
     'total'    => $total,
     'current'  => $current,
     'interval' => $interval,
     'display'  => $variables['display'],
-    'label_t'  => $variables['tags']['label'],
-    'total_t'  => $variables['tags']['total'],
   ));
   $title = t('Set @text number to go to, then press enter', array('@text' => $text));
+  $output = "<span class=\"pagerer-slider\" id='$state'><span class='zsa'>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></span>";
+
+
+/*
   //<div title='.ui-icon-circle-minus' class='ui-state-default ui-corner-all'></div>
   //<div title='.ui-icon-circle-plus' class='ui-state-default ui-corner-all'></div>
 //    <div class='pagerer-slider-item'>Page&nbsp</div>
@@ -1473,7 +1503,7 @@ function _pagerer_slider($variables, $markers) {
     <div class='ui-icon ui-icon-circle-minus'></div>
     <div class='pagerer-slider' title='$title' id='$state'></div>
     <div class='ui-icon ui-icon-circle-plus'></div>
-  </span>"; 
+  </span>";
 
   $row = array(
     'data' => array(
@@ -1482,7 +1512,7 @@ function _pagerer_slider($variables, $markers) {
 //      "<div class='pagerer-slider' title='$title' id='$state'></div>",
 //      "<div class='ui-icon ui-icon-circle-plus'></div>",
       "<div class='ui-icon ui-icon-circle-minus'></div>" .
-      "<div class='pagerer-slider' title='$title' id='$state'></div>" . 
+      "<div class='pagerer-slider' title='$title' id='$state'></div>" .
       "<div class='ui-icon ui-icon-circle-plus'></div>",
       "of 4",
     ),
@@ -1497,39 +1527,20 @@ function _pagerer_slider($variables, $markers) {
       'sticky'     => FALSE,
       'empty'      => NULL,
     )
-  );
+  );*/
 
   return $output;
-}
-
-/**
- * Pagerer alternative to standard pager_get_query_parameters()
- *
- * Needed as theme_pagerer_adaptive() requires additional paging parameters
- * in the querystring, that pager_get_query_parameters() can not handle.
- *
- * Maybe this could be dropped if Drupal core is changed to include passed 
- * parameters in pager_get_query_parameters().
- */
-function _pagerer_get_query_parameters() {
-  $query = &drupal_static(__FUNCTION__);
-  if (!isset($query)) {
-    $query = drupal_get_query_parameters($_GET, array('q', 'page', 'page_ak'));
-  }
-  return $query;
 }
 
 /**
  * Override of standard theme_pager_link()
  *
  * Needed as theme_pagerer_adaptive() handles additional paging parameters
- * in the querystring, masked by calling _pagerer_get_query_parameters()
- * instead of standard pager_get_query_parameters(). The standard function
- * would override the 'page_ak' portion of the querystring from the url 
- * which is not acceptable as pagerer has to change it.
+ * in the querystring. The standard function would override the 'page_ak' 
+ * portion of the querystring from the url which is not acceptable as pagerer 
+ * has to change it programmatically.
  *
- * Maybe this could be dropped if Drupal core is changed to include passed 
- * parameters in pager_get_query_parameters().
+ * @see http://drupal.org/node/1588138
  */
 function _pagerer_override_theme_pager_link($variables) {
   $text = $variables['text'];
@@ -1547,8 +1558,9 @@ function _pagerer_override_theme_pager_link($variables) {
   if (count($parameters)) {
     $query = drupal_get_query_parameters($parameters, array());
   }
-  if ($query_pager = _pagerer_get_query_parameters()) {     
-    $query = array_merge($query, $query_pager);
+  if ($query_pager = pager_get_query_parameters()) {
+    // @see http://drupal.org/node/1588138
+    $query = array_merge($query_pager, $query);     
   }
 
   // Set each pager link title.
@@ -1601,7 +1613,7 @@ function _pagerer_get_variables() {
 }
 
 function _pagerer_load_ak_array($value, $element, $old_array) {
-  $new_array = $old_array; 
+  $new_array = $old_array;
   // Look for empty elements.
   for ($i = 0; $i < $element; $i++) {
     if (empty($new_array[$i])) {
