@@ -23,8 +23,16 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	margin: 0;
 	padding: 0.1em 0 0 0;
 	vertical-align: middle;
-	/*border: 1px dotted;		/* @todo remove */
 }
+/* @todo remove */
+/*table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-current,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-last,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-previous,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
+	border: 1px dotted;		
+}*/
 .pagerer-left .item-list .pager{
 	text-align: left;
 }
@@ -47,13 +55,14 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 }
 
 /* slider widget */
-/*div.pagerer-slider{
-	display: inline;
-}
-table.pagerer tbody tr td div.item-list ul.pager li.pager-item  div.ui-icon{
-	display: inline;
-	width: 16px;
-}*/ 
+div.pagerer-slider {
+	display: inline-block;
+	vertical-align: text-top;
+} 
+div.pagerer-slider-icon {
+	display: inline-block;
+	vertical-align: text-bottom;
+} 
 
 /* Admin */
 table.pagerer_admin_panes_config,

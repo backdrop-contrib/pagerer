@@ -209,10 +209,7 @@ function _pagerer_theme_override_safe($theme_registry, $theme, $function, $modul
   }
   else {
     drupal_set_message(
-      t(
-        'The "!theme" theme is currently overriden by "!function" from "!path". ' .
-        'Remove overrides to Drupal core pager themes by disabling affecting modules/templates ' .
-        'to enable Pagerer.',
+      t('The "!theme" theme is currently overriden by "!function" from "!path". Remove overrides to Drupal core pager themes by disabling affecting modules/templates to enable Pagerer.',
         array(
           '!theme'    => $theme,
           '!function' => isset($theme_registry[$theme]['function']) ? $theme_registry[$theme]['function'] . '()' : $theme_registry[$theme]['template'] . '.tpl.php',
@@ -639,17 +636,17 @@ function _pagerer_theme_handler($theme, $variables) {
   $m = $markers['pager_max'] - 1;
   switch ($theme) {
     case 'pagerer_adaptive':
-      global $pagerer_ak_array;
+      global $_pagerer_ak_array;
       // Initialise array of adaptive keys.
-      if (!isset($pagerer_ak_array)) {
-        $pagerer_ak_array = array();
+      if (!isset($_pagerer_ak_array)) {
+        $_pagerer_ak_array = array();
       }
       // Determine adaptive keys coming from query parameters.
       $qps = drupal_get_query_parameters();
       if (isset($qps['page_ak'])) {
         $aksa = explode(',', $qps['page_ak']);
         if (isset($aksa[$variables['element']])) {
-          $pagerer_ak_array[$variables['element']] = $aksa[$variables['element']];
+          $_pagerer_ak_array[$variables['element']] = $aksa[$variables['element']];
           $tmp = explode('.', $aksa[$variables['element']]);
           $pl = $tmp[0];
           $pr = $tmp[1];
@@ -731,7 +728,7 @@ function _pagerer_theme_handler($theme, $variables) {
           if ($kpages[$x] < $c) {
             $off = $la ? $kpages[$x] - $la : NULL;
           }
-          else if ($kpages[$x] > $c) {
+          elseif ($kpages[$x] > $c) {
             $off = $ra ? $ra - $kpages[$x] : NULL;
           }
           if ($off) {
@@ -1036,7 +1033,7 @@ function _pagerer_itemize_last_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers = TRUE) {
-  global $pager_page_array, $pagerer_ak_array;
+  global $pager_page_array, $_pagerer_ak_array;
 
   $element = $variables['element'];
   $c = $markers['pager_current'] - 1;
@@ -1062,9 +1059,9 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
           );
         }
       }
-      // If on first link, but current page is not first, introduce a
-      // breaker before the new link.
       elseif ($page <> 0 and $fl_breakers) {
+        // If on first link, but current page is not first, introduce a
+        // breaker before the new link.
         $items[] = array(
           'class' => array('pager-item'),
           'data' => $variables['tags']['pager_breaker'],
@@ -1073,8 +1070,8 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       // Sets previous page.
       $previous_page = $page;
       $text = $page_data['text'];
-      // Link to page before the current.
       if ($page_data['interval'] < 0) {
+        // Link to page before the current.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
             $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
@@ -1088,7 +1085,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         }
         $page_new = pager_load_array($page, $element, $pager_page_array);
         if ($aks) {
-          $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $pagerer_ak_array));
+          $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
         else {
           unset($variables['parameters']['page_ak']);
@@ -1109,8 +1106,8 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
           ),
         );
       }
-      // Link to current page.
       elseif ($page_data['interval'] == 0) {
+        // Link to current page.
         if ($variables['label_display'] == 'before_current') {
           $items[] = array(
             'class' => array('pager-item'),
@@ -1138,8 +1135,8 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
           );
         }
       }
-      // Link to page after the current.
       elseif ($page_data['interval'] > 0) {
+        // Link to page after the current.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
             $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
@@ -1153,7 +1150,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         }
         $page_new = pager_load_array($page, $element, $pager_page_array);
         if ($aks) {
-          $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $pagerer_ak_array));
+          $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
         else {
           unset($variables['parameters']['page_ak']);
@@ -1262,7 +1259,7 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
   $offset = 0;
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
-  for ($i = 0;; $i++) {
+  for ($i = 0; ; $i++) {
     // Breaks if limit reached.
     if ($limit and $i > $limit - 1) {
       break;
@@ -1431,7 +1428,6 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
 
   // Prepare query parameters.
-
   // 'page' querystring fragment, overriding current 'page' with a text
   // that the js widget will then replace with the content of HTML 'value'
   // attribute.
@@ -1471,12 +1467,12 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     $text = t('item');
   }
 
-  // Clean urls.
   if (!empty($GLOBALS['conf']['clean_url'])) {
+    // Clean urls.
     $path = $_GET['q'] . '?' . drupal_http_build_query($variables['parameters']);
   }
-  // No clean urls.
   else {
+    // No clean urls.
     $query = array('q' => $_GET['q']);
     $query += $variables['parameters'];
     $path = '?' . drupal_http_build_query($query);
@@ -1484,9 +1480,10 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
   // Prepare js widget state and title.
   $state = drupal_json_encode(array(
-    'root'     => url(NULL, array('absolute' => TRUE,) ),
+    'root'     => url(NULL, array('absolute' => TRUE)),
     'path'     => $path,
     'element'  => $variables['element'],
+    'quantity' => $variables['quantity'],
     'total'    => $total,
     'current'  => $current,
     'interval' => $interval,
@@ -1496,8 +1493,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   $items = array();
   switch ($element_type) {
     case 'widget':
-      // @todo parameterise
-      $title = t('Set @text number to go to, then press enter', array('@text' => $text));
+      $title = t('Enter @text, and press <Return>.', array('@text' => $text));
       $items[] = array(
         'class' => array('pager-current'),
         'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
@@ -1506,79 +1502,24 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     case 'slider':
       // Add ui.slider library.
       drupal_add_library('system', 'ui.slider');
-      $title = t('Set @text number to go to, then press enter', array('@text' => $text));
-      $filler = str_repeat("&nbsp", $variables['quantity'] * 10);
-      
-      $xdata =  "<div class='pppppp' style='display:online'>" .
-                "<div class='ui-icon ui-icon-circle-minus' style='float:left'/>" .
-                "<div class='pagerer-slider' id='$state' title='$title' style='float:left'>$filler</div>" .
-                "<div class='ui-icon ui-icon-circle-plus'/>" .
-                "</div>";
-                
       $items[] = array(
         'class' => array('pager-item'),
-        'data' => "<div class='ui-icon ui-icon-circle-minus' style='float:left'></div>",
+        'data' => "<div class='pagerer-slider-icon ui-icon ui-icon-circle-minus'/>",
+      );
+      $title = t('Drag slider to the @text, then double click.', array('@text' => $text));
+      $items[] = array(
+        'class' => array('pager-item'),
+        'data' => "<div class='pagerer-slider' id='$state' title='$title'/>",
       );
       $items[] = array(
         'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider' id='$state' title='$title' style='float:left'>$filler</div>",
-      );
-      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => "<div class='ui-icon ui-icon-circle-plus'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</div>", 
-      );
-/*      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => $xdata,
-      );*/
-      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => $variables['tags']['pager_separator'],
+        'data' => "<div class='pagerer-slider-icon ui-icon ui-icon-circle-plus'/>",
       );
       break;
   }
-      
+
   return $items;
 }
-
-
-/*
-  //<div title='.ui-icon-circle-minus' class='ui-state-default ui-corner-all'></div>
-  //<div title='.ui-icon-circle-plus' class='ui-state-default ui-corner-all'></div>
-//    <div class='pagerer-slider-item'>Page&nbsp</div>
-
-
-
-  $output = "x<span class='pagerer-slider-container'>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    <div class='ui-icon ui-icon-circle-minus'></div>
-    <div class='pagerer-slider' title='$title' id='$state'></div>
-    <div class='ui-icon ui-icon-circle-plus'></div>
-  </span>";
-
-  $row = array(
-    'data' => array(
-      "page",
-//      "<div class='ui-icon ui-icon-circle-minus'></div>",
-//      "<div class='pagerer-slider' title='$title' id='$state'></div>",
-//      "<div class='ui-icon ui-icon-circle-plus'></div>",
-      "<div class='ui-icon ui-icon-circle-minus'></div>" .
-      "<div class='pagerer-slider' title='$title' id='$state'></div>" .
-      "<div class='ui-icon ui-icon-circle-plus'></div>",
-      "of 4",
-    ),
-    'no_striping' => TRUE,
-  );
-  $output = theme_table(array(
-      'header'     => array(),
-      'rows'       => array($row),
-      'attributes' => array('class' => array('pagerer-slider-container')),
-      'caption'    => NULL,
-      'colgroups'  => NULL,
-      'sticky'     => FALSE,
-      'empty'      => NULL,
-    )
-  );*/
-
 
 /**
  * Override of standard theme_pager_link()
@@ -1660,6 +1601,12 @@ function _pagerer_get_variables() {
   return $vars;
 }
 
+/**
+ * Helper function
+ *
+ * Copies $old_array to $new_array and sets $new_array[$element] = $value
+ * Fills in $new_array[0 .. $element - 1] = NULL
+ */
 function _pagerer_load_ak_array($value, $element, $old_array) {
   $new_array = $old_array;
   // Look for empty elements.

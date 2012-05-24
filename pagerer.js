@@ -77,16 +77,17 @@ Drupal.behaviors.pagerer = {
     // slider event binding
     $('.pagerer-slider', context)
     .bind('slidecreate', function(e, ui) {
-      var sliderHeight = $(this).height();
+      //var sliderHeight = $(this).height();
       //alert(sliderHeight);
       var state = eval('(' + $(this).attr('id') + ');');
       $(this).slider("option", "max", state.total);
       $(this).slider("option", "value", state.current);
+	  $(this).width((state.quantity * 3) + 'em');
       var handleEmWidth = String(state.total).length;
       var sliderHandle = $(this).find(".ui-slider-handle");
       //sliderHandle.css('top', '-2em');
-      sliderHandle.css('top', '-4px');
-      sliderHandle.height((sliderHeight + 6) + 'px');
+      //sliderHandle.css('top', '-4px');
+      //sliderHandle.height((sliderHeight + 6) + 'px');
       sliderHandle.width(handleEmWidth + 'em');
       $(this).css('margin-left', sliderHandle.width() / 2);
       $(this).css('margin-right', sliderHandle.width() / 2);
@@ -102,6 +103,23 @@ Drupal.behaviors.pagerer = {
     .bind('slidechange', function(e, ui) {
       $(this).find(".ui-slider-handle").text(ui.value);
     })
+	
+    // @todo check limits
+    $('.ui-icon-circle-minus', context)
+    .bind('mousedown', function(e) {
+	  var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      var xx = pSlider.slider("option", "value") - 1;
+      pSlider.slider("option", "value", xx);
+    });
+    // @todo check limits
+    $('.ui-icon-circle-plus', context)
+    .bind('mousedown', function(e) {
+	  var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      var xx = pSlider.slider("option", "value") + 1;
+      pSlider.slider("option", "value", xx);
+    });
+	
+	
   }
 };
 
