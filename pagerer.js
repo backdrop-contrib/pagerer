@@ -7,6 +7,7 @@ Drupal.behaviors.pagerer = {
 
     // document ready
     $(document).ready(function(){
+
       // adjust all the widths of pagerer-page to corresponding max
       // width expected
       $('.pagerer-page').each(function(index) {
@@ -14,20 +15,12 @@ Drupal.behaviors.pagerer = {
         $(this).width(String(state.total).length + 'em');
       });
 
-      
       // initiate slider
       $('.pagerer-slider').each(function(index) {
-//        var state = eval('(' + $(this).attr('name') + ');');
-//alert($(this).css('width'));  
-		$(this).find('.zsa').css("visibility", "hidden");  
-		//$(this).find('.zsa').hide();  
-		$(this).slider({ min : 1, step : 1, range : 'min', animate: true });
-//        $(this).text('wwwwwwwwwwwwwwwww')
+        $(this).slider({ min : 1, step : 1, range : 'min', animate: true });
       });
-      
-      
-    });
 
+    });
 
     // pagerer-page event binding
     $(".pagerer-page", context)
@@ -39,20 +32,19 @@ Drupal.behaviors.pagerer = {
       $(this).removeClass('pagerer-page-has-focus');
     })
     .bind('keydown', function(e) {
+      var state = eval('(' + $(this).attr('name') + ');');
       switch(e.keyCode) {
         case 13:
         case 10:   // iPhone <return>
-          var self = $(this);
-          var state = eval('(' + self.attr('name') + ');');
           if (state.display == 'pages') {
-            var page = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
+            var page = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
             if (page < 0) {
               page = 0;
             } else if (page >= state.total) {
               page = state.total - 1;
             }
           } else {
-            var item = isNaN(self.val()) ? 0 : parseInt(self.val()) - 1;
+            var item = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
             if (item < 0) {
               item = 0;
             } else if (item >= state.total) {
@@ -60,10 +52,7 @@ Drupal.behaviors.pagerer = {
             }
             page = parseInt(item / parseInt(state.interval));
           }
-          var viewContext = Drupal.Pagerer.getAjaxViewContext(this);
-          if (viewContext) {                // Views
-            Drupal.Pagerer.doAjaxView(self.next(), page, viewContext);
-          } else if (window.Drupal.overlayChild) {    // Drupal admin overlay
+          if (window.Drupal.overlayChild) {    // Drupal admin overlay
             window.parent.jQuery.bbq.pushState({'overlay': state.path.replace(/pagererpage/, page)});
           } else {                    // Normal page
             document.location = state.root + state.path.replace(/pagererpage/, page);
@@ -71,27 +60,41 @@ Drupal.behaviors.pagerer = {
           e.preventDefault();
           return false;
         case 38:    // up key
-          Drupal.Pagerer.pageStep(this, -1);
+          Drupal.Pagerer.pageStep(this, state, -1);
           return true;
         case 40:    // down key
-          Drupal.Pagerer.pageStep(this, 1);
+          Drupal.Pagerer.pageStep(this, state, 1);
           return true;
         case 33:    // page up
-          Drupal.Pagerer.pageStep(this, -5);
+          Drupal.Pagerer.pageStep(this, state, -5);
           return true;
         case 34:    // page down
-          Drupal.Pagerer.pageStep(this, 5);
+          Drupal.Pagerer.pageStep(this, state, 5);
           return true;
       }
     });
-    
+
     // slider event binding
     $('.pagerer-slider', context)
     .bind('slidecreate', function(e, ui) {
+      var sliderHeight = $(this).height();
+      //alert(sliderHeight);
       var state = eval('(' + $(this).attr('id') + ');');
       $(this).slider("option", "max", state.total);
       $(this).slider("option", "value", state.current);
-      $(this).find(".ui-slider-handle").text(state.current);
+      var handleEmWidth = String(state.total).length;
+      var sliderHandle = $(this).find(".ui-slider-handle");
+      //sliderHandle.css('top', '-2em');
+      sliderHandle.css('top', '-4px');
+      sliderHandle.height((sliderHeight + 6) + 'px');
+      sliderHandle.width(handleEmWidth + 'em');
+      $(this).css('margin-left', sliderHandle.width() / 2);
+      $(this).css('margin-right', sliderHandle.width() / 2);
+      sliderHandle.css('margin-left', -sliderHandle.width() / 2);
+      sliderHandle.css('text-align', 'center');
+      sliderHandle.css('line-height', sliderHandle.height() + 'px');
+      //alert(sliderHandle.height());
+      //$(this).find(".ui-slider-handle").append("<span class='mytext'>xxx</span>" );
     })
     .bind('slide', function(e, ui) {
       $(this).find(".ui-slider-handle").text(ui.value);
@@ -99,108 +102,18 @@ Drupal.behaviors.pagerer = {
     .bind('slidechange', function(e, ui) {
       $(this).find(".ui-slider-handle").text(ui.value);
     })
-  
-    // patch up first/previous/next/last link title attribute
-    // if they are not set.
-    $(".pager .pager-first a", context).each(function(){
-      if (!this.title) {
-        this.title = Drupal.t("Go to first page");
-      }
-    });
-    $(".pager .pager-previous a", context).each(function(){
-      if (!this.title) {
-        this.title = Drupal.t("Go to previous page");
-      }
-    });
-    $(".pager .pager-next a", context).each(function(){
-      if (!this.title) {
-        this.title = Drupal.t("Go to next page");
-      }
-    });
-    $(".pager .pager-last a", context).each(function(){
-      if (!this.title) {
-        this.title = Drupal.t("Go to last page");
-      }
-    });
   }
 };
 
-Drupal.Pagerer.getAjaxViewContext = function(element) {
-  if (Drupal.settings && Drupal.settings.views && Drupal.settings.views.ajaxViews) {
-    for (i = 0 ; i < Drupal.settings.views.ajaxViews.length ; ++i) {
-      var view = '.view-dom-id-' + Drupal.settings.views.ajaxViews[i].view_dom_id;
-      var viewDiv = $(element).parents(view);
-      if (viewDiv.size()) {
-        return { target: viewDiv.get(0), settings: Drupal.settings.views.ajaxViews[i] };
-      }
-    }
-    return false;
-  } else {
-    return false;
-  }
-};
-
-Drupal.Pagerer.doAjaxView = function(throbberElement, page, viewContext) {
-  throbberElement.addClass('views-throbbing');
-  var viewData = { 'js': 1, 'page': page };
-  $.extend(
-    viewData,
-    viewContext.settings
-  );
-  var target = viewContext.target;
-  //
-  // copy from views/js/ajax_view.js
-  //
-  var ajax_path = Drupal.settings.views.ajax_path;
-  // If there are multiple views this might've ended up showing up multiple times.
-  if (ajax_path.constructor.toString().indexOf("Array") != -1) {
-    ajax_path = ajax_path[0];
-  }
-  $.ajax({
-    path: ajax_path,
-    type: 'GET',
-    data: viewData,
-    success: function(response) {
-      throbberElement.removeClass('views-throbbing');
-      // Scroll to the top of the view. This will allow users
-      // to browse newly loaded content after e.g. clicking a pager
-      // link.
-      var offset = $(target).offset();
-      // We can't guarantee that the scrollable object should be
-      // the body, as the view could be embedded in something
-      // more complex such as a modal popup. Recurse up the DOM
-      // and scroll the first element that has a non-zero top.
-      var scrollTarget = target;
-      while ($(scrollTarget).scrollTop() == 0 && $(scrollTarget).parent()) {
-        scrollTarget = $(scrollTarget).parent()
-      }
-      // Only scroll upward
-      if (offset.top - 10 < $(scrollTarget).scrollTop()) {
-        $(scrollTarget).animate({scrollTop: (offset.top - 10)}, 500);
-      }
-      // Call all callbacks.
-      if (response.__callbacks) {
-        $.each(response.__callbacks, function(i, callback) {
-          eval(callback)(target, response);
-        });
-      }
-    },
-    error: function(xhr) { throbberElement.removeClass('views-throbbing'); Drupal.Views.Ajax.handleErrors(xhr, ajax_path); },
-    dataType: 'json'
-  });
-};
-
-Drupal.Pagerer.pageStep = function(el, step) {
-  var self = $(el);
-  var state = eval('(' + self.attr('name') + ');');
-  var page = isNaN(self.val()) ? 1 : parseInt(self.val());
+Drupal.Pagerer.pageStep = function(el, state, step) {
+  var page = isNaN($(el).val()) ? 1 : parseInt($(el).val());
   page += step * state.interval;
   if (page < 1) {
     page = 1;
   } else if (page > state.total){
     page = state.total;
   }
-  self.val(page);
+  $(el).val(page);
 };
 
 })(jQuery);

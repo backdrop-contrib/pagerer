@@ -21,15 +21,10 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
     list-style-type: none;
     list-style-image:none;
 	margin: 0;
-	padding: 0;
+	padding: 0.1em 0 0 0;
 	vertical-align: middle;
-	/*border: 1px dotted;*/		/* @todo remove */
+	/*border: 1px dotted;		/* @todo remove */
 }
-/*table.pagerer tbody tr td div.item-list ul.pager li.pager-item.slider {
-	width: 300px;
-	height: 16px;
-	display: inline;
-}*/
 .pagerer-left .item-list .pager{
 	text-align: left;
 }
@@ -40,9 +35,8 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	text-align: right;
 }
 
-/* widget */
+/* page widget */
 .pagerer-page {
-	width: 1em;
 	text-align: center;
 	border: 1px black dotted;
 	margin: 0;
@@ -52,35 +46,18 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	background-color: Gainsboro;
 }
 
-/* slider */
-table.pagerer-slider-container { 
-	width: 360px;
-	border: 1px dotted;
-	padding: 0;
-	margin: 0;
+/* slider widget */
+/*div.pagerer-slider{
+	display: inline;
 }
-table.pagerer-slider-container tbody tr td { 
-	border: 1px dotted;
-	padding: 0;
-	margin: 0;
-}
-table.pagerer-slider-container .ui-icon { 
-}
-table.pagerer-slider-container .ui-slider { 
-	width: 300px;
-	margin-left : 10px;
-	margin-right : 10px;
-}
-.pagerer-slider-callout { 
-	position: absolute; 
-	top: -20px; 
-	text-align: center;
-}
-
+table.pagerer tbody tr td div.item-list ul.pager li.pager-item  div.ui-icon{
+	display: inline;
+	width: 16px;
+}*/ 
 
 /* Admin */
 table.pagerer_admin_panes_config,
-table.pagerer_admin_panes_config tbody, 
+table.pagerer_admin_panes_config tbody,
 table.pagerer_admin_panes_config tbody tr,
 table.pagerer_admin_panes_config tbody tr td {
 	margin: 0;
