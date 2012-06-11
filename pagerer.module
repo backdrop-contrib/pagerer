@@ -1259,7 +1259,7 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
   $offset = 0;
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
-  for ($i = 0; ; $i++) {
+  for ($i = 0; TRUE; $i++) {
     // Breaks if limit reached.
     if ($limit and $i > $limit - 1) {
       break;

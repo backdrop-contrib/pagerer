@@ -1,4 +1,17 @@
-table.pagerer {
+/**
+ * @file
+ *
+ * Pagerer
+ *
+ * A collection of pager themes to enhance Drupal standard pager.
+ *
+ * Drupal core 7.x
+ *
+ * @package  User interface
+ * @author   mondrake <mondrake@mondrake.org>
+ */
+
+ table.pagerer {
 	border: 0;
 	margin: 0.5em 0;
 	padding: 0;
@@ -24,15 +37,6 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	padding: 0.1em 0 0 0;
 	vertical-align: middle;
 }
-/* @todo remove */
-/*table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-current,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-last,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-previous,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
-	border: 1px dotted;		
-}*/
 .pagerer-left .item-list .pager{
 	text-align: left;
 }
@@ -43,7 +47,7 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	text-align: right;
 }
 
-/* page widget */
+/* pagerer-page widget */
 .pagerer-page {
 	text-align: center;
 	border: 1px black dotted;
@@ -54,10 +58,12 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
 	background-color: Gainsboro;
 }
 
-/* slider widget */
+/* pagerer-slider widget */
 div.pagerer-slider {
 	display: inline-block;
-	vertical-align: text-top;
+} 
+div.pagerer-slider  .ui-slider-handle {
+	text-align: center;
 } 
 div.pagerer-slider-icon {
 	display: inline-block;

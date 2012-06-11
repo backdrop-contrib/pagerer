@@ -1,6 +1,6 @@
 (function ($) {
 
-Drupal.Pagerer = {};
+Drupal.pagerer = {};
 
 Drupal.behaviors.pagerer = {
   attach: function(context, settings) {
@@ -52,78 +52,106 @@ Drupal.behaviors.pagerer = {
             }
             page = parseInt(item / parseInt(state.interval));
           }
-          if (window.Drupal.overlayChild) {    // Drupal admin overlay
-            window.parent.jQuery.bbq.pushState({'overlay': state.path.replace(/pagererpage/, page)});
-          } else {                    // Normal page
-            document.location = state.root + state.path.replace(/pagererpage/, page);
-          }
+          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, page));
           e.preventDefault();
           return false;
         case 38:    // up key
-          Drupal.Pagerer.pageStep(this, state, -1);
+          Drupal.pagerer.pageStep(this, state, -1);
           return true;
         case 40:    // down key
-          Drupal.Pagerer.pageStep(this, state, 1);
+          Drupal.pagerer.pageStep(this, state, 1);
           return true;
         case 33:    // page up
-          Drupal.Pagerer.pageStep(this, state, -5);
+          Drupal.pagerer.pageStep(this, state, -5);
           return true;
         case 34:    // page down
-          Drupal.Pagerer.pageStep(this, state, 5);
+          Drupal.pagerer.pageStep(this, state, 5);
           return true;
       }
     });
 
-    // slider event binding
+    // pagerer-slider event binding
     $('.pagerer-slider', context)
     .bind('slidecreate', function(e, ui) {
-      //var sliderHeight = $(this).height();
-      //alert(sliderHeight);
       var state = eval('(' + $(this).attr('id') + ');');
-      $(this).slider("option", "max", state.total);
-      $(this).slider("option", "value", state.current);
-	  $(this).width((state.quantity * 3) + 'em');
-      var handleEmWidth = String(state.total).length;
-      var sliderHandle = $(this).find(".ui-slider-handle");
-      //sliderHandle.css('top', '-2em');
-      //sliderHandle.css('top', '-4px');
-      //sliderHandle.height((sliderHeight + 6) + 'px');
-      sliderHandle.width(handleEmWidth + 'em');
-      $(this).css('margin-left', sliderHandle.width() / 2);
-      $(this).css('margin-right', sliderHandle.width() / 2);
-      sliderHandle.css('margin-left', -sliderHandle.width() / 2);
-      sliderHandle.css('text-align', 'center');
-      sliderHandle.css('line-height', sliderHandle.height() + 'px');
-      //alert(sliderHandle.height());
-      //$(this).find(".ui-slider-handle").append("<span class='mytext'>xxx</span>" );
+      var sliderBar = $(this);
+      var sliderHandle = $(this).find(".ui-slider-handle")
+      sliderHandle
+        .width(String(state.total).length + 'em')
+        .css('line-height', sliderHandle.height() + 'px')
+        .css('margin-left', -sliderHandle.width() / 2)
+        .bind('blur', function(e) {
+          var xPage = $(this).parent().slider("option", "value") - 1;
+          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, xPage));
+//          alert('slider blur ' + xxx);
+        });
+      sliderBar
+        .slider("option", "max", state.total)
+        .slider("option", "value", state.current)
+        .width((state.quantity * 3) + 'em')
+        .css('margin-left', sliderHandle.width() / 2)
+        .css('margin-right', sliderHandle.width() / 2);
     })
     .bind('slide', function(e, ui) {
       $(this).find(".ui-slider-handle").text(ui.value);
     })
     .bind('slidechange', function(e, ui) {
       $(this).find(".ui-slider-handle").text(ui.value);
-    })
-	
-    // @todo check limits
+    });
+
+
+    function offsetSliderValue(ui, offset) {
+      var newValue = ui.slider("option", "value") + offset;
+      var maxValue = ui.slider("option", "max");
+      if (newValue > 0 && newValue <= maxValue) {
+        ui.slider("option", "value", newValue);
+      }
+    }
+
+    var timeoutId = 0;
+    var idlecycles = 0;
+
     $('.ui-icon-circle-minus', context)
     .bind('mousedown', function(e) {
-	  var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      var xx = pSlider.slider("option", "value") - 1;
-      pSlider.slider("option", "value", xx);
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      offsetSliderValue(pSlider, -1);
+      timeoutId = setInterval(function(){
+        idlecycles++;
+        if (idlecycles > 10) {
+          offsetSliderValue(pSlider, -1);
+        }
+      }, 50);
+    })
+    .bind('mouseup mouseleave', function() {
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      idlecycles = 0;
+      clearInterval(timeoutId);
+      pSlider.find(".ui-slider-handle").focus();
     });
-    // @todo check limits
+
     $('.ui-icon-circle-plus', context)
     .bind('mousedown', function(e) {
-	  var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      var xx = pSlider.slider("option", "value") + 1;
-      pSlider.slider("option", "value", xx);
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      var state = eval('(' + pSlider.attr('id') + ');');
+      offsetSliderValue(pSlider, 1);
+      timeoutId = setInterval(function(){
+        idlecycles++;
+        if (idlecycles > 10) {
+          offsetSliderValue(pSlider, 1);
+        }
+      }, 50);
+    })
+    .bind('mouseup mouseleave', function() {
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      idlecycles = 0;
+      clearInterval(timeoutId);
+      pSlider.find(".ui-slider-handle").focus();
     });
-	
-	
+
   }
 };
 
-Drupal.Pagerer.pageStep = function(el, state, step) {
+Drupal.pagerer.pageStep = function(el, state, step) {
   var page = isNaN($(el).val()) ? 1 : parseInt($(el).val());
   page += step * state.interval;
   if (page < 1) {
@@ -133,5 +161,17 @@ Drupal.Pagerer.pageStep = function(el, state, step) {
   }
   $(el).val(page);
 };
+
+Drupal.pagerer.relocate = function (root, path) {
+  if (window.Drupal.overlayChild) {
+    // Drupal admin overlay
+    window.parent.jQuery.bbq.pushState({'overlay': path});
+  } else {
+    // Normal page
+    document.location = root + path;
+  }
+};
+
+
 
 })(jQuery);
