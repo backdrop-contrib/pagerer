@@ -1,15 +1,30 @@
 <?php
-// @todo in install
+/**
+ * @file
+ *
+ * Pagerer install
+ *
+ * Pagerer installation hooks.
+ *
+ * Drupal core 7.x
+ *
+ * @package  User interface
+ * @author   mondrake <mondrake@mondrake.org>
+ */
 
+/**
+ * Implements hook_install().
+ */
 function pagerer_install() {
   menu_rebuild();    
-//  db_query("UPDATE {system} SET weight = 255 WHERE name = 'pagerer'");
-  // @todo ???? + help 
   $t = get_t();
-  drupal_set_message($t('The Pagerer module has been installed. Visit <a href="@url">module help</a> for instructions.',
-                     array('@url' => url('admin/help/pagerer'))));
+  drupal_set_message($t('The Pagerer module has been installed. Visit <a href="@url">configure</a> for configuration.',
+                     array('@url' => url('admin/config/user-interface/pagerer'))));
 }
 
+/**
+ * Implements hook_uninstall().
+ */
 function pagerer_uninstall() {
   db_query("DELETE FROM {variable} WHERE name LIKE 'pagerer%'");
   cache_clear_all('variables', 'cache');

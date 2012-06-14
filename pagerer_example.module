@@ -1,0 +1,100 @@
+<?php
+/**
+ * @file
+ *
+ * Pagerer example
+ *
+ * Display various combinations of Pagerer pagers.
+ *
+ * Drupal core 7.x
+ *
+ * @package  User interface
+ * @author   mondrake <mondrake@mondrake.org>
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function pagerer_example_menu() {
+  $items['pagerer/example'] = array(
+    'title' => 'Pagerer example',
+    'description' => 'Display various combinations of Pagerer pagers',
+    'page callback' => 'pagerer_example_page',
+    'access callback' => TRUE
+  );
+  return $items;
+}
+
+/**
+ * Build the pager query
+ *
+ * Uses the date_formats table since it is installed with ~35 rows
+ * in it and we don't have to create fake data in order to show
+ * this example.
+ *
+ * @return
+ *   A render array completely set up with a pager.
+ */
+function pagerer_example_page() {
+  // we are going to output the results in a table with a nice header
+  $header = array(
+    array('data' => t('wid')),
+    array('data' => t('type')),
+    array('data' => t('message')),
+  );
+
+  // we are extending the PagerDefault class here
+  // it has a default of 10 rows per page
+  // the extend('PagerDefault') part here does all the magic.
+  $query = db_select('watchdog', 'd')->extend('PagerDefault');
+  $query->fields('d', array('wid', 'type', 'message'));
+
+  $result = $query
+    ->limit(5)         // this is where you change the number of rows
+    ->orderBy('d.wid')
+    ->execute();
+
+  $rows = array();
+  foreach ($result as $row) {
+    // normally we would add some nice formatting to our rows
+    // but for our purpose we are simply going to add our row
+    // to the array.
+    $rows[] = array('data' => (array) $row);
+  }
+
+  // attach the pager themes
+  // @todo check if hooked
+  $build['l_pager_pager'] = array('#markup' => '<b>Drupal standard \'pager\' theme:</b>');
+  $build['pager_pager'] = array('#theme' => 'pager');
+  $build['l_pagerer_standard'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s):</b>');
+  $build['pagerer_standard'] = array('#theme' => 'pagerer_standard', '#pager_separator' => 'none');
+  $build['l_pagerer_progressive'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
+  $build['pagerer_progressive'] = array('#theme' => 'pagerer_progressive', '#pager_separator' => 'none');
+  $build['l_pagerer_adaptive'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
+  $build['pagerer_adaptive'] = array('#theme' => 'pagerer_adaptive', '#pager_separator' => 'none');
+  $build['l_pagerer_mini'] = array('#markup' => '<br/><b>\'pagerer_mini\' pager theme:</b>');
+  $build['pagerer_mini'] = array('#theme' => 'pagerer_mini', '#pager_separator' => 'none');
+  $build['l_pagerer_slider'] = array('#markup' => '<br/><b>\'pagerer_slider\' pager theme:</b>');
+  $build['pagerer_slider'] = array('#theme' => 'pagerer_slider', '#pager_separator' => 'none');
+
+  $build['l_pagerer_pagerer'] = array('#markup' => '<br/><b>\'pagerer\' theme:</b>');
+  $config_vars = _pagerer_get_variables();
+  $build['pagerer_pagerer'] = array(
+    '#theme' => 'pagerer', 
+    '#left_pane' => $config_vars['left_pane'],
+    '#center_pane' => $config_vars['center_pane'],
+    '#right_pane' => $config_vars['right_pane'],
+  );
+
+  // Create a render array ($build) which will be themed as a table with a
+  // pager.
+  $build['l_pager_table'] = array('#markup' => '<br/><br/><b>Data table:</b><br/>');
+  $build['pager_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are no watchdog records found in the db'),
+  );
+
+  return $build;
+}

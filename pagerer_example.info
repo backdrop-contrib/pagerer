@@ -1,0 +1,8 @@
+name = Pagerer example
+description = "Pagerer example."
+package = User interface
+core = 7.x
+
+dependencies[] = pagerer
+files[] = pagerer_example.module
+

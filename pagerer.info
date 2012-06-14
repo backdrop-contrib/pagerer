@@ -1,5 +1,5 @@
 name = Pagerer
-description = "Extended pager theme."
+description = "Extended pager themes."
 package = User interface
 core = 7.x
 

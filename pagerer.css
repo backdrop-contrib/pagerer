@@ -63,11 +63,15 @@ div.pagerer-slider {
 	display: inline-block;
 } 
 div.pagerer-slider  .ui-slider-handle {
+	vertical-align: top;
 	text-align: center;
 } 
 div.pagerer-slider-icon {
 	display: inline-block;
 	vertical-align: text-bottom;
+} 
+div.pagerer-slider-handle-icon {
+	display: inline-block;
 } 
 
 /* Admin */

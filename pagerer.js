@@ -1,3 +1,5 @@
+// @todo error if multi
+
 (function ($) {
 
 Drupal.pagerer = {};
@@ -17,7 +19,7 @@ Drupal.behaviors.pagerer = {
 
       // initiate slider
       $('.pagerer-slider').each(function(index) {
-        $(this).slider({ min : 1, step : 1, range : 'min', animate: true });
+        $(this).slider({ min : 1, range : 'min', animate: true });
       });
 
     });
@@ -36,12 +38,13 @@ Drupal.behaviors.pagerer = {
       switch(e.keyCode) {
         case 13:
         case 10:   // iPhone <return>
+          var newPage;
           if (state.display == 'pages') {
-            var page = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
-            if (page < 0) {
-              page = 0;
-            } else if (page >= state.total) {
-              page = state.total - 1;
+            newPage = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
+            if (newPage < 0) {
+              newPage = 0;
+            } else if (newPage >= state.total) {
+              newPage = state.total - 1;
             }
           } else {
             var item = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
@@ -50,9 +53,9 @@ Drupal.behaviors.pagerer = {
             } else if (item >= state.total) {
               item = state.total - 1;
             }
-            page = parseInt(item / parseInt(state.interval));
+            newPage = parseInt(item / parseInt(state.interval));
           }
-          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, page));
+          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, newPage));
           e.preventDefault();
           return false;
         case 38:    // up key
@@ -71,23 +74,26 @@ Drupal.behaviors.pagerer = {
     });
 
     // pagerer-slider event binding
+    var sliderSet = false;
     $('.pagerer-slider', context)
     .bind('slidecreate', function(e, ui) {
       var state = eval('(' + $(this).attr('id') + ');');
       var sliderBar = $(this);
       var sliderHandle = $(this).find(".ui-slider-handle")
       sliderHandle
-        .width(String(state.total).length + 'em')
+        .width((String(state.total).length + 2) + 'em')
         .css('line-height', sliderHandle.height() + 'px')
         .css('margin-left', -sliderHandle.width() / 2)
-        .bind('blur', function(e) {
-          var xPage = $(this).parent().slider("option", "value") - 1;
-          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, xPage));
-//          alert('slider blur ' + xxx);
-        });
+/*        .bind('blur', function(e) {
+          var sliderBar = $(this).parent();
+          var state = eval('(' + sliderBar.attr('id') + ');');
+          sliderBar.slider("option", "value", state.current);
+          $(this).text(state.current);
+        })*/;
       sliderBar
         .slider("option", "max", state.total)
         .slider("option", "value", state.current)
+        .slider("option", "step", state.interval)
         .width((state.quantity * 3) + 'em')
         .css('margin-left', sliderHandle.width() / 2)
         .css('margin-right', sliderHandle.width() / 2);
@@ -96,12 +102,32 @@ Drupal.behaviors.pagerer = {
       $(this).find(".ui-slider-handle").text(ui.value);
     })
     .bind('slidechange', function(e, ui) {
-      $(this).find(".ui-slider-handle").text(ui.value);
+      var sliderHandle = $(this).find(".ui-slider-handle");
+      sliderHandle.text(ui.value + ' ');
+      if (sliderSet == true) { 
+        sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
+        sliderHandle.find('.ui-icon-check')
+          .bind('mousedown', function(e) {
+            var sliderBar = $(this).parent().parent();
+            var state = eval('(' + sliderBar.attr('id') + ');');
+            var currVal = sliderBar.slider("option", "value");
+            var newPage;
+            if (state.display == 'pages') {
+              newPage = currVal - 1;
+            } else {
+              newPage = parseInt(currVal / parseInt(state.interval));
+            }
+            Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, newPage));
+            return false;
+          });
+      } else {
+        sliderSet = true;
+      }
     });
 
-
     function offsetSliderValue(ui, offset) {
-      var newValue = ui.slider("option", "value") + offset;
+      var step = ui.slider("option", "step");
+      var newValue = ui.slider("option", "value") + (offset * step);
       var maxValue = ui.slider("option", "max");
       if (newValue > 0 && newValue <= maxValue) {
         ui.slider("option", "value", newValue);
@@ -111,6 +137,7 @@ Drupal.behaviors.pagerer = {
     var timeoutId = 0;
     var idlecycles = 0;
 
+    // @todo right context
     $('.ui-icon-circle-minus', context)
     .bind('mousedown', function(e) {
       var pSlider = $(this).parent().parent().find('.pagerer-slider');
@@ -129,6 +156,7 @@ Drupal.behaviors.pagerer = {
       pSlider.find(".ui-slider-handle").focus();
     });
 
+    // @todo right context
     $('.ui-icon-circle-plus', context)
     .bind('mousedown', function(e) {
       var pSlider = $(this).parent().parent().find('.pagerer-slider');
