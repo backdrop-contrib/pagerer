@@ -11,7 +11,7 @@
  * @author   mondrake <mondrake@mondrake.org>
  */
 
- table.pagerer {
+table.pagerer {
 	border: 0;
 	margin: 0.5em 0;
 	padding: 0;
@@ -26,14 +26,26 @@ table.pagerer tbody tr td {
 table.pagerer tbody tr td div.item-list,
 table.pagerer tbody tr td div.item-list ul.pager,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-current,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-last,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-previous,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-next{
+table.pagerer tbody tr td div.item-list ul.pager li.pager-current{
     list-style-type: none;
     list-style-image:none;
 	margin: 0;
+	padding: 0.1em 0 0 0;
+	vertical-align: middle;
+}
+table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-previous{
+    list-style-type: none;
+    list-style-image:none;
+	margin: 0 0.5em 0 0;
+	padding: 0.1em 0 0 0;
+	vertical-align: middle;
+}
+table.pagerer tbody tr td div.item-list ul.pager li.pager-next,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-last{
+    list-style-type: none;
+    list-style-image:none;
+	margin: 0 0 0 0.5em;
 	padding: 0.1em 0 0 0;
 	vertical-align: middle;
 }
@@ -66,7 +78,7 @@ div.pagerer-slider  .ui-slider-handle {
 	vertical-align: top;
 	text-align: center;
 } 
-div.pagerer-slider-icon {
+div.pagerer-slider-control-icon {
 	display: inline-block;
 	vertical-align: text-bottom;
 } 

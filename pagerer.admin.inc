@@ -9,9 +9,6 @@
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
  */
-
- 
-// @todo pagerer preview not pager 
  
 /**
  * Main Pagerer settings admin form.
@@ -128,10 +125,14 @@ function pagerer_settings_form($form, &$form_state) {
   pager_default_initialize(47884, 50);
   $form['preview'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Pager preview'),
+    '#title' => t('Pagerer preview'),
   );
   $form['preview']['pagerer'] = array(
-    '#markup' => theme('pager', array()),
+    '#markup' => theme('pagerer', array(
+                        'left_pane'   => $vars['left_pane'],
+                        'center_pane' => $vars['center_pane'],
+                        'right_pane' => $vars['right_pane'],
+                      )),
   );
 
   // Save configuration.

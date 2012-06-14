@@ -1,5 +1,9 @@
-// @todo error if multi
-
+/**
+ * @file
+ *
+ * Pagerer jquery scripts.
+ *
+ */
 (function ($) {
 
 Drupal.pagerer = {};
@@ -55,26 +59,25 @@ Drupal.behaviors.pagerer = {
             }
             newPage = parseInt(item / parseInt(state.interval));
           }
-          Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, newPage));
+          pagerer_relocate(state.root, state.path.replace(/pagererpage/, newPage));
           e.preventDefault();
           return false;
         case 38:    // up key
-          Drupal.pagerer.pageStep(this, state, -1);
-          return true;
+          pagerer_offset_widget_value(this, state, -1);
+          return false;
         case 40:    // down key
-          Drupal.pagerer.pageStep(this, state, 1);
-          return true;
+          pagerer_offset_widget_value(this, state, 1);
+          return false;
         case 33:    // page up
-          Drupal.pagerer.pageStep(this, state, -5);
-          return true;
+          pagerer_offset_widget_value(this, state, -5);
+          return false;
         case 34:    // page down
-          Drupal.pagerer.pageStep(this, state, 5);
-          return true;
+          pagerer_offset_widget_value(this, state, 5);
+          return false;
       }
     });
 
     // pagerer-slider event binding
-    var sliderSet = false;
     $('.pagerer-slider', context)
     .bind('slidecreate', function(e, ui) {
       var state = eval('(' + $(this).attr('id') + ');');
@@ -84,7 +87,8 @@ Drupal.behaviors.pagerer = {
         .width((String(state.total).length + 2) + 'em')
         .css('line-height', sliderHandle.height() + 'px')
         .css('margin-left', -sliderHandle.width() / 2)
-/*        .bind('blur', function(e) {
+// @todo blurring when css ok
+        /*        .bind('blur', function(e) {
           var sliderBar = $(this).parent();
           var state = eval('(' + sliderBar.attr('id') + ');');
           sliderBar.slider("option", "value", state.current);
@@ -104,7 +108,7 @@ Drupal.behaviors.pagerer = {
     .bind('slidechange', function(e, ui) {
       var sliderHandle = $(this).find(".ui-slider-handle");
       sliderHandle.text(ui.value + ' ');
-      if (sliderSet == true) { 
+      if (sliderHandle.hasClass('pagerer-slider-set')) { 
         sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
         sliderHandle.find('.ui-icon-check')
           .bind('mousedown', function(e) {
@@ -117,15 +121,70 @@ Drupal.behaviors.pagerer = {
             } else {
               newPage = parseInt(currVal / parseInt(state.interval));
             }
-            Drupal.pagerer.relocate(state.root, state.path.replace(/pagererpage/, newPage));
+            pagerer_relocate(state.root, state.path.replace(/pagererpage/, newPage));
             return false;
           });
       } else {
-        sliderSet = true;
+        sliderHandle.addClass('pagerer-slider-set');
       }
     });
 
-    function offsetSliderValue(ui, offset) {
+    // pagerer-slider control icons event binding
+    var timeoutId = 0;
+    var idleCycles = 0;
+    $('.pagerer-slider-control-icon', context)
+    .bind('mousedown', function(e) {
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      var offset = $(this).hasClass('ui-icon-circle-minus') ? -1 : 1;
+      pagerer_offset_slider_value(pSlider, offset);
+      timeoutId = setInterval(function(){
+        idleCycles++;
+        if (idleCycles > 10) {
+          pagerer_offset_slider_value(pSlider, offset);
+        }
+      }, 50);
+    })
+    .bind('mouseup mouseleave', function() {
+      var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      idleCycles = 0;
+      clearInterval(timeoutId);
+      pSlider.find(".ui-slider-handle").focus();
+    });
+
+
+    // Helper functions
+    
+    /**
+     * Relocates client browser to target page.
+     */
+    function pagerer_relocate(root, path) {
+      if (window.Drupal.overlayChild) {
+        // Drupal admin overlay
+        window.parent.jQuery.bbq.pushState({'overlay': path});
+      } else {
+        // Normal page
+        document.location = root + path;
+      }
+    };
+
+    /**
+     * Updates widget value.
+     */
+    function pagerer_offset_widget_value(widget, state, offset) {
+      var widgetValue = isNaN($(widget).val()) ? 1 : parseInt($(widget).val());
+      widgetValue += offset * state.interval;
+      if (widgetValue < 1) {
+        widgetValue = 1;
+      } else if (widgetValue > state.total){
+        widgetValue = state.total;
+      }
+      $(widget).val(widgetValue);
+    };
+    
+    /**
+     * Updates slider value.
+     */
+    function pagerer_offset_slider_value(ui, offset) {
       var step = ui.slider("option", "step");
       var newValue = ui.slider("option", "value") + (offset * step);
       var maxValue = ui.slider("option", "max");
@@ -134,72 +193,6 @@ Drupal.behaviors.pagerer = {
       }
     }
 
-    var timeoutId = 0;
-    var idlecycles = 0;
-
-    // @todo right context
-    $('.ui-icon-circle-minus', context)
-    .bind('mousedown', function(e) {
-      var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      offsetSliderValue(pSlider, -1);
-      timeoutId = setInterval(function(){
-        idlecycles++;
-        if (idlecycles > 10) {
-          offsetSliderValue(pSlider, -1);
-        }
-      }, 50);
-    })
-    .bind('mouseup mouseleave', function() {
-      var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      idlecycles = 0;
-      clearInterval(timeoutId);
-      pSlider.find(".ui-slider-handle").focus();
-    });
-
-    // @todo right context
-    $('.ui-icon-circle-plus', context)
-    .bind('mousedown', function(e) {
-      var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      var state = eval('(' + pSlider.attr('id') + ');');
-      offsetSliderValue(pSlider, 1);
-      timeoutId = setInterval(function(){
-        idlecycles++;
-        if (idlecycles > 10) {
-          offsetSliderValue(pSlider, 1);
-        }
-      }, 50);
-    })
-    .bind('mouseup mouseleave', function() {
-      var pSlider = $(this).parent().parent().find('.pagerer-slider');
-      idlecycles = 0;
-      clearInterval(timeoutId);
-      pSlider.find(".ui-slider-handle").focus();
-    });
-
   }
 };
-
-Drupal.pagerer.pageStep = function(el, state, step) {
-  var page = isNaN($(el).val()) ? 1 : parseInt($(el).val());
-  page += step * state.interval;
-  if (page < 1) {
-    page = 1;
-  } else if (page > state.total){
-    page = state.total;
-  }
-  $(el).val(page);
-};
-
-Drupal.pagerer.relocate = function (root, path) {
-  if (window.Drupal.overlayChild) {
-    // Drupal admin overlay
-    window.parent.jQuery.bbq.pushState({'overlay': path});
-  } else {
-    // Normal page
-    document.location = root + path;
-  }
-};
-
-
-
 })(jQuery);

@@ -76,7 +76,7 @@ function pagerer_theme() {
         'next_link'       => 'not_on_last',
         'last_link'       => 'not_on_last',
         'pager_breaker'   => '…',
-        'pager_separator' => '&nbsp',
+        'pager_separator' => 'none',
         'range_separator' => '-',
       ),
     ),
@@ -97,7 +97,7 @@ function pagerer_theme() {
         'progr_links'     => 'relative',
         'factors'         => '2.5,5,10',
         'pager_breaker'   => '…',
-        'pager_separator' => '&nbsp',
+        'pager_separator' => 'none',
         'range_separator' => '-',
       ),
     ),
@@ -116,7 +116,7 @@ function pagerer_theme() {
         'next_link'       => 'always',
         'last_link'       => 'always',
         'pager_breaker'   => '…',
-        'pager_separator' => '&nbsp',
+        'pager_separator' => 'none',
         'range_separator' => '-',
       ),
     ),
@@ -135,7 +135,7 @@ function pagerer_theme() {
         'next_link'       => 'never',
         'last_link'       => 'never',
         'pager_breaker'   => '…',
-        'pager_separator' => '&nbsp',
+        'pager_separator' => 'none',
         'range_separator' => '-',
       ),
     ),
@@ -157,7 +157,7 @@ function pagerer_theme() {
         'last_link'       => 'never',
         'progr_links'     => 'relative',
         'pager_breaker'   => '…',
-        'pager_separator' => '&nbsp',
+        'pager_separator' => 'none',
         'range_separator' => '-',
       ),
     );
@@ -392,6 +392,12 @@ function theme_pagerer($variables) {
     if (isset($variables['quantity'])) {
       $left_pane_vars['quantity'] = $variables['quantity'];
     }
+    if (!isset($left_pane_vars['pager_separator'])) {
+      $left_pane_vars['pager_separator'] = '&nbsp';
+    }
+    if ($left_pane_vars['pager_separator'] == 'none') {
+      $left_pane_vars['pager_separator'] = '&nbsp';
+    }
     $left_pane = array(
       'data' => theme(
         $variables['left_pane']['theme_name'],
@@ -418,6 +424,12 @@ function theme_pagerer($variables) {
     if (isset($variables['quantity'])) {
       $center_pane_vars['quantity'] = $variables['quantity'];
     }
+    if (!isset($center_pane_vars['pager_separator'])) {
+      $center_pane_vars['pager_separator'] = '&nbsp';
+    }
+    if ($center_pane_vars['pager_separator'] == 'none') {
+      $center_pane_vars['pager_separator'] = '&nbsp';
+    }
     $center_pane = array(
       'data' => theme(
         $variables['center_pane']['theme_name'],
@@ -443,6 +455,12 @@ function theme_pagerer($variables) {
     }
     if (isset($variables['quantity'])) {
       $right_pane_vars['quantity'] = $variables['quantity'];
+    }
+    if (!isset($right_pane_vars['pager_separator'])) {
+      $right_pane_vars['pager_separator'] = '&nbsp';
+    }
+    if ($right_pane_vars['pager_separator'] == 'none') {
+      $right_pane_vars['pager_separator'] = '&nbsp';
     }
     $right_pane = array(
       'data' => theme(
@@ -628,7 +646,7 @@ function theme_pagerer_slider($variables) {
   if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
     $variables['current_display'] = 'widget';
     return _pagerer_theme_handler('pagerer_mini', $variables);
-  } 
+  }
   else {
     return _pagerer_theme_handler('pagerer_slider', $variables);
   }
@@ -660,22 +678,31 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // Add Pagerer's css.
   drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  // Get pagerer configuration.
+  $pagerer_vars = _pagerer_get_variables();  
   // Resolve default tags.
   $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['tags']);
   // Resolve markers.
   $markers = _pagerer_resolve_markers($variables);
+  // Short to main markers.
+  $c = $markers['pager_current'] - 1;
+  $m = $markers['pager_max'] - 1;
+  // Initialise array of adaptive keys if adaptive theme enabled.
+  if ($pagerer_vars['pagerer_enable_adaptive']) {
+    global $_pagerer_ak_array;
+    if (!isset($_pagerer_ak_array)) {
+      $_pagerer_ak_array = array();
+    }
+    $daks = "0.$m";
+  }
+  else {
+    $daks = NULL;
+  }
 
   // Determine pager items needed.
   $pages = array();
-  $c = $markers['pager_current'] - 1;
-  $m = $markers['pager_max'] - 1;
   switch ($theme) {
     case 'pagerer_adaptive':
-      global $_pagerer_ak_array;
-      // Initialise array of adaptive keys.
-      if (!isset($_pagerer_ak_array)) {
-        $_pagerer_ak_array = array();
-      }
       // Determine adaptive keys coming from query parameters.
       $qps = drupal_get_query_parameters();
       if (isset($qps['page_ak'])) {
@@ -776,6 +803,7 @@ function _pagerer_theme_handler($theme, $variables) {
           }
         }
       }
+      break;
     case 'pagerer_progressive':
       // First.
       $pages[0]['interval'] = -$c;
@@ -793,6 +821,9 @@ function _pagerer_theme_handler($theme, $variables) {
         }
       }
       ksort($pages);
+      if ($pages and $pagerer_vars['pagerer_enable_adaptive']) {
+        _pagerer_set_pages_default_ak($pages, $m);
+      }
       break;
     case 'pagerer_mini':
     case 'pagerer_slider':
@@ -804,6 +835,9 @@ function _pagerer_theme_handler($theme, $variables) {
     default:
       // Neighborhood.
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
+      if ($pages and $pagerer_vars['pagerer_enable_adaptive']) {
+        _pagerer_set_pages_default_ak($pages, $m);
+      }
   }
 
   // Compose pager.
@@ -823,19 +857,19 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers));
+    $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers, $daks));
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers));
+    $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers, $daks));
   }
   // 3 - Pages.
   $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, (($theme == 'pagerer_mini' or $theme == 'pagerer_slider') ? FALSE : TRUE)));
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
+    $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers, $daks));
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers));
+    $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers, $daks));
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
@@ -923,9 +957,16 @@ function _pagerer_resolve_markers($variables) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_first_link($variables, $markers) {
+function _pagerer_itemize_first_link($variables, $markers, $aks) {
   $c = $markers['pager_current'] - 1;
   $text = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['first']);
+  if ($aks) {
+    global $_pagerer_ak_array;
+    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
+  }
+  else {
+    unset($variables['parameters']['page_ak']);
+  }
   $li_first = theme(
     'pager_first',
     array(
@@ -939,12 +980,6 @@ function _pagerer_itemize_first_link($variables, $markers) {
     'class' => array('pager-first'),
     'data' => $li_first ? $li_first : t($variables['tags']['first'], array('@num' => $text)),
   );
-  if ($variables['pager_separator'] != 'none') {
-    $items[] = array(
-      'class' => array('pager-item'),
-      'data' => $variables['pager_separator'],
-    );
-  }
   return $items;
 }
 
@@ -960,8 +995,15 @@ function _pagerer_itemize_first_link($variables, $markers) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_previous_link($variables, $markers) {
+function _pagerer_itemize_previous_link($variables, $markers, $aks) {
   $text = _pagerer_get_page_text($variables, $markers, -1, $variables['tags']['previous']);
+  if ($aks) {
+    global $_pagerer_ak_array;
+    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
+  }
+  else {
+    unset($variables['parameters']['page_ak']);
+  }
   $li_previous = theme(
     'pager_previous',
     array(
@@ -976,12 +1018,6 @@ function _pagerer_itemize_previous_link($variables, $markers) {
     'class' => array('pager-previous'),
     'data' => $li_previous ? $li_previous : t($variables['tags']['previous'], array('@num' => $text)),
   );
-  if ($variables['pager_separator'] != 'none') {
-    $items[] = array(
-      'class' => array('pager-item'),
-      'data' => $variables['pager_separator'],
-    );
-  }
   return $items;
 }
 
@@ -996,8 +1032,15 @@ function _pagerer_itemize_previous_link($variables, $markers) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_next_link($variables, $markers) {
+function _pagerer_itemize_next_link($variables, $markers, $aks) {
   $text = _pagerer_get_page_text($variables, $markers, 1, $variables['tags']['next']);
+  if ($aks) {
+    global $_pagerer_ak_array;
+    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
+  }
+  else {
+    unset($variables['parameters']['page_ak']);
+  }
   $li_next = theme(
     'pager_next',
     array(
@@ -1008,12 +1051,6 @@ function _pagerer_itemize_next_link($variables, $markers) {
     )
   );
   $items = array();
-  if ($variables['pager_separator'] != 'none') {
-    $items[] = array(
-      'class' => array('pager-item'),
-      'data' => $variables['pager_separator'],
-    );
-  }
   $items[] = array(
     'class' => array('pager-next'),
     'data' => $li_next ? $li_next : t($variables['tags']['next'], array('@num' => $text)),
@@ -1032,10 +1069,17 @@ function _pagerer_itemize_next_link($variables, $markers) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_last_link($variables, $markers) {
+function _pagerer_itemize_last_link($variables, $markers, $aks) {
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
   $text = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['last']);
+  if ($aks) {
+    global $_pagerer_ak_array;
+    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
+  }
+  else {
+    unset($variables['parameters']['page_ak']);
+  }
   $li_last = theme(
     'pager_last',
     array(
@@ -1045,12 +1089,6 @@ function _pagerer_itemize_last_link($variables, $markers) {
     )
   );
   $items = array();
-  if ($variables['pager_separator'] != 'none') {
-    $items[] = array(
-      'class' => array('pager-item'),
-      'data' => $variables['pager_separator'],
-    );
-  }
   $items[] = array(
     'class' => array('pager-last'),
     'data' => $li_last ? $li_last : t($variables['tags']['last'], array('@num' => $text)),
@@ -1397,6 +1435,23 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
 }
 
 /**
+ * Loads pages with default adaptive keys.
+ *
+ * @param array   $pages
+ *   array of pages 
+ * @param integer $max
+ *   last page on the pager
+ */
+function _pagerer_set_pages_default_ak(&$pages, $max) {
+  if ($pages) {
+    foreach ($pages as &$page) {
+      $page['page_pl'] = 0;
+      $page['page_pr'] = $max;
+    }
+  }
+}
+
+/**
  * Return textual element for a 'page' element in the pager.
  *
  * Value returned is dependent on what's being displayed in the pager via the
@@ -1615,7 +1670,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
       drupal_add_library('system', 'ui.slider');
       $items[] = array(
         'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider-icon ui-icon ui-icon-circle-minus'/>",
+        'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
       );
       $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
       $items[] = array(
@@ -1624,7 +1679,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
       );
       $items[] = array(
         'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider-icon ui-icon ui-icon-circle-plus'/>",
+        'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
       );
       break;
   }
@@ -1744,7 +1799,7 @@ function _pagerer_load_ak_array($value, $element, $old_array) {
  */
 function _pagerer_browser_info($agent = NULL) {
   $agent = $agent ? $agent : $_SERVER['HTTP_USER_AGENT'];
-  $version= "";
+  $ub = $version= "";
 
   // Find browser.
   if(preg_match('/MSIE/i',$agent) && !preg_match('/Opera/i',$agent)) {
@@ -1777,28 +1832,28 @@ function _pagerer_browser_info($agent = NULL) {
   if ($i != 1) {
     // We will have two since we are not using 'other' argument yet
     // see if version is before or after the name.
-    if (strripos($agent,"Version") < strripos($agent,$ub)){
-      $version= $matches['version'][0];
+    if (strripos($agent, "Version") < strripos($agent, $ub)){
+      $version = $matches['version'][0];
     }
     else {
-      $version= $matches['version'][1];
+      $version = $matches['version'][1];
     }
   }
   else {
-    $version= $matches['version'][0];
+    $version = $matches['version'][0];
   }
   // Check if we have a number.
   if (is_null($version) || $version == "") {
-    $version="?";
+    $version = "?";
   }
-  $exVersion = explode('.', $version);
+  $ex_version = explode('.', $version);
 
   $ret = array(
-      'browser' => $ub,
-      'version' => $version,
-      'version_major' => isset($exVersion[0]) ? $exVersion[0] : null,
-      'version_minor' => isset($exVersion[1]) ? $exVersion[1] : null,
+    'browser' => $ub,
+    'version' => $version,
+    'version_major' => isset($ex_version[0]) ? $ex_version[0] : NULL,
+    'version_minor' => isset($ex_version[1]) ? $ex_version[1] : NULL,
   );
-  
+
   return $ret;
 }
