@@ -87,13 +87,15 @@ Drupal.behaviors.pagerer = {
         .width((String(state.total).length + 2) + 'em')
         .css('line-height', sliderHandle.height() + 'px')
         .css('margin-left', -sliderHandle.width() / 2)
-// @todo blurring when css ok
-        /*        .bind('blur', function(e) {
+        .bind('blur', function(e) {
+          if ($(this).hasClass('being-spinned')) {
+            return false;
+          }
           var sliderBar = $(this).parent();
           var state = eval('(' + sliderBar.attr('id') + ');');
           sliderBar.slider("option", "value", state.current);
           $(this).text(state.current);
-        })*/;
+        });
       sliderBar
         .slider("option", "max", state.total)
         .slider("option", "value", state.current)
@@ -135,6 +137,7 @@ Drupal.behaviors.pagerer = {
     $('.pagerer-slider-control-icon', context)
     .bind('mousedown', function(e) {
       var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      pSlider.find('.ui-slider-handle').addClass('being-spinned');
       var offset = $(this).hasClass('ui-icon-circle-minus') ? -1 : 1;
       pagerer_offset_slider_value(pSlider, offset);
       timeoutId = setInterval(function(){
@@ -146,6 +149,7 @@ Drupal.behaviors.pagerer = {
     })
     .bind('mouseup mouseleave', function() {
       var pSlider = $(this).parent().parent().find('.pagerer-slider');
+      pSlider.find('.ui-slider-handle').removeClass('being-spinned');
       idleCycles = 0;
       clearInterval(timeoutId);
       pSlider.find(".ui-slider-handle").focus();

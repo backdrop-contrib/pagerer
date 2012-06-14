@@ -83,6 +83,7 @@ div.pagerer-slider-control-icon {
 	vertical-align: text-bottom;
 } 
 div.pagerer-slider-handle-icon {
+	height: 12px;
 	display: inline-block;
 } 
 

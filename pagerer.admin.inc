@@ -9,7 +9,7 @@
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
  */
- 
+
 /**
  * Main Pagerer settings admin form.
  */
@@ -280,7 +280,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
       break;
   }
 
-  // Merge configuration variables with those coming from default theme variables.
+  // Merge configuration variables with those coming from default theme
+  // variables.
   $vars = _pagerer_get_variables();
   $theme = $vars[$pane . '_pane']['theme_name'];
   if (isset($vars[$pane . '_pane']['theme_variables'])) {
@@ -291,7 +292,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   }
   $theme_registry = theme_get_registry();
   $default_theme_vars = $theme_registry[$theme]['variables'];
-  $v = array_merge($default_theme_vars, $theme_vars); 
+  $v = array_merge($default_theme_vars, $theme_vars);
 
   // Pane theme.
   $form['theme_name'] = array(
