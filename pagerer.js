@@ -41,7 +41,7 @@ Drupal.behaviors.pagerer = {
       var state = eval('(' + $(this).attr('name') + ');');
       switch(e.keyCode) {
         case 13:
-        case 10:   // iPhone <return>
+        case 10:
           var newPage;
           if (state.display == 'pages') {
             newPage = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
@@ -62,16 +62,20 @@ Drupal.behaviors.pagerer = {
           pagerer_relocate(state.root, state.path.replace(/pagererpage/, newPage));
           e.preventDefault();
           return false;
-        case 38:    // up key
+        case 38:
+          // up key
           pagerer_offset_widget_value(this, state, -1);
           return false;
-        case 40:    // down key
+        case 40:
+          // down key
           pagerer_offset_widget_value(this, state, 1);
           return false;
-        case 33:    // page up
+        case 33:
+          // page up
           pagerer_offset_widget_value(this, state, -5);
           return false;
-        case 34:    // page down
+        case 34:
+          // page down
           pagerer_offset_widget_value(this, state, 5);
           return false;
       }
@@ -110,7 +114,7 @@ Drupal.behaviors.pagerer = {
     .bind('slidechange', function(e, ui) {
       var sliderHandle = $(this).find(".ui-slider-handle");
       sliderHandle.text(ui.value + ' ');
-      if (sliderHandle.hasClass('pagerer-slider-set')) { 
+      if (sliderHandle.hasClass('pagerer-slider-set')) {
         sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
         sliderHandle.find('.ui-icon-check')
           .bind('mousedown', function(e) {
@@ -157,7 +161,7 @@ Drupal.behaviors.pagerer = {
 
 
     // Helper functions
-    
+
     /**
      * Relocates client browser to target page.
      */
@@ -184,7 +188,7 @@ Drupal.behaviors.pagerer = {
       }
       $(widget).val(widgetValue);
     };
-    
+
     /**
      * Updates slider value.
      */

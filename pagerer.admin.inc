@@ -1,7 +1,6 @@
 <?php
 /**
  * @file
- *
  * Pagerer administration
  *
  * Drupal core 7.x
@@ -41,7 +40,14 @@ function pagerer_settings_form($form, &$form_state) {
   );
 
   // List of the themes available for panes.
-  $options = array('none', 'pagerer_standard', 'pagerer_mini', 'pagerer_slider', 'pagerer_progressive', 'pagerer_adaptive');
+  $options = array(
+    'none', 
+    'pagerer_standard', 
+    'pagerer_mini', 
+    'pagerer_slider', 
+    'pagerer_progressive', 
+    'pagerer_adaptive',
+  );
   $options = drupal_map_assoc($options);
 
   // Panes configuration.
@@ -197,7 +203,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
       drupal_set_message(t('Pagerer will replace Drupal core pager.'));
       watchdog(
         'pagerer',
-        t('Pagerer will replace Drupal core pager.'),
+        'Pagerer will replace Drupal core pager.',
         NULL,
         WATCHDOG_NOTICE
       );
@@ -206,7 +212,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
       drupal_set_message(t('Drupal core pager has been restored.'));
       watchdog(
         'pagerer',
-        t('Drupal core pager has been restored.'),
+        'Drupal core pager has been restored.',
         NULL,
         WATCHDOG_NOTICE
       );
@@ -218,7 +224,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
       drupal_set_message(t('Pagerer adaptive pager is now enabled.'));
       watchdog(
         'pagerer',
-        t('Pagerer adaptive pager is now enabled.'),
+        'Pagerer adaptive pager is now enabled.',
         NULL,
         WATCHDOG_NOTICE
       );
@@ -227,7 +233,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
       drupal_set_message(t('Pagerer adaptive pager has been disabled.'));
       watchdog(
         'pagerer',
-        t('Pagerer adaptive pager has been disabled.'),
+        'Pagerer adaptive pager has been disabled.',
         NULL,
         WATCHDOG_NOTICE
       );
@@ -272,9 +278,11 @@ function pagerer_pane_settings_form($form, &$form_state) {
     case 'left':
       $pane_t = t('Left');
       break;
+      
     case 'center':
       $pane_t = t('Center');
       break;
+      
     case 'right':
       $pane_t = t('Right');
       break;

@@ -1,7 +1,6 @@
 <?php
 /**
  * @file
- *
  * Pagerer example
  *
  * Display various combinations of Pagerer themes.
@@ -18,7 +17,7 @@
 function pagerer_example_menu() {
   $items['pagerer/example'] = array(
     'title' => 'Pagerer example',
-    'description' => t('Display various combinations of Pagerer themes.'),
+    'description' => 'Display various combinations of Pagerer themes.',
     'page callback' => 'pagerer_example_page',
     'access callback' => TRUE,
   );
@@ -26,7 +25,7 @@ function pagerer_example_menu() {
 }
 
 /**
- * Build the pager query
+ * Build the pager query.
  *
  * Uses the date_formats table since it is installed with ~35 rows
  * in it and we don't have to create fake data in order to show
@@ -110,8 +109,16 @@ function pagerer_example_page() {
   }
   $build['l_pagerer_standard'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s standard)</b> in three \'display\' modes: \'pages\', \'items\', and \'item_ranges\'');
   $build['pagerer_standard_pages'] = array('#theme' => 'pagerer_standard', '#element' => 0);
-  $build['pagerer_standard_items'] = array('#theme' => 'pagerer_standard', '#display' => 'items', '#element' => 0);
-  $build['pagerer_standard_item_ranges'] = array('#theme' => 'pagerer_standard', '#display' => 'item_ranges', '#element' => 0);
+  $build['pagerer_standard_items'] = array(
+    '#theme' => 'pagerer_standard', 
+    '#display' => 'items', 
+    '#element' => 0
+  );
+  $build['pagerer_standard_item_ranges'] = array(
+    '#theme' => 'pagerer_standard', 
+    '#display' => 'item_ranges', 
+    '#element' => 0,
+  );
   $build['l_pagerer_progressive'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
   $build['pagerer_progressive'] = array('#theme' => 'pagerer_progressive', '#element' => 0);
   $build['l_pagerer_adaptive'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');

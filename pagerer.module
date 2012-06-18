@@ -1,7 +1,6 @@
 <?php
 /**
  * @file
- *
  * Pagerer
  *
  * A collection of pager themes to enhance Drupal standard pager.
@@ -19,7 +18,7 @@ function pagerer_menu() {
   $items = array();
   $items['admin/config/user-interface/pagerer'] = array(
     'title' => 'Pagerer',
-    'description' => t('Configure Pagerer.'),
+    'description' => 'Configure Pagerer.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('pagerer_settings_form'),
     'access arguments' => array('administer site configuration'),
@@ -192,9 +191,11 @@ function _pagerer_pane_settings_title($pane) {
     case 'left':
       $text = t('Left');
       break;
+
     case 'center':
       $text = t('Center');
       break;
+
     case 'right':
       $text = t('Right');
       break;
@@ -244,7 +245,7 @@ function _pagerer_theme_override_safe($theme_registry, $theme, $function, $modul
 function _pagerer_tags_merge_default($theme, $tags = NULL) {
   switch ($theme) {
     case 'pagerer_standard':
-        $default_tags = array(
+      $default_tags = array(
           'first'            => t('« first'),
           'previous'         => t('‹ previous'),
           'next'             => t('next ›'),
@@ -255,8 +256,9 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
           'item_range_label' => t('Items'),
         );
       break;
+
     case 'pagerer_mini':
-        $default_tags = array(
+      $default_tags = array(
           'first'            => t('«'),
           'previous'         => t('<'),
           'next'             => t('>'),
@@ -267,8 +269,9 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
           'item_range_label' => t('Items'),
         );
       break;
+
     case 'pagerer_slider':
-        $default_tags = array(
+      $default_tags = array(
           'first'            => t('«'),
           'previous'         => t('<'),
           'next'             => t('>'),
@@ -279,8 +282,9 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
           'item_range_label' => t('Items'),
         );
       break;
+
     default:
-        $default_tags = array(
+      $default_tags = array(
           'first'            => t('« @num'),
           'previous'         => t('‹ @num'),
           'next'             => t('@num ›'),
@@ -804,6 +808,7 @@ function _pagerer_theme_handler($theme, $variables) {
         }
       }
       break;
+
     case 'pagerer_progressive':
       // First.
       $pages[0]['interval'] = -$c;
@@ -825,12 +830,14 @@ function _pagerer_theme_handler($theme, $variables) {
         _pagerer_set_pages_default_ak($pages, $m);
       }
       break;
+
     case 'pagerer_mini':
     case 'pagerer_slider':
       // Current.
       $pages[$c]['interval'] = 0;
       $pages[$c]['text'] = _pagerer_get_page_text($variables, $markers, 0);
       break;
+
     case 'pagerer_standard':
     default:
       // Neighborhood.
@@ -921,9 +928,7 @@ function _pagerer_resolve_markers($variables) {
   // 'pager_current_first_item' is the first item listed on the current page.
   $markers['pager_current_first_item'] = $pager_limits[$variables['element']] * $pager_page_array[$variables['element']] + 1;
   // 'pager_current_last_item' is the last item listed on the current page.
-  $markers['pager_current_last_item'] = ($pager_limits[$variables['element']] * $markers['pager_current']) > $pager_total_items[$variables['element']] ?
-    $pager_total_items[$variables['element']] :
-    $pager_limits[$variables['element']] * $markers['pager_current'];
+  $markers['pager_current_last_item'] = ($pager_limits[$variables['element']] * $markers['pager_current']) > $pager_total_items[$variables['element']] ? $pager_total_items[$variables['element']] : $pager_limits[$variables['element']] * $markers['pager_current'];
   // 'pager_item_max' is the maximum item number.
   $markers['pager_item_max'] = $pager_total_items[$variables['element']];
   // 'pager_items_next' is the number of items expected on next page.
@@ -931,9 +936,7 @@ function _pagerer_resolve_markers($variables) {
     $markers['pager_items_next'] = NULL;
   }
   else {
-    $markers['pager_items_next'] = $pager_total_items[$variables['element']] - ($markers['pager_current'] * $pager_limits[$variables['element']]) > $pager_limits[$variables['element']] ?
-      $pager_limits[$variables['element']] :
-      $pager_total_items[$variables['element']] - ($markers['pager_current'] * $pager_limits[$variables['element']]);
+    $markers['pager_items_next'] = $pager_total_items[$variables['element']] - ($markers['pager_current'] * $pager_limits[$variables['element']]) > $pager_limits[$variables['element']] ? $pager_limits[$variables['element']] : $pager_total_items[$variables['element']] - ($markers['pager_current'] * $pager_limits[$variables['element']]);
   }
   // 'pager_item_previous' is the number of items expected on previous page.
   if ($markers['pager_current'] == 1) {
@@ -984,8 +987,7 @@ function _pagerer_itemize_first_link($variables, $markers, $aks) {
 }
 
 /**
- * Return rendered items representing the link to "previous" element in
- * the pager.
+ * Return items representing the link to "previous" element in the pager.
  *
  * @param array $variables
  *   theme's variables
@@ -1125,9 +1127,11 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
     case 'pages':
       $tag = t('page');
       break;
+
     case 'items':
       $tag = t('item');
       break;
+
     case 'item_ranges':
       $tag = t('item range');
       break;
@@ -1171,7 +1175,11 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         // Link to page before the current.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
-            $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
+            $aks = implode('.', array(
+              $page_data['page_pl'],
+              $page_data['page_pr'],
+              $page_data['page_px'],
+            ));
           }
           else {
             $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr']));
@@ -1197,7 +1205,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'element' => $variables['element'],
               'interval' => -$page_data['interval'],
               'parameters' => $variables['parameters'],
-              'attributes' => array('title' => t('Go to @tag @text', array('@tag' => $tag, '@text' => $text))),
+              'attributes' => array('title' => t('Go to @tag @text', array(
+                '@tag' => $tag,
+                '@text' => $text,
+              ))),
             )
           ),
         );
@@ -1213,10 +1224,12 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         switch ($variables['current_display']) {
           case 'none':
             break;
+
           case 'widget':
           case 'slider':
             $items = array_merge($items, _pagerer_itemize_js_element($variables['current_display'], $variables, $markers));
             break;
+
           case 'normal':
           default:
             $items[] = array(
@@ -1235,10 +1248,17 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         // Link to page after the current.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
-            $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr'], $page_data['page_px']));
+            $aks = implode('.', array(
+              $page_data['page_pl'],
+              $page_data['page_pr'],
+              $page_data['page_px'],
+            ));
           }
           else {
-            $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr']));
+            $aks = implode('.', array(
+              $page_data['page_pl'],
+              $page_data['page_pr'],
+            ));
           }
         }
         else {
@@ -1261,7 +1281,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'element' => $variables['element'],
               'interval' => $page_data['interval'],
               'parameters' => $variables['parameters'],
-              'attributes' => array('title' => t('Go to @tag @text', array('@tag' => $tag, '@text' => $text))),
+              'attributes' => array('title' => t('Go to @tag @text', array(
+                '@tag' => $tag,
+                '@text' => $text,
+              ))),
             )
           ),
         );
@@ -1345,7 +1368,7 @@ function _pagerer_get_neighborhood_pages($variables, $markers) {
  *   a key 'progressive' set to TRUE is also added as a marker
  */
 function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_factor, $ratio, $limit = NULL) {
-    global $pager_limits;
+  global $pager_limits;
 
   // Avoid endless loop in converging series.
   if ($ratio < 1) {
@@ -1486,12 +1509,14 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
         case 'items':
           $text = t($tag, array('@num' => abs($offset * $pager_limits[$variables['element']])));
           break;
+
         case 'pages':
         default:
           $text = t($tag, array('@num' => abs($offset)));
           break;
       }
       break;
+
     case 'absolute':
     default:
       switch ($variables['display']) {
@@ -1501,9 +1526,11 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
                   . $variables['range_separator']
                   . ($max);
           break;
+
         case 'items':
           $text = ($c + $offset) * $pager_limits[$variables['element']] + 1;
           break;
+
         case 'pages':
         default:
           $text = $c + $offset + 1;
@@ -1531,9 +1558,11 @@ function _pagerer_get_label_tag($variables) {
     case 'item_ranges':
       return $variables['tags']['item_range_label'];
       break;
+
     case 'items':
       return $variables['tags']['item_label'];
       break;
+
     case 'pages':
     default:
       return $variables['tags']['page_label'];
@@ -1561,6 +1590,7 @@ function _pagerer_get_total($variables, $markers) {
     case 'item_ranges':
       return $markers['pager_item_max'];
       break;
+
     case 'pages':
     default:
       return $markers['pager_max'];
@@ -1665,6 +1695,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
       );
       break;
+
     case 'slider':
       // Add ui.slider library.
       drupal_add_library('system', 'ui.slider');
@@ -1688,7 +1719,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 }
 
 /**
- * Override of standard theme_pager_link()
+ * Override of standard theme_pager_link().
  *
  * Needed as theme_pagerer_adaptive() handles additional paging parameters
  * in the querystring. The standard function would override the 'page_ak'
@@ -1825,7 +1856,7 @@ function _pagerer_browser_info($agent = NULL) {
   $known = array('Version', $ub, 'other');
   $pattern = '#(?<browser>' . join('|', $known) . ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
   if (!preg_match_all($pattern, $agent, $matches)) {
-      // We have no matching number just continue.
+    // We have no matching number just continue.
   }
   // See how many matches we have.
   $i = count($matches['browser']);
