@@ -267,4 +267,3 @@ tags to be used to render the pager. It differs from Drupal core pager
 In the ‘first’, ‘previous’, ‘next’, ‘last’, ‘previous_progr’ and
 ‘next_progr’ tags you can use a ‘@num’ placeholder to enable the actual
 offset to be shown at runtime.
-

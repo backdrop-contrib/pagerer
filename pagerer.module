@@ -246,56 +246,56 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
   switch ($theme) {
     case 'pagerer_standard':
       $default_tags = array(
-          'first'            => t('« first'),
-          'previous'         => t('‹ previous'),
-          'next'             => t('next ›'),
-          'last'             => t('last »'),
-          'total'            => t('of @total'),
-          'page_label'       => t('Page'),
-          'item_label'       => t('Item'),
-          'item_range_label' => t('Items'),
-        );
+        'first'            => t('« first'),
+        'previous'         => t('‹ previous'),
+        'next'             => t('next ›'),
+        'last'             => t('last »'),
+        'total'            => t('of @total'),
+        'page_label'       => t('Page'),
+        'item_label'       => t('Item'),
+        'item_range_label' => t('Items'),
+      );
       break;
 
     case 'pagerer_mini':
       $default_tags = array(
-          'first'            => t('«'),
-          'previous'         => t('<'),
-          'next'             => t('>'),
-          'last'             => t('»'),
-          'total'            => t('of @total'),
-          'page_label'       => t('Page'),
-          'item_label'       => t('Item'),
-          'item_range_label' => t('Items'),
-        );
+        'first'            => t('«'),
+        'previous'         => t('<'),
+        'next'             => t('>'),
+        'last'             => t('»'),
+        'total'            => t('of @total'),
+        'page_label'       => t('Page'),
+        'item_label'       => t('Item'),
+        'item_range_label' => t('Items'),
+      );
       break;
 
     case 'pagerer_slider':
       $default_tags = array(
-          'first'            => t('«'),
-          'previous'         => t('<'),
-          'next'             => t('>'),
-          'last'             => t('»'),
-          'total'            => t('of @total'),
-          'page_label'       => t('Page'),
-          'item_label'       => t('Item'),
-          'item_range_label' => t('Items'),
-        );
+        'first'            => t('«'),
+        'previous'         => t('<'),
+        'next'             => t('>'),
+        'last'             => t('»'),
+        'total'            => t('of @total'),
+        'page_label'       => t('Page'),
+        'item_label'       => t('Item'),
+        'item_range_label' => t('Items'),
+      );
       break;
 
     default:
       $default_tags = array(
-          'first'            => t('« @num'),
-          'previous'         => t('‹ @num'),
-          'next'             => t('@num ›'),
-          'last'             => t('@num »'),
-          'previous_progr'   => t('-@num'),
-          'next_progr'       => t('+@num'),
-          'total'            => t('of @total'),
-          'page_label'       => t('Page'),
-          'item_label'       => t('Item'),
-          'item_range_label' => t('Items'),
-        );
+        'first'            => t('« @num'),
+        'previous'         => t('‹ @num'),
+        'next'             => t('@num ›'),
+        'last'             => t('@num »'),
+        'previous_progr'   => t('-@num'),
+        'next_progr'       => t('+@num'),
+        'total'            => t('of @total'),
+        'page_label'       => t('Page'),
+        'item_label'       => t('Item'),
+        'item_range_label' => t('Items'),
+      );
       break;
   }
   if ($tags) {
@@ -1205,9 +1205,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'element' => $variables['element'],
               'interval' => -$page_data['interval'],
               'parameters' => $variables['parameters'],
-              'attributes' => array('title' => t('Go to @tag @text', array(
-                '@tag' => $tag,
-                '@text' => $text,
+              'attributes' => array(
+                'title' => t('Go to @tag @text', array(
+                  '@tag' => $tag,
+                  '@text' => $text,
               ))),
             )
           ),
@@ -1281,9 +1282,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               'element' => $variables['element'],
               'interval' => $page_data['interval'],
               'parameters' => $variables['parameters'],
-              'attributes' => array('title' => t('Go to @tag @text', array(
-                '@tag' => $tag,
-                '@text' => $text,
+              'attributes' => array(
+                'title' => t('Go to @tag @text', array(
+                  '@tag' => $tag,
+                  '@text' => $text,
               ))),
             )
           ),

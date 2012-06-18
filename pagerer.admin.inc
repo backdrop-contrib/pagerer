@@ -41,11 +41,11 @@ function pagerer_settings_form($form, &$form_state) {
 
   // List of the themes available for panes.
   $options = array(
-    'none', 
-    'pagerer_standard', 
-    'pagerer_mini', 
-    'pagerer_slider', 
-    'pagerer_progressive', 
+    'none',
+    'pagerer_standard',
+    'pagerer_mini',
+    'pagerer_slider',
+    'pagerer_progressive',
     'pagerer_adaptive',
   );
   $options = drupal_map_assoc($options);
@@ -278,11 +278,11 @@ function pagerer_pane_settings_form($form, &$form_state) {
     case 'left':
       $pane_t = t('Left');
       break;
-      
+
     case 'center':
       $pane_t = t('Center');
       break;
-      
+
     case 'right':
       $pane_t = t('Right');
       break;

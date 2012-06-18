@@ -27,7 +27,7 @@ table.pagerer tbody tr td div.item-list,
 table.pagerer tbody tr td div.item-list ul.pager,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-current {
-  list-style-image:none;
+  list-style-image: none;
   list-style-type: none;
   margin: 0;
   padding: 0.1em 0 0 0;
@@ -35,7 +35,7 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-current {
 }
 table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-previous {
-  list-style-image:none;
+  list-style-image: none;
   list-style-type: none;
   margin: 0 0.5em 0 0;
   padding: 0.1em 0 0 0;
@@ -43,19 +43,19 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-previous {
 }
 table.pagerer tbody tr td div.item-list ul.pager li.pager-next,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-last {
-  list-style-image:none;
+  list-style-image: none;
   list-style-type: none;
   margin: 0 0 0 0.5em;
   padding: 0.1em 0 0 0;
   vertical-align: middle;
 }
-.pagerer-left .item-list .pager{
+.pagerer-left .item-list .pager {
   text-align: left;
 }
-.pagerer-center .item-list .pager{
+.pagerer-center .item-list .pager {
   text-align: center;
 }
-.pagerer-right .item-list .pager{
+.pagerer-right .item-list .pager {
   text-align: right;
 }
 

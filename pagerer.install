@@ -28,7 +28,7 @@ function pagerer_uninstall() {
   $res = db_select('variable', 'v')
       ->fields('v')
       ->condition('name', 'pagerer%', 'LIKE')
-      ->execute();    
+      ->execute();
   if ($res) {
     foreach ($res as $row) {
       variable_del($row->name);

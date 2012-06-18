@@ -110,13 +110,13 @@ function pagerer_example_page() {
   $build['l_pagerer_standard'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s standard)</b> in three \'display\' modes: \'pages\', \'items\', and \'item_ranges\'');
   $build['pagerer_standard_pages'] = array('#theme' => 'pagerer_standard', '#element' => 0);
   $build['pagerer_standard_items'] = array(
-    '#theme' => 'pagerer_standard', 
-    '#display' => 'items', 
-    '#element' => 0
+    '#theme' => 'pagerer_standard',
+    '#display' => 'items',
+    '#element' => 0,
   );
   $build['pagerer_standard_item_ranges'] = array(
-    '#theme' => 'pagerer_standard', 
-    '#display' => 'item_ranges', 
+    '#theme' => 'pagerer_standard',
+    '#display' => 'item_ranges',
     '#element' => 0,
   );
   $build['l_pagerer_progressive'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
