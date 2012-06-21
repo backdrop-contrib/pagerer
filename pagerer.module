@@ -1667,7 +1667,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     $text = t('item');
   }
 
-   // Prepare root and path to the page.
+  // Prepare root and path to the page.
   $path = url(request_path(), array('query' => $variables['parameters']));
   $root = base_path();
   if (strpos($path, $root) == 0) {

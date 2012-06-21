@@ -12,7 +12,7 @@ Drupal.behaviors.pagerer = {
 
     // pagerer-page event binding
     $(".pagerer-page", context)
-    .ready().each( function(index) {
+    .ready().each(function(index) {
       var state = eval('(' + $(this).attr('name') + ');');
       $(this).width(String(state.total).length + 'em');
     })
@@ -69,7 +69,7 @@ Drupal.behaviors.pagerer = {
 
     // pagerer-slider event binding
     $('.pagerer-slider', context)
-    .ready().each( function(index) {
+    .ready().each(function(index) {
       var state = eval('(' + $(this).attr('id') + ');');
       var sliderBar = $(this);
       sliderBar.slider({ min : 1, range : 'min', animate: true });
