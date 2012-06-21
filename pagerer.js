@@ -6,30 +6,16 @@
  */
 (function ($) {
 
-Drupal.pagerer = {};
-
 Drupal.behaviors.pagerer = {
+
   attach: function(context, settings) {
-
-    // document ready
-    $(document).ready(function(){
-
-      // adjust all the widths of pagerer-page to corresponding max
-      // width expected
-      $('.pagerer-page').each(function(index) {
-        var state = eval('(' + $(this).attr('name') + ');');
-        $(this).width(String(state.total).length + 'em');
-      });
-
-      // initiate slider
-      $('.pagerer-slider').each(function(index) {
-        $(this).slider({ min : 1, range : 'min', animate: true });
-      });
-
-    });
 
     // pagerer-page event binding
     $(".pagerer-page", context)
+    .ready().each( function(index) {
+      var state = eval('(' + $(this).attr('name') + ');');
+      $(this).width(String(state.total).length + 'em');
+    })
     .bind('focus', function(e) {
       this.select();
       $(this).addClass('pagerer-page-has-focus');
@@ -83,14 +69,16 @@ Drupal.behaviors.pagerer = {
 
     // pagerer-slider event binding
     $('.pagerer-slider', context)
-    .bind('slidecreate', function(e, ui) {
+    .ready().each( function(index) {
       var state = eval('(' + $(this).attr('id') + ');');
       var sliderBar = $(this);
+      sliderBar.slider({ min : 1, range : 'min', animate: true });
       var sliderHandle = $(this).find(".ui-slider-handle")
       sliderHandle
         .width((String(state.total).length + 2) + 'em')
         .css('line-height', sliderHandle.height() + 'px')
         .css('margin-left', -sliderHandle.width() / 2)
+        .text(state.current)
         .bind('blur', function(e) {
           if ($(this).hasClass('being-spinned')) {
             return false;
@@ -113,10 +101,10 @@ Drupal.behaviors.pagerer = {
     })
     .bind('slidechange', function(e, ui) {
       var sliderHandle = $(this).find(".ui-slider-handle");
-      sliderHandle.text(ui.value + ' ');
-      if (sliderHandle.hasClass('pagerer-slider-set')) {
-        sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
-        sliderHandle.find('.ui-icon-check')
+      sliderHandle
+        .text(ui.value + ' ')
+        .append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>")
+        .find('.ui-icon-check')
           .bind('mousedown', function(e) {
             var sliderBar = $(this).parent().parent();
             var state = eval('(' + sliderBar.attr('id') + ');');
@@ -130,9 +118,6 @@ Drupal.behaviors.pagerer = {
             pagerer_relocate(state.root, state.path.replace(/pagererpage/, newPage));
             return false;
           });
-      } else {
-        sliderHandle.addClass('pagerer-slider-set');
-      }
     });
 
     // pagerer-slider control icons event binding

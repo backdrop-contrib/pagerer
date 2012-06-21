@@ -170,7 +170,7 @@ function pagerer_theme() {
 function pagerer_theme_registry_alter(&$theme_registry) {
   $vars = _pagerer_get_variables();
   // Replace the built-in pagers only if options are set and
-  // the theme hooks are not alredy overridden.
+  // the theme hooks are not already overridden.
   if ($vars['pagerer_override_pager']
       and _pagerer_theme_override_safe($theme_registry, 'pager', 'theme_pager', 'system')) {
     $theme_registry['pager']['theme path'] = drupal_get_path('module', 'pagerer');
@@ -225,7 +225,7 @@ function _pagerer_theme_override_safe($theme_registry, $theme, $function, $modul
   }
   else {
     drupal_set_message(
-      t('The "!theme" theme is currently overriden by "!function" from "!path". Remove overrides to Drupal core pager themes by disabling affecting modules/templates to enable Pagerer.',
+      t('The "!theme" theme is currently overridden by "!function" from "!path". Remove overrides to Drupal core pager themes by disabling affecting modules/templates to enable Pagerer.',
         array(
           '!theme'    => $theme,
           '!function' => isset($theme_registry[$theme]['function']) ? $theme_registry[$theme]['function'] . '()' : $theme_registry[$theme]['template'] . '.tpl.php',
@@ -714,8 +714,8 @@ function _pagerer_theme_handler($theme, $variables) {
         if (isset($aksa[$variables['element']])) {
           $_pagerer_ak_array[$variables['element']] = $aksa[$variables['element']];
           $tmp = explode('.', $aksa[$variables['element']]);
-          $pl = $tmp[0];
-          $pr = $tmp[1];
+          $pl = isset($tmp[0]) ? $tmp[0] : 0;
+          $pr = isset($tmp[1]) ? $tmp[1] : $m;
           $px = isset($tmp[2]) ? $tmp[2] : NULL;
         }
       }
@@ -981,7 +981,7 @@ function _pagerer_itemize_first_link($variables, $markers, $aks) {
   $items = array();
   $items[] = array(
     'class' => array('pager-first'),
-    'data' => $li_first ? $li_first : t($variables['tags']['first'], array('@num' => $text)),
+    'data' => $li_first ? _pagerer_resolve_link_data($li_first) : t($variables['tags']['first'], array('@num' => $text)),
   );
   return $items;
 }
@@ -1018,7 +1018,7 @@ function _pagerer_itemize_previous_link($variables, $markers, $aks) {
   $items = array();
   $items[] = array(
     'class' => array('pager-previous'),
-    'data' => $li_previous ? $li_previous : t($variables['tags']['previous'], array('@num' => $text)),
+    'data' => $li_previous ? _pagerer_resolve_link_data($li_previous) : t($variables['tags']['previous'], array('@num' => $text)),
   );
   return $items;
 }
@@ -1055,7 +1055,7 @@ function _pagerer_itemize_next_link($variables, $markers, $aks) {
   $items = array();
   $items[] = array(
     'class' => array('pager-next'),
-    'data' => $li_next ? $li_next : t($variables['tags']['next'], array('@num' => $text)),
+    'data' => $li_next ? _pagerer_resolve_link_data($li_next) : t($variables['tags']['next'], array('@num' => $text)),
   );
   return $items;
 }
@@ -1093,7 +1093,7 @@ function _pagerer_itemize_last_link($variables, $markers, $aks) {
   $items = array();
   $items[] = array(
     'class' => array('pager-last'),
-    'data' => $li_last ? $li_last : t($variables['tags']['last'], array('@num' => $text)),
+    'data' => $li_last ? _pagerer_resolve_link_data($li_last) : t($variables['tags']['last'], array('@num' => $text)),
   );
   return $items;
 }
@@ -1195,23 +1195,24 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         else {
           unset($variables['parameters']['page_ak']);
         }
+        $link_data = theme(
+          'pager_link',
+          array(
+            'text' => $text,
+            'page_new' => $page_new,
+            'element' => $variables['element'],
+            'interval' => -$page_data['interval'],
+            'parameters' => $variables['parameters'],
+            'attributes' => array(
+              'title' => t('Go to @tag @text', array(
+                '@tag' => $tag,
+                '@text' => $text,
+            ))),
+          )
+        );
         $items[] = array(
           'class' => array('pager-item'),
-          'data' => theme(
-            'pager_link',
-            array(
-              'text' => $text,
-              'page_new' => $page_new,
-              'element' => $variables['element'],
-              'interval' => -$page_data['interval'],
-              'parameters' => $variables['parameters'],
-              'attributes' => array(
-                'title' => t('Go to @tag @text', array(
-                  '@tag' => $tag,
-                  '@text' => $text,
-              ))),
-            )
-          ),
+          'data' => _pagerer_resolve_link_data($link_data),
         );
       }
       elseif ($page_data['interval'] == 0) {
@@ -1272,23 +1273,24 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         else {
           unset($variables['parameters']['page_ak']);
         }
+        $link_data = theme(
+          'pager_link',
+          array(
+            'text' => $text,
+            'page_new' => $page_new,
+            'element' => $variables['element'],
+            'interval' => $page_data['interval'],
+            'parameters' => $variables['parameters'],
+            'attributes' => array(
+              'title' => t('Go to @tag @text', array(
+                '@tag' => $tag,
+                '@text' => $text,
+            ))),
+          )
+        );
         $items[] = array(
           'class' => array('pager-item'),
-          'data' => theme(
-            'pager_link',
-            array(
-              'text' => $text,
-              'page_new' => $page_new,
-              'element' => $variables['element'],
-              'interval' => $page_data['interval'],
-              'parameters' => $variables['parameters'],
-              'attributes' => array(
-                'title' => t('Go to @tag @text', array(
-                  '@tag' => $tag,
-                  '@text' => $text,
-              ))),
-            )
-          ),
+          'data' => _pagerer_resolve_link_data($link_data),
         );
       }
       $i++;
@@ -1665,20 +1667,16 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     $text = t('item');
   }
 
-  if (!empty($GLOBALS['conf']['clean_url'])) {
-    // Clean urls.
-    $path = $_GET['q'] . '?' . drupal_http_build_query($variables['parameters']);
-  }
-  else {
-    // No clean urls.
-    $query = array('q' => $_GET['q']);
-    $query += $variables['parameters'];
-    $path = '?' . drupal_http_build_query($query);
+   // Prepare root and path to the page.
+  $path = url(request_path(), array('query' => $variables['parameters']));
+  $root = base_path();
+  if (strpos($path, $root) == 0) {
+    $path = drupal_substr($path, drupal_strlen($root));
   }
 
   // Prepare js widget state and title.
   $state = drupal_json_encode(array(
-    'root'     => url(NULL, array('absolute' => TRUE)),
+    'root'     => $root,
     'path'     => $path,
     'element'  => $variables['element'],
     'quantity' => $variables['quantity'],
@@ -1798,6 +1796,30 @@ function _pagerer_get_variables() {
   }
 
   return $vars;
+}
+
+/**
+ * Helper to convert to data returned from pager_xxxx calls.
+ *
+ * Tao based-themes override Drupal core pager_xxxx() calls and
+ * return an array that can be used by theme_links(), instead of
+ * HTML markup. In this case the input is themed and HTML returned.
+ *
+ * @param string|array $link
+ *   result of pager_xxxx() call
+ *
+ * @return string
+ *   HTML markup
+ */
+function _pagerer_resolve_link_data($link) {
+  if (is_array($link)) {
+    if (isset($link['title']) and isset($link['href'])) {
+      $link = theme('links', array(
+        'links' => array($link),
+      ));
+    }
+  }
+  return $link;
 }
 
 /**
