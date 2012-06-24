@@ -1814,9 +1814,7 @@ function _pagerer_get_variables() {
 function _pagerer_resolve_link_data($link) {
   if (is_array($link)) {
     if (isset($link['title']) and isset($link['href'])) {
-      $link = theme('links', array(
-        'links' => array($link),
-      ));
+      $link = l($link['title'], $link['href'], $link);
     }
   }
   return $link;
