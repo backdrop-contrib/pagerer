@@ -634,10 +634,10 @@ function theme_pagerer_mini($variables) {
  * Page navigation is managed via javascript.
  */
 function theme_pagerer_slider($variables) {
-  // Requires 'jquery_update' and 'jquery_plugin' modules.
-  if (!module_exists('jquery_update') or !module_exists('jquery_plugin')) {
+  // Requires 'jquery_update' module.
+  if (!module_exists('jquery_update')) {
     drupal_set_message(
-      t('The pagerer_slider theme requires "jquery_update" and "jquery_plugin" modules to be installed and enabled to work properly.'),
+      t('The pagerer_slider theme requires "jQuery update" module to be installed and enabled to work properly.'),
       'error',
       FALSE
     );
