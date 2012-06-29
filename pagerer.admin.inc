@@ -474,12 +474,6 @@ function pagerer_pane_settings_form($form, &$form_state) {
 }
 
 /**
- * Pagerer pane level settings admin form - validation.
- */
-function pagerer_pane_settings_form_validate($form, $form_state) {
-}
-
-/**
  * Pagerer pane level settings admin form - submission.
  */
 function pagerer_pane_settings_form_submit($form, $form_state) {

@@ -1,16 +1,16 @@
-Pagerer
+ï»¿Pagerer
 =======
 
 Pagerer is a module providing a collection of pager themes to enhance
 Drupal standard pager.
 
 The most straightforward usage is to display on a page a pager that is
-made up of three ‘panes’ (left, center, and right); and each pane
+made up of three 'panes' (left, center, and right); and each pane
 contains (or not) a pager theme, so providing plenty of possibilities to
-combine different elements to satisfy complex requirements. Pagerer’s
+combine different elements to satisfy complex requirements. Pagerer's
 configuration provides an easy way to setup the pager according to the
-needs, and allows as well to override Drupal’s core pager so that
-Pagerer’s capabilities can be activated on a site by an administrator.
+needs, and allows as well to override Drupal's core pager so that
+Pagerer's capabilities can be activated on a site by an administrator.
 Pagerer uses standard Drupal pager classes to render the pagers, so
 styling is preserved.
 
@@ -19,14 +19,14 @@ allowing even more complex scenarios.
 
 Themes:
 
-pagerer_standard – alike standard Drupal pager theme
+pagerer_standard - alike standard Drupal pager theme
 pagerer_progressive - provides links to pages progressively more distant
                       from current
 pagerer_adaptive - provides links to pages following an adaptive logic
-pagerer_mini – minimal pager, providing direct page entry
-pagerer_slider – provides page navigation through a jQuery UI slider
+pagerer_mini - minimal pager, providing direct page entry
+pagerer_slider - provides page navigation through a jQuery UI slider
                  (requires jQuery Update module)
-pagerer – a multi-pane (left, center, and right) pager theme, enabling
+pagerer - a multi-pane (left, center, and right) pager theme, enabling
           each pane to contain one of the themes above
 
 Features:
@@ -40,8 +40,8 @@ vertical bar) and page breakers (like an ellipsis)
 
 Credits:
 
-The ‘pagerer_mini’ theme concept and javascript code is to a large
-extent the same of the ‘Minimax pager’ module for Drupal 6 (i.e. proudly
+The 'pagerer_mini' theme concept and javascript code is to a large
+extent the same of the 'Minimax pager' module for Drupal 6 (i.e. proudly
 copied, thanks mattyoung).
 
 Themes
@@ -153,33 +153,33 @@ Examples:
 
 page 9 out of 955, display 'pages':
 -----------------------------------------------------------
-« < Page 9 of 955 > »
+<< < Page 9 of 955 > >>
 -----------------------------------------------------------
 
 page 9 out of 955, total items = 47731, limit = 50, display = 'items':
 -----------------------------------------------------------
- « < Item 401 of 47731 > »
- -----------------------------------------------------------
+<< < Item 401 of 47731 > >>
+-----------------------------------------------------------
 
 theme_pagerer_slider
 --------------------
 This theme displays a jquery slider. Page navigation is managed via
 javascript.
 
-pagerer_xxxx themes’ variables
+pagerer_xxxx themes' variables
 ==============================
 
-Pagerer themes’ variables array differs, to some extent, from standard
+Pagerer themes' variables array differs, to some extent, from standard
 Drupal core pager theme variables.
 
 - tags: an associative array of tags to be used to render the pager, see
-  details in section below (note: this is different from Drupal ‘tags’
+  details in section below (note: this is different from Drupal 'tags'
   variable in the pager theme!)
 - element: same as Drupal, an optional integer to distinguish between
   multiple pagers on one page.
 - parameters: same as Drupal, an associative array of query string
   parameters to append to the pager links.
-- quantity: the number of pages in the list of the ‘neighborhood’ of the
+- quantity: the number of pages in the list of the 'neighborhood' of the
   current page. For pagerer_slider theme, it serves to approximate the witdh
   of the jQuery slider.
 - display: can take the values 'pages', 'items', 'item_ranges'. Determines
@@ -215,14 +215,14 @@ Drupal core pager theme variables.
 - factors: pagerer_progressive theme only. Comma delimited string of factors
   to use to determine progressive links.
 - pager_breaker: Text to render a break in the page sequence.
-- pager_separator: Text to fill between contiguous pages. If ‘none’, no
+- pager_separator: Text to fill between contiguous pages. If 'none', no
   separators are rendered.
 - range_separator: Text to place between first and last item in a range.
 
 pagerer theme variables 
 =======================
 
-The ‘pagerer’ theme itself is more a container of individual
+The 'pagerer' theme itself is more a container of individual
 pagerer_xxxx themes. The theme to be used in each pane (left, center,
 and right) and its variables are passed to a {position}_pane variable of
 the pagerer theme.
@@ -231,39 +231,39 @@ the pagerer theme.
   multiple pagers on one page. 
 - parameters: same as Drupal, an associative array of query string parameters 
   to append to the pager links. 
-- {position}_pane: where {position} is ‘left’|’center’|’right’, an associative 
+- {position}_pane: where {position} is 'left'|'center'|'right', an associative 
   array of 
-    - theme_name: ‘pagerer_standard’ |’pagerer_progressive’ | 
-	  ’pagerer_adaptive’ | ’pagerer_mini’ | ’pagerer_slider’ | ’none’ 
+    - theme_name: 'pagerer_standard' |'pagerer_progressive' | 
+	  'pagerer_adaptive' | 'pagerer_mini' | 'pagerer_slider' | 'none' 
     - theme_variables: the $variables associative array for the theme passed 
-      in ‘theme_name’
+      in 'theme_name'
 
-The ‘tags’ variable in Pagerer 
+The 'tags' variable in Pagerer 
 ==============================
 
-The ‘tags’ variable in pagerer_xxxx themes is an associative array of
+The 'tags' variable in pagerer_xxxx themes is an associative array of
 tags to be used to render the pager. It differs from Drupal core pager
-‘tags’ variable, which is a simple array.
+'tags' variable, which is a simple array.
 
-- first: Text to use to render the link to the first page (e.g. “<<
-  first”). 
+- first: Text to use to render the link to the first page (e.g. "<<
+  first"). 
 - previous: Text to use to render the link to the previous page
-  (e.g. “< previous”). 
-- next: Text to use to render the link to the next page (e.g. “next >”). 
-- last: Text to use to render the link to the last page (e.g. “last >>”). 
+  (e.g. "< previous"). 
+- next: Text to use to render the link to the next page (e.g. "next >"). 
+- last: Text to use to render the link to the last page (e.g. "last >>"). 
 - previous_progr: pagerer_progressive and pagerer_adaptive themes only. 
   Text to use to render the link to a previous page outside of the 
-  neighborhood (e.g. “-100”). 
+  neighborhood (e.g. "-100"). 
 - next_progr: pagerer_progressive and pagerer_adaptive themes only. Text 
   to use to render the link to a next page outside of the neighborhood 
-  (e.g. “+100”). 
+  (e.g. "+100"). 
 - total: Text to use to render the total pages/items on the pager (e.g. 
-  “of 100”). Use ‘@total’ placeholder to enable the actual total number 
+  "of 100"). Use '@total' placeholder to enable the actual total number 
   be shown at runtime. 
-- page_label: Text to use to render a ‘Page’ label. 
-- item_label: Text to use to render a ‘Item’ label. 
-- item_range_label: Text to use to render a ‘Items range’ label.
+- page_label: Text to use to render a 'Page' label. 
+- item_label: Text to use to render a 'Item' label. 
+- item_range_label: Text to use to render a 'Items range' label.
 
-In the ‘first’, ‘previous’, ‘next’, ‘last’, ‘previous_progr’ and
-‘next_progr’ tags you can use a ‘@num’ placeholder to enable the actual
+In the 'first', 'previous', 'next', 'last', 'previous_progr' and
+'next_progr' tags you can use a '@num' placeholder to enable the actual
 offset to be shown at runtime.
