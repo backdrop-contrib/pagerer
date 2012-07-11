@@ -625,6 +625,16 @@ function theme_pagerer_adaptive($variables) {
  * -----------------------------------------------------------
  */
 function theme_pagerer_mini($variables) {
+  // Requires 'jquery_update' module.
+  if (!module_exists('jquery_update')) {
+    drupal_set_message(
+      t('The pagerer_mini theme requires "jQuery update" module to be installed and enabled to work properly.'),
+      'error',
+      FALSE
+    );
+    return NULL;
+  }
+
   return _pagerer_theme_handler('pagerer_mini', $variables);
 }
 
@@ -717,6 +727,9 @@ function _pagerer_theme_handler($theme, $variables) {
           $pl = isset($tmp[0]) ? $tmp[0] : 0;
           $pr = isset($tmp[1]) ? $tmp[1] : $m;
           $px = isset($tmp[2]) ? $tmp[2] : NULL;
+        }
+        else {
+          list($pl, $pr, $px) = array(0, $m, NULL);
         }
       }
       else {

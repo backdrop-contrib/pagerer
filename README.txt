@@ -24,6 +24,7 @@ pagerer_progressive - provides links to pages progressively more distant
                       from current
 pagerer_adaptive - provides links to pages following an adaptive logic
 pagerer_mini - minimal pager, providing direct page entry
+               (requires jQuery Update module)
 pagerer_slider - provides page navigation through a jQuery UI slider
                  (requires jQuery Update module)
 pagerer - a multi-pane (left, center, and right) pager theme, enabling
