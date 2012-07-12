@@ -718,22 +718,19 @@ function _pagerer_theme_handler($theme, $variables) {
   switch ($theme) {
     case 'pagerer_adaptive':
       // Determine adaptive keys coming from query parameters.
+      list($pl, $pr, $px) = array(0, $m, NULL);
       $qps = drupal_get_query_parameters();
       if (isset($qps['page_ak'])) {
+        // A 'page_ak' query parameter exists in the calling URL.
         $aksa = explode(',', $qps['page_ak']);
         if (isset($aksa[$variables['element']])) {
+          // Adaptive keys for the specific element exist.
           $_pagerer_ak_array[$variables['element']] = $aksa[$variables['element']];
           $tmp = explode('.', $aksa[$variables['element']]);
           $pl = isset($tmp[0]) ? $tmp[0] : 0;
           $pr = isset($tmp[1]) ? $tmp[1] : $m;
           $px = isset($tmp[2]) ? $tmp[2] : NULL;
         }
-        else {
-          list($pl, $pr, $px) = array(0, $m, NULL);
-        }
-      }
-      else {
-        list($pl, $pr, $px) = array(0, $m, NULL);
       }
       // First.
       $pages[0]['interval'] = -$c;
@@ -1702,7 +1699,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   $items = array();
   switch ($element_type) {
     case 'widget':
-      $title = t('Enter @text, and press <Return>.', array('@text' => $text));
+      $title = t('Enter @text, and press Return.', array('@text' => $text));
       $items[] = array(
         'class' => array('pager-current'),
         'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
@@ -1812,14 +1809,14 @@ function _pagerer_get_variables() {
 }
 
 /**
- * Helper to convert to data returned from pager_xxxx calls.
+ * Helper to convert data returned from theme_pager_xxxx() calls.
  *
- * Tao based-themes override Drupal core pager_xxxx() calls and
+ * Tao based-themes override Drupal core theme_pager_xxxx() calls and
  * return an array that can be used by theme_links(), instead of
  * HTML markup. In this case the input is themed and HTML returned.
  *
  * @param string|array $link
- *   result of pager_xxxx() call
+ *   result of theme_pager_xxxx() call
  *
  * @return string
  *   HTML markup

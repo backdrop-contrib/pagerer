@@ -54,10 +54,10 @@ function pagerer_example_page() {
   $header_0 = array(
     array('data' => t('wid')),
     array('data' => t('type')),
-    array('data' => t('message')),
+    array('data' => t('timestamp')),
   );
   $query_0 = db_select('watchdog', 'd')->extend('PagerDefault')->element(0);
-  $query_0->fields('d', array('wid', 'type', 'message'));
+  $query_0->fields('d', array('wid', 'type', 'timestamp'));
   $result_0 = $query_0
     ->limit(5)
     ->orderBy('d.wid')
