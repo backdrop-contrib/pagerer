@@ -625,16 +625,6 @@ function theme_pagerer_adaptive($variables) {
  * -----------------------------------------------------------
  */
 function theme_pagerer_mini($variables) {
-  // Requires 'jquery_update' module.
-  if (!module_exists('jquery_update')) {
-    drupal_set_message(
-      t('The pagerer_mini theme requires "jQuery update" module to be installed and enabled to work properly.'),
-      'error',
-      FALSE
-    );
-    return NULL;
-  }
-
   return _pagerer_theme_handler('pagerer_mini', $variables);
 }
 
@@ -644,26 +634,7 @@ function theme_pagerer_mini($variables) {
  * Page navigation is managed via javascript.
  */
 function theme_pagerer_slider($variables) {
-  // Requires 'jquery_update' module.
-  if (!module_exists('jquery_update')) {
-    drupal_set_message(
-      t('The pagerer_slider theme requires "jQuery update" module to be installed and enabled to work properly.'),
-      'error',
-      FALSE
-    );
-    return NULL;
-  }
-
-  // It will not work for Internet Explorer below version 9. In such case,
-  // revert to pagerer_mini.
-  $browser_info = _pagerer_browser_info();
-  if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
-    $variables['current_display'] = 'widget';
-    return _pagerer_theme_handler('pagerer_mini', $variables);
-  }
-  else {
-    return _pagerer_theme_handler('pagerer_slider', $variables);
-  }
+  return _pagerer_theme_handler('pagerer_slider', $variables);
 }
 
 /**
@@ -865,12 +836,24 @@ function _pagerer_theme_handler($theme, $variables) {
       'class' => array('pager-item'),
       'data' => _pagerer_get_label_tag($variables),
     );
+    if ($variables['pager_separator'] != 'none') {
+      $items[] = array(
+        'class' => array('pager-item'),
+        'data' => $variables['pager_separator'],
+      );
+    }
   }
   if ($variables['total_display'] == 'first') {
     $items[] = array(
       'class' => array('pager-item'),
       'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
     );
+    if ($variables['pager_separator'] != 'none') {
+      $items[] = array(
+        'class' => array('pager-item'),
+        'data' => $variables['pager_separator'],
+      );
+    }
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
@@ -890,12 +873,24 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
+    if ($variables['pager_separator'] != 'none') {
+      $items[] = array(
+        'class' => array('pager-item'),
+        'data' => $variables['pager_separator'],
+      );
+    }
     $items[] = array(
       'class' => array('pager-item'),
       'data' => _pagerer_get_label_tag($variables),
     );
   }
   if ($variables['total_display'] == 'last') {
+    if ($variables['pager_separator'] != 'none') {
+      $items[] = array(
+        'class' => array('pager-item'),
+        'data' => $variables['pager_separator'],
+      );
+    }
     $items[] = array(
       'class' => array('pager-item'),
       'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
@@ -1630,12 +1625,39 @@ function _pagerer_get_total($variables, $markers) {
  */
 function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   global $pager_page_array, $pager_limits;
+  static $js_enabled;
+
   $vars = _pagerer_get_variables();
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
 
-  // Add pagerer js.
-  drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
+  // Checks jQuery is available.
+  if (!isset($js_enabled)) {
+    // Requires 'jquery_update' module.
+    if (module_exists('jquery_update')) {
+      // Add pagerer js.
+      $js_enabled = TRUE;
+      drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
+    }
+    else {
+      // Degrade.
+      $js_enabled = FALSE;
+      drupal_set_message(
+        t('Pagerer module requires "jQuery update" module to be installed and enabled to use properly jQuery elements.'),
+        'error',
+        FALSE
+      );
+    }
+  }
+
+  // Slider will not work for Internet Explorer below version 9. In such case,
+  // revert to widget.
+  if ($element_type == 'slider') {
+    $browser_info = _pagerer_browser_info();
+    if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
+      $element_type = 'widget';
+    }
+  }
 
   // Prepare query parameters.
   // 'page' querystring fragment, overriding current 'page' with a text
@@ -1697,32 +1719,40 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   ));
 
   $items = array();
-  switch ($element_type) {
-    case 'widget':
-      $title = t('Enter @text, and press Return.', array('@text' => $text));
-      $items[] = array(
-        'class' => array('pager-current'),
-        'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
-      );
-      break;
+  if ($js_enabled) {
+    switch ($element_type) {
+      case 'widget':
+        $title = t('Enter @text, and press Return.', array('@text' => $text));
+        $items[] = array(
+          'class' => array('pager-current'),
+          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
+        );
+        break;
 
-    case 'slider':
-      // Add ui.slider library.
-      drupal_add_library('system', 'ui.slider');
-      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
-      );
-      $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
-      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider' id='$state' title='$title'/>",
-      );
-      $items[] = array(
-        'class' => array('pager-item'),
-        'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
-      );
-      break;
+      case 'slider':
+        // Add ui.slider library.
+        drupal_add_library('system', 'ui.slider');
+        $items[] = array(
+          'class' => array('pager-item'),
+          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
+        );
+        $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
+        $items[] = array(
+          'class' => array('pager-item'),
+          'data' => "<div class='pagerer-slider' id='$state' title='$title'/>",
+        );
+        $items[] = array(
+          'class' => array('pager-item'),
+          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
+        );
+        break;
+    }
+  }
+  else {
+    $items[] = array(
+      'class' => array('pager-current'),
+      'data' => $current,
+    );
   }
 
   return $items;

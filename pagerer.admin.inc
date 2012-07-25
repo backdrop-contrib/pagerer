@@ -454,7 +454,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' =>  t('Element separator'),
     '#default_value' => $v['pager_separator'],
-    '#description' => t('Text to fill between contiguous pages.'),
+    '#description' => t('Text to fill between contiguous pages. "none" will prevent creating any filler.'),
   );
   $form['separators_container']['range_separator'] = array(
     '#type' => 'textfield',

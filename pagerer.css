@@ -49,6 +49,7 @@ table.pagerer tbody tr td div.item-list ul.pager li.pager-last {
   padding: 0.1em 0 0 0;
   vertical-align: middle;
 }
+
 .pagerer-left .item-list .pager {
   text-align: left;
 }
