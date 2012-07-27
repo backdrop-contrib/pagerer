@@ -397,10 +397,7 @@ function theme_pagerer($variables) {
       $left_pane_vars['quantity'] = $variables['quantity'];
     }
     if (!isset($left_pane_vars['pager_separator'])) {
-      $left_pane_vars['pager_separator'] = '&nbsp';
-    }
-    if ($left_pane_vars['pager_separator'] == 'none') {
-      $left_pane_vars['pager_separator'] = '&nbsp';
+      $left_pane_vars['pager_separator'] = 'none';
     }
     $left_pane = array(
       'data' => theme(
@@ -429,10 +426,7 @@ function theme_pagerer($variables) {
       $center_pane_vars['quantity'] = $variables['quantity'];
     }
     if (!isset($center_pane_vars['pager_separator'])) {
-      $center_pane_vars['pager_separator'] = '&nbsp';
-    }
-    if ($center_pane_vars['pager_separator'] == 'none') {
-      $center_pane_vars['pager_separator'] = '&nbsp';
+      $center_pane_vars['pager_separator'] = 'none';
     }
     $center_pane = array(
       'data' => theme(
@@ -461,10 +455,7 @@ function theme_pagerer($variables) {
       $right_pane_vars['quantity'] = $variables['quantity'];
     }
     if (!isset($right_pane_vars['pager_separator'])) {
-      $right_pane_vars['pager_separator'] = '&nbsp';
-    }
-    if ($right_pane_vars['pager_separator'] == 'none') {
-      $right_pane_vars['pager_separator'] = '&nbsp';
+      $right_pane_vars['pager_separator'] = 'none';
     }
     $right_pane = array(
       'data' => theme(

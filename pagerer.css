@@ -24,32 +24,31 @@ table.pagerer tbody tr td {
   padding: 0;
 }
 table.pagerer tbody tr td div.item-list,
-table.pagerer tbody tr td div.item-list ul.pager,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-current {
+table.pagerer tbody tr td div.item-list ul.pager {
   list-style-image: none;
   list-style-type: none;
   margin: 0;
   padding: 0.1em 0 0 0;
   vertical-align: middle;
 }
+table.pagerer tbody tr td div.item-list ul.pager li.pager-item,
+table.pagerer tbody tr td div.item-list ul.pager li.pager-current,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-first,
-table.pagerer tbody tr td div.item-list ul.pager li.pager-previous {
-  list-style-image: none;
-  list-style-type: none;
-  margin: 0 0.5em 0 0;
-  padding: 0.1em 0 0 0;
-  vertical-align: middle;
-}
+table.pagerer tbody tr td div.item-list ul.pager li.pager-previous,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-next,
 table.pagerer tbody tr td div.item-list ul.pager li.pager-last {
   list-style-image: none;
   list-style-type: none;
-  margin: 0 0 0 0.5em;
+  margin: 0 0.3em 0 0.3em;
   padding: 0.1em 0 0 0;
   vertical-align: middle;
 }
-
+table.pagerer tbody tr td div.item-list ul.pager li.first.pager-item {
+  margin-left: 0;
+}
+table.pagerer tbody tr td div.item-list ul.pager li.last.pager-item {
+  margin-right: 0;
+}
 .pagerer-left .item-list .pager {
   text-align: left;
 }
