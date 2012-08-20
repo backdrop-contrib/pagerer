@@ -32,8 +32,9 @@ Drupal.behaviors.pagerer = {
       switch(event.keyCode) {
         case 13:
         case 10:
-          // Return.
+          // Return key pressed.
           var newPage;
+          // Determine destination page.
           if (state.display == 'pages') {
             newPage = isNaN($(this).val()) ? 0 : parseInt($(this).val()) - 1;
             if (newPage < 0) {
@@ -62,6 +63,10 @@ Drupal.behaviors.pagerer = {
           }
           event.stopPropagation();
           event.preventDefault();
+          return false;
+        case 27:
+          // Escape.
+           $(this).val(state.current);
           return false;
         case 38:
           // Up.
@@ -134,7 +139,7 @@ Drupal.behaviors.pagerer = {
     })
     .bind('slidechange', function(event, ui) {
 
-      // Add a tickmark in the handle, to be clicked to activate page relocation.
+      // Add a tickmark to the handle, to be clicked to activate page relocation.
       var sliderHandle = $(this).find(".ui-slider-handle");
       sliderHandle
         .text(ui.value + ' ')
@@ -249,6 +254,7 @@ Drupal.behaviors.pagerer = {
      */
     function pagererInViewsAjaxContext(element) {
       if (Drupal.settings && Drupal.settings.views && Drupal.settings.views.ajaxViews) {
+        // Loop through active Views Ajax elements.
         for (var i in Drupal.settings.views.ajaxViews) {
           var view = '.view-dom-id-' + Drupal.settings.views.ajaxViews[i].view_dom_id;
           var viewDiv = $(element).parents(view);
@@ -260,10 +266,8 @@ Drupal.behaviors.pagerer = {
             };
           }
         }
-        return false;
-      } else {
-        return false;
       }
+      return false;
     }
 
     /**

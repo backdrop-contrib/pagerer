@@ -396,9 +396,6 @@ function theme_pagerer($variables) {
     if (isset($variables['quantity'])) {
       $left_pane_vars['quantity'] = $variables['quantity'];
     }
-    if (!isset($left_pane_vars['pager_separator'])) {
-      $left_pane_vars['pager_separator'] = 'none';
-    }
     $left_pane = array(
       'data' => theme(
         $variables['left_pane']['theme_name'],
@@ -425,9 +422,6 @@ function theme_pagerer($variables) {
     if (isset($variables['quantity'])) {
       $center_pane_vars['quantity'] = $variables['quantity'];
     }
-    if (!isset($center_pane_vars['pager_separator'])) {
-      $center_pane_vars['pager_separator'] = 'none';
-    }
     $center_pane = array(
       'data' => theme(
         $variables['center_pane']['theme_name'],
@@ -453,9 +447,6 @@ function theme_pagerer($variables) {
     }
     if (isset($variables['quantity'])) {
       $right_pane_vars['quantity'] = $variables['quantity'];
-    }
-    if (!isset($right_pane_vars['pager_separator'])) {
-      $right_pane_vars['pager_separator'] = 'none';
     }
     $right_pane = array(
       'data' => theme(
@@ -663,16 +654,27 @@ function _pagerer_theme_handler($theme, $variables) {
   // Short to main markers.
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
-  // Initialise array of adaptive keys if adaptive theme enabled.
+
+  // If adaptive theme enabled, sets adaptive markers.
   if ($pagerer_vars['pagerer_enable_adaptive']) {
     global $_pagerer_ak_array;
+    $qps = drupal_get_query_parameters();
+    // Initialise global array for all pagers' adaptive keys.
     if (!isset($_pagerer_ak_array)) {
-      $_pagerer_ak_array = array();
+      // Take querystring parameters if existing.
+      if (isset($qps['page_ak'])) {
+        // A 'page_ak' query parameter exists in the calling URL.
+        $_pagerer_ak_array = explode(',', $qps['page_ak']);
+      }
+      else {
+        $_pagerer_ak_array = array();
+      }
     }
-    $daks = "0.$m";
-  }
-  else {
-    $daks = NULL;
+    // Set default 'page_ak' querystring parameter for this pager.
+    if (isset($qps['page_ak'])) {
+      $page_ak = implode(',', _pagerer_load_ak_array(NULL, $variables['element'], $_pagerer_ak_array));
+      $variables['parameters']['page_ak'] = $page_ak;
+    }
   }
 
   // Determine pager items needed.
@@ -681,18 +683,12 @@ function _pagerer_theme_handler($theme, $variables) {
     case 'pagerer_adaptive':
       // Determine adaptive keys coming from query parameters.
       list($pl, $pr, $px) = array(0, $m, NULL);
-      $qps = drupal_get_query_parameters();
-      if (isset($qps['page_ak'])) {
-        // A 'page_ak' query parameter exists in the calling URL.
-        $aksa = explode(',', $qps['page_ak']);
-        if (isset($aksa[$variables['element']])) {
-          // Adaptive keys for the specific element exist.
-          $_pagerer_ak_array[$variables['element']] = $aksa[$variables['element']];
-          $tmp = explode('.', $aksa[$variables['element']]);
-          $pl = isset($tmp[0]) ? $tmp[0] : 0;
-          $pr = isset($tmp[1]) ? $tmp[1] : $m;
-          $px = isset($tmp[2]) ? $tmp[2] : NULL;
-        }
+      if (isset($_pagerer_ak_array[$variables['element']])) {
+        // Adaptive keys for the specific element exist.
+        $tmp = explode('.', $_pagerer_ak_array[$variables['element']]);
+        $pl = isset($tmp[0]) ? ($tmp[0] ? $tmp[0] : 0) : 0;
+        $pr = isset($tmp[1]) ? $tmp[1] : $m;
+        $px = isset($tmp[2]) ? $tmp[2] : NULL;
       }
       // First.
       $pages[0]['interval'] = -$c;
@@ -798,9 +794,6 @@ function _pagerer_theme_handler($theme, $variables) {
         }
       }
       ksort($pages);
-      if ($pages and $pagerer_vars['pagerer_enable_adaptive']) {
-        _pagerer_set_pages_default_ak($pages, $m);
-      }
       break;
 
     case 'pagerer_mini':
@@ -814,9 +807,6 @@ function _pagerer_theme_handler($theme, $variables) {
     default:
       // Neighborhood.
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
-      if ($pages and $pagerer_vars['pagerer_enable_adaptive']) {
-        _pagerer_set_pages_default_ak($pages, $m);
-      }
   }
 
   // Compose pager.
@@ -829,7 +819,7 @@ function _pagerer_theme_handler($theme, $variables) {
     );
     if ($variables['pager_separator'] != 'none') {
       $items[] = array(
-        'class' => array('pager-item'),
+        'class' => array('pager-item', 'separator'),
         'data' => $variables['pager_separator'],
       );
     }
@@ -841,32 +831,32 @@ function _pagerer_theme_handler($theme, $variables) {
     );
     if ($variables['pager_separator'] != 'none') {
       $items[] = array(
-        'class' => array('pager-item'),
+        'class' => array('pager-item', 'separator'),
         'data' => $variables['pager_separator'],
       );
     }
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers, $daks));
+    $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers));
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers, $daks));
+    $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers));
   }
   // 3 - Pages.
   $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, (($theme == 'pagerer_mini' or $theme == 'pagerer_slider') ? FALSE : TRUE)));
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers, $daks));
+    $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers, $daks));
+    $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers));
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
     if ($variables['pager_separator'] != 'none') {
       $items[] = array(
-        'class' => array('pager-item'),
+        'class' => array('pager-item', 'separator'),
         'data' => $variables['pager_separator'],
       );
     }
@@ -878,7 +868,7 @@ function _pagerer_theme_handler($theme, $variables) {
   if ($variables['total_display'] == 'last') {
     if ($variables['pager_separator'] != 'none') {
       $items[] = array(
-        'class' => array('pager-item'),
+        'class' => array('pager-item', 'separator'),
         'data' => $variables['pager_separator'],
       );
     }
@@ -956,16 +946,9 @@ function _pagerer_resolve_markers($variables) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_first_link($variables, $markers, $aks) {
+function _pagerer_itemize_first_link($variables, $markers) {
   $c = $markers['pager_current'] - 1;
   $text = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['first']);
-  if ($aks) {
-    global $_pagerer_ak_array;
-    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
-  }
-  else {
-    unset($variables['parameters']['page_ak']);
-  }
   $li_first = theme(
     'pager_first',
     array(
@@ -993,15 +976,8 @@ function _pagerer_itemize_first_link($variables, $markers, $aks) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_previous_link($variables, $markers, $aks) {
+function _pagerer_itemize_previous_link($variables, $markers) {
   $text = _pagerer_get_page_text($variables, $markers, -1, $variables['tags']['previous']);
-  if ($aks) {
-    global $_pagerer_ak_array;
-    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
-  }
-  else {
-    unset($variables['parameters']['page_ak']);
-  }
   $li_previous = theme(
     'pager_previous',
     array(
@@ -1030,15 +1006,8 @@ function _pagerer_itemize_previous_link($variables, $markers, $aks) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_next_link($variables, $markers, $aks) {
+function _pagerer_itemize_next_link($variables, $markers) {
   $text = _pagerer_get_page_text($variables, $markers, 1, $variables['tags']['next']);
-  if ($aks) {
-    global $_pagerer_ak_array;
-    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
-  }
-  else {
-    unset($variables['parameters']['page_ak']);
-  }
   $li_next = theme(
     'pager_next',
     array(
@@ -1067,17 +1036,10 @@ function _pagerer_itemize_next_link($variables, $markers, $aks) {
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_last_link($variables, $markers, $aks) {
+function _pagerer_itemize_last_link($variables, $markers) {
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
   $text = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['last']);
-  if ($aks) {
-    global $_pagerer_ak_array;
-    $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $variables['element'], $_pagerer_ak_array));
-  }
-  else {
-    unset($variables['parameters']['page_ak']);
-  }
   $li_last = theme(
     'pager_last',
     array(
@@ -1144,14 +1106,14 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         if ($page == $previous_page + 1) {
           if ($variables['pager_separator'] != 'none') {
             $items[] = array(
-              'class' => array('pager-item'),
+              'class' => array('pager-item', 'separator'),
               'data' => $variables['pager_separator'],
             );
           }
         }
         else {
           $items[] = array(
-            'class' => array('pager-item'),
+            'class' => array('pager-item', 'breaker'),
             'data' => $variables['pager_breaker'],
           );
         }
@@ -1160,7 +1122,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         // If on first link, but current page is not first, introduce a
         // breaker before the new link.
         $items[] = array(
-          'class' => array('pager-item'),
+          'class' => array('pager-item', 'breaker'),
           'data' => $variables['pager_breaker'],
         );
       }
@@ -1169,6 +1131,11 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       $text = $page_data['text'];
       if ($page_data['interval'] < 0) {
         // Link to page before the current.
+
+        // Target page.
+        $page_new = pager_load_array($page, $element, $pager_page_array);
+
+        // Adaptive keys.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
             $aks = implode('.', array(
@@ -1178,19 +1145,15 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
             ));
           }
           else {
-            $aks = implode('.', array($page_data['page_pl'], $page_data['page_pr']));
+            $aks = implode('.', array(
+              $page_data['page_pl'],
+              $page_data['page_pr'],
+            ));
           }
-        }
-        else {
-          $aks = NULL;
-        }
-        $page_new = pager_load_array($page, $element, $pager_page_array);
-        if ($aks) {
           $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
-        else {
-          unset($variables['parameters']['page_ak']);
-        }
+
+        // Get link data from theme_pager_link().
         $link_data = theme(
           'pager_link',
           array(
@@ -1206,6 +1169,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
             ))),
           )
         );
+
         $items[] = array(
           'class' => array('pager-item'),
           'data' => _pagerer_resolve_link_data($link_data),
@@ -1244,6 +1208,11 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       }
       elseif ($page_data['interval'] > 0) {
         // Link to page after the current.
+
+        // Target page.
+        $page_new = pager_load_array($page, $element, $pager_page_array);
+
+        // Adaptive keys.
         if (isset($page_data['page_pl'])) {
           if (isset($page_data['page_px'])) {
             $aks = implode('.', array(
@@ -1258,17 +1227,10 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
               $page_data['page_pr'],
             ));
           }
-        }
-        else {
-          $aks = NULL;
-        }
-        $page_new = pager_load_array($page, $element, $pager_page_array);
-        if ($aks) {
           $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
-        else {
-          unset($variables['parameters']['page_ak']);
-        }
+
+        // Get link data from theme_pager_link().
         $link_data = theme(
           'pager_link',
           array(
@@ -1293,7 +1255,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
     }
     if (($page <> $m) and $fl_breakers) {
       $items[] = array(
-        'class' => array('pager-item'),
+        'class' => array('pager-item', 'breaker'),
         'data' => $variables['pager_breaker'],
       );
     }
@@ -1455,23 +1417,6 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
     }
   }
   return $pages;
-}
-
-/**
- * Loads pages with default adaptive keys.
- *
- * @param array   $pages
- *   array of pages
- * @param integer $max
- *   last page on the pager
- */
-function _pagerer_set_pages_default_ak(&$pages, $max) {
-  if ($pages) {
-    foreach ($pages as &$page) {
-      $page['page_pl'] = 0;
-      $page['page_pr'] = $max;
-    }
-  }
 }
 
 /**
@@ -1651,6 +1596,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare query parameters.
+
   // 'page' querystring fragment, overriding current 'page' with a text
   // that the js widget will then replace with the content of HTML 'value'
   // attribute.
@@ -1662,17 +1608,8 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   // Querystring parameters from url.
   $query_parameters = drupal_get_query_parameters();
 
-  // Adaptive keys 'page_ak' querystring fragment, if existing.
-  if (isset($query_parameters['page_ak'])) {
-    $aksa = explode(',', $query_parameters['page_ak']);
-    if (isset($aksa[$variables['element']])) {
-      $aksa = _pagerer_load_ak_array("0.$m", $variables['element'], $aksa);
-    }
-    $variables['parameters']['page_ak'] = implode(',', $aksa);
-  }
-
   // Any other parameter gets appended here.
-  $variables['parameters'] += $query_parameters;
+  $variables['parameters'] = array_merge($query_parameters, $variables['parameters']);
 
   // Are we displaying pages or items; 'value' HTML attribute will bear
   // the current $current value; $total is passed to the js widget to
@@ -1920,7 +1857,7 @@ function _pagerer_browser_info($agent = NULL) {
       $version = $matches['version'][0];
     }
     else {
-      $version = $matches['version'][1];
+      $version = isset($matches['version'][1]) ? $matches['version'][1] : NULL;
     }
   }
   else {

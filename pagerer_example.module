@@ -84,13 +84,31 @@ function pagerer_example_page() {
     $rows_1[] = array('data' => (array) $row);
   }
 
+  // *** Third data table - associated to pager element 2 ***
+  $header_2 = array(
+    array('data' => t('path')),
+    array('data' => t('title')),
+  );
+  $query_2 = db_select('menu_router', 'd')->extend('PagerDefault')->element(2);
+  $query_2->fields('d', array('path', 'title'));
+  $result_2 = $query_2
+    ->limit(5)
+    ->orderBy('d.path')
+    ->execute();
+  $rows_2 = array();
+  foreach ($result_2 as $row) {
+    $rows_2[] = array('data' => (array) $row);
+  }
+
   // Some description.
-  $build['initdesc'] = array('#markup' => t("This page is an example of pagerer's features. It runs two separate queries on the database, and renders two tables with the results. A distinct pager is associated to each of the tables, and each pager is rendered through various pagerer's themes.</br>"));
+  $build['initdesc'] = array('#markup' => t("This page is an example of pagerer's features. It runs three separate queries on the database, and renders three tables with the results. A distinct pager is associated to each of the tables, and each pager is rendered through various pagerer's themes.</br>"));
 
   // Create a render array ($build) which will be themed as a table with a
   // pager.
-  $build['l_pager_table'] = array('#markup' => '<br/><br/><h2><b>First data table:</b></h2>');
-  $build['pager_table'] = array(
+
+  // First table.
+  $build['l_pager_table_0'] = array('#markup' => '<br/><br/><h2><b>First data table:</b></h2>');
+  $build['pager_table_0'] = array(
     '#theme' => 'table',
     '#header' => $header_0,
     '#rows' => $rows_0,
@@ -98,45 +116,63 @@ function pagerer_example_page() {
   );
 
   // Attach the pager themes.
-  $build['l_pager_pager'] = array('#markup' => '<b>Drupal standard \'pager\' theme:</b>');
+  $build['l_pager_pager_0'] = array('#markup' => '<b>Drupal standard \'pager\' theme:</b>');
   if ($vars['pagerer_override_pager']) {
-    $build['pager_pager'] = array(
+    $build['pager_pager_0'] = array(
       '#markup' => t('<br/>Drupal standard \'pager\' theme is <a href="@url">configured</a> to be overridden by \'pagerer\' theme (see below)<br/>', array('@url' => url('admin/config/user-interface/pagerer'))),
     );
   }
   else {
-    $build['pager_pager'] = array('#theme' => 'pager', '#element' => 0);
+    $build['pager_pager_0'] = array(
+      '#theme' => 'pager', 
+      '#element' => 0
+    );
   }
-  $build['l_pagerer_standard'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s standard)</b> in three \'display\' modes: \'pages\', \'items\', and \'item_ranges\'');
-  $build['pagerer_standard_pages'] = array('#theme' => 'pagerer_standard', '#element' => 0);
-  $build['pagerer_standard_items'] = array(
+  $build['l_pagerer_standard_0'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s standard)</b> in three \'display\' modes: \'pages\', \'items\', and \'item_ranges\'');
+  $build['pagerer_standard_pages_0'] = array(
+    '#theme' => 'pagerer_standard', 
+    '#element' => 0,
+  );
+  $build['pagerer_standard_items_0'] = array(
     '#theme' => 'pagerer_standard',
     '#display' => 'items',
     '#element' => 0,
   );
-  $build['pagerer_standard_item_ranges'] = array(
+  $build['pagerer_standard_item_ranges_0'] = array(
     '#theme' => 'pagerer_standard',
     '#display' => 'item_ranges',
     '#element' => 0,
   );
-  $build['l_pagerer_progressive'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
-  $build['pagerer_progressive'] = array('#theme' => 'pagerer_progressive', '#element' => 0);
-  $build['l_pagerer_adaptive'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
+  $build['l_pagerer_progressive_0'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
+  $build['pagerer_progressive_0'] = array(
+    '#theme' => 'pagerer_progressive', 
+    '#element' => 0.
+  );
+  $build['l_pagerer_adaptive_0'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
   if (!$vars['pagerer_enable_adaptive']) {
-    $build['pagerer_adaptive'] = array(
+    $build['pagerer_adaptive_0'] = array(
       '#markup' => t('<br/>\'pagerer_adaptive\' pager theme is not enabled in <a href="@url">configuration</a>.<br/>', array('@url' => url('admin/config/user-interface/pagerer'))),
     );
   }
   else {
-    $build['pagerer_adaptive'] = array('#theme' => 'pagerer_adaptive', '#element' => 0);
+    $build['pagerer_adaptive_0'] = array(
+      '#theme' => 'pagerer_adaptive', 
+      '#element' => 0,
+    );
   }
-  $build['l_pagerer_mini'] = array('#markup' => '<br/><b>\'pagerer_mini\' pager theme:</b>');
-  $build['pagerer_mini'] = array('#theme' => 'pagerer_mini', '#element' => 0);
-  $build['l_pagerer_slider'] = array('#markup' => '<br/><b>\'pagerer_slider\' pager theme:</b>');
-  $build['pagerer_slider'] = array('#theme' => 'pagerer_slider', '#element' => 0);
+  $build['l_pagerer_mini_0'] = array('#markup' => '<br/><b>\'pagerer_mini\' pager theme:</b>');
+  $build['pagerer_mini_0'] = array(
+    '#theme' => 'pagerer_mini', 
+    '#element' => 0.
+  );
+  $build['l_pagerer_slider_0'] = array('#markup' => '<br/><b>\'pagerer_slider\' pager theme:</b>');
+  $build['pagerer_slider_0'] = array(
+    '#theme' => 'pagerer_slider', 
+    '#element' => 0,
+  );
 
-  $build['l_pagerer_pagerer'] = array('#markup' => '<br/><b>\'pagerer\' (configured) theme:</b>');
-  $build['pagerer_pagerer'] = array(
+  $build['l_pagerer_pagerer_0'] = array('#markup' => '<br/><b>\'pagerer\' (configured) theme:</b>');
+  $build['pagerer_pagerer_0'] = array(
     '#theme' => 'pagerer',
     '#left_pane' => $vars['left_pane'],
     '#center_pane' => $vars['center_pane'],
@@ -144,26 +180,38 @@ function pagerer_example_page() {
     '#element' => 0,
   );
 
-  // Create a render array ($build) which will be themed as a table with a
-  // pager.
-  $build['l_pager_table_2'] = array('#markup' => '<br/><br/><h2><b>Second data table:</b></h2>');
-  $build['pager_table_2'] = array(
+  // Second table.
+  $build['l_pager_table_1'] = array('#markup' => '<br/><br/><h2><b>Second data table:</b></h2>');
+  $build['pager_table_1'] = array(
     '#theme' => 'table',
     '#header' => $header_1,
     '#rows' => $rows_1,
     '#empty' => t('There are no date formats found in the db'),
   );
 
-  $build['l_pagerer_pagerer_2'] = array('#markup' => '<br/><b>\'pagerer\' (configured) theme:</b>');
-  $build['pagerer_pagerer_2'] = array(
+  // Attach the pager themes.
+  $build['l_pagerer_adaptive_1'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
+  if (!$vars['pagerer_enable_adaptive']) {
+    $build['pagerer_adaptive_1'] = array(
+      '#markup' => t('<br/>\'pagerer_adaptive\' pager theme is not enabled in <a href="@url">configuration</a>.<br/>', array('@url' => url('admin/config/user-interface/pagerer'))),
+    );
+  }
+  else {
+    $build['pagerer_adaptive_1'] = array(
+      '#theme' => 'pagerer_adaptive', 
+      '#element' => 1,
+    );
+  }
+  $build['l_pagerer_pagerer_1'] = array('#markup' => '<br/><b>\'pagerer\' (configured) theme:</b>');
+  $build['pagerer_pagerer_1'] = array(
     '#theme' => 'pagerer',
     '#left_pane' => $vars['left_pane'],
     '#center_pane' => $vars['center_pane'],
     '#right_pane' => $vars['right_pane'],
     '#element' => 1,
   );
-  $build['l_pagerer_pagerer_2c'] = array('#markup' => '<br/><b>\'pagerer\' (direct call) theme:</b>');
-  $build['pagerer_pagerer_2c'] = array(
+  $build['l_pagerer_pagerer_direct_1'] = array('#markup' => '<br/><b>\'pagerer\' (direct call) theme:</b>');
+  $build['pagerer_pagerer_direct_1'] = array(
     '#theme' => 'pagerer',
     '#left_pane' => array(
       'theme_name' => 'pagerer_mini',
@@ -205,6 +253,36 @@ function pagerer_example_page() {
     '#element' => 1,
   );
 
+  // Third table.
+  $build['l_pager_table_2'] = array('#markup' => '<br/><br/><h2><b>Third data table:</b></h2>');
+  $build['pager_table_2'] = array(
+    '#theme' => 'table',
+    '#header' => $header_2,
+    '#rows' => $rows_2,
+    '#empty' => t('There are no date formats found in the db'),
+  );
+
+  // Attach the pager themes.
+  $build['l_pagerer_adaptive_2'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
+  if (!$vars['pagerer_enable_adaptive']) {
+    $build['pagerer_adaptive_2'] = array(
+      '#markup' => t('<br/>\'pagerer_adaptive\' pager theme is not enabled in <a href="@url">configuration</a>.<br/>', array('@url' => url('admin/config/user-interface/pagerer'))),
+    );
+  }
+  else {
+    $build['pagerer_adaptive_2'] = array(
+      '#theme' => 'pagerer_adaptive', 
+      '#element' => 2,
+    );
+  }
+  $build['l_pagerer_pagerer_2'] = array('#markup' => '<br/><b>\'pagerer\' (configured) theme:</b>');
+  $build['pagerer_pagerer_2'] = array(
+    '#theme' => 'pagerer',
+    '#left_pane' => $vars['left_pane'],
+    '#center_pane' => $vars['center_pane'],
+    '#right_pane' => $vars['right_pane'],
+    '#element' => 2,
+  );
 
   return $build;
 }
