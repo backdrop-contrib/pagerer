@@ -103,11 +103,8 @@ function pagerer_example_page() {
   // Some description.
   $build['initdesc'] = array('#markup' => t("This page is an example of pagerer's features. It runs three separate queries on the database, and renders three tables with the results. A distinct pager is associated to each of the tables, and each pager is rendered through various pagerer's themes.</br>"));
 
-  /**
-   * Create a render array ($build) which will be themed as a table with a
-   * pager.
-   */
-
+  // Create a render array ($build) which will be themed as a table with a
+  // pager.
   // First table.
   $build['l_pager_table_0'] = array('#markup' => '<br/><br/><h2><b>First data table:</b></h2>');
   $build['pager_table_0'] = array(

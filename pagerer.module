@@ -704,7 +704,7 @@ function _pagerer_theme_handler($theme, $variables) {
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
       // Adaptive keys left pointed page.
       if (($pl > 0) and !isset($pages[$pl])) {
-        $pages[$pl]['interval'] = - $markers['pager_current'] + $pl + 1;
+        $pages[$pl]['interval'] = $pl + 1 - $markers['pager_current'];
         $pages[$pl]['text'] = _pagerer_get_page_text($variables, $markers, -$markers['pager_current'] + $pl + 1, $variables['tags']['previous_progr'], $variables['progr_links']);
         $pages[$pl]['progressive'] = TRUE;
       }
