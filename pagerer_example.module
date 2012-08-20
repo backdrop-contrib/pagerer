@@ -103,8 +103,10 @@ function pagerer_example_page() {
   // Some description.
   $build['initdesc'] = array('#markup' => t("This page is an example of pagerer's features. It runs three separate queries on the database, and renders three tables with the results. A distinct pager is associated to each of the tables, and each pager is rendered through various pagerer's themes.</br>"));
 
-  // Create a render array ($build) which will be themed as a table with a
-  // pager.
+  /**
+   * Create a render array ($build) which will be themed as a table with a
+   * pager.
+   */
 
   // First table.
   $build['l_pager_table_0'] = array('#markup' => '<br/><br/><h2><b>First data table:</b></h2>');
@@ -124,13 +126,13 @@ function pagerer_example_page() {
   }
   else {
     $build['pager_pager_0'] = array(
-      '#theme' => 'pager', 
-      '#element' => 0
+      '#theme' => 'pager',
+      '#element' => 0,
     );
   }
   $build['l_pagerer_standard_0'] = array('#markup' => '<br/><b>\'pagerer_standard\' pager theme (mimick of Drupal\'s standard)</b> in three \'display\' modes: \'pages\', \'items\', and \'item_ranges\'');
   $build['pagerer_standard_pages_0'] = array(
-    '#theme' => 'pagerer_standard', 
+    '#theme' => 'pagerer_standard',
     '#element' => 0,
   );
   $build['pagerer_standard_items_0'] = array(
@@ -145,8 +147,8 @@ function pagerer_example_page() {
   );
   $build['l_pagerer_progressive_0'] = array('#markup' => '<br/><b>\'pagerer_progressive\' pager theme:</b>');
   $build['pagerer_progressive_0'] = array(
-    '#theme' => 'pagerer_progressive', 
-    '#element' => 0.
+    '#theme' => 'pagerer_progressive',
+    '#element' => 0,
   );
   $build['l_pagerer_adaptive_0'] = array('#markup' => '<br/><b>\'pagerer_adaptive\' pager theme:</b>');
   if (!$vars['pagerer_enable_adaptive']) {
@@ -156,18 +158,18 @@ function pagerer_example_page() {
   }
   else {
     $build['pagerer_adaptive_0'] = array(
-      '#theme' => 'pagerer_adaptive', 
+      '#theme' => 'pagerer_adaptive',
       '#element' => 0,
     );
   }
   $build['l_pagerer_mini_0'] = array('#markup' => '<br/><b>\'pagerer_mini\' pager theme:</b>');
   $build['pagerer_mini_0'] = array(
-    '#theme' => 'pagerer_mini', 
-    '#element' => 0.
+    '#theme' => 'pagerer_mini',
+    '#element' => 0,
   );
   $build['l_pagerer_slider_0'] = array('#markup' => '<br/><b>\'pagerer_slider\' pager theme:</b>');
   $build['pagerer_slider_0'] = array(
-    '#theme' => 'pagerer_slider', 
+    '#theme' => 'pagerer_slider',
     '#element' => 0,
   );
 
@@ -198,7 +200,7 @@ function pagerer_example_page() {
   }
   else {
     $build['pagerer_adaptive_1'] = array(
-      '#theme' => 'pagerer_adaptive', 
+      '#theme' => 'pagerer_adaptive',
       '#element' => 1,
     );
   }
@@ -271,7 +273,7 @@ function pagerer_example_page() {
   }
   else {
     $build['pagerer_adaptive_2'] = array(
-      '#theme' => 'pagerer_adaptive', 
+      '#theme' => 'pagerer_adaptive',
       '#element' => 2,
     );
   }

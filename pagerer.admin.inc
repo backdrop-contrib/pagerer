@@ -60,7 +60,7 @@ function pagerer_settings_form($form, &$form_state) {
   // Table container to render the 3 pane config boxes inline.
   $form['panes_container']['panes'] = array(
     '#tree'          => TRUE,
-    '#title'         =>  t('Panes'),
+    '#title'         => t('Panes'),
     '#theme'         => 'table',
     '#header'        => array(),
     '#rows'          => array(),
@@ -73,8 +73,8 @@ function pagerer_settings_form($form, &$form_state) {
   );
   $left_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' =>  t('Theme'),
-    '#options' =>  $options,
+    '#title' => t('Theme'),
+    '#options' => $options,
     '#default_value' => $vars['left_pane']['theme_name'],
   );
   $left_pane['configure'] = array(
@@ -89,8 +89,8 @@ function pagerer_settings_form($form, &$form_state) {
   );
   $center_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' =>  t('Theme'),
-    '#options' =>  $options,
+    '#title' => t('Theme'),
+    '#options' => $options,
     '#default_value' => $vars['center_pane']['theme_name'],
   );
   $center_pane['configure'] = array(
@@ -105,8 +105,8 @@ function pagerer_settings_form($form, &$form_state) {
   );
   $right_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' =>  t('Theme'),
-    '#options' =>  $options,
+    '#title' => t('Theme'),
+    '#options' => $options,
     '#default_value' => $vars['right_pane']['theme_name'],
   );
   $right_pane['configure'] = array(
@@ -305,7 +305,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   // Pane theme.
   $form['theme_name'] = array(
     '#type' => 'textfield',
-    '#title' =>  t('@pane_t pane theme', array('@pane_t' => $pane_t)),
+    '#title' => t('@pane_t pane theme', array('@pane_t' => $pane_t)),
     '#default_value' => $theme,
     '#description' => t('To change the pane theme, go back to main Pagerer configuration.'),
     '#disabled' => TRUE,
@@ -319,15 +319,15 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('pages', 'items', 'item_ranges'));
   $form['display'] = array(
     '#type' => 'select',
-    '#title' =>  t('Display'),
-    '#options' =>  $options,
+    '#title' => t('Display'),
+    '#options' => $options,
     '#default_value' => $v['display'],
     '#description' => t('Select whether to display pages, or items, or item ranges.'),
     '#required' => TRUE,
   );
   $form['quantity'] = array(
     '#type' => 'textfield',
-    '#title' =>  t('Quantity'),
+    '#title' => t('Quantity'),
     '#default_value' => $v['quantity'],
     '#description' => t('The number of pages in the pager list.'),
     '#required' => TRUE,
@@ -337,7 +337,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   if ($theme == 'pagerer_progressive') {
     $form['factors'] = array(
       '#type' => 'textfield',
-      '#title' =>  t('Scale factors'),
+      '#title' => t('Scale factors'),
       '#default_value' => $v['factors'],
       '#description' => t('Comma delimited string of factors to use to determine progressive links.'),
       '#required' => TRUE,
@@ -355,8 +355,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('none', 'before_current', 'first', 'last'));
   $form['display_container']['label_display'] = array(
     '#type' => 'select',
-    '#title' =>  t('Label'),
-    '#options' =>  $options,
+    '#title' => t('Label'),
+    '#options' => $options,
     '#default_value' => $v['label_display'],
     '#description' => t('Select whether and where to render a text "label" element (e.g. "Page:"). Options are "none" (not displayed), "before_current" (in front of current page), "first" (at the beginning), "last" (at the end).'),
     '#required' => TRUE,
@@ -364,8 +364,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('none', 'normal', 'widget', 'slider'));
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
-    '#title' =>  t('Current page'),
-    '#options' =>  $options,
+    '#title' => t('Current page'),
+    '#options' => $options,
     '#default_value' => $v['current_display'],
     '#description' => t('Select how the current page is rendered in the pager. Options are "none" (not displayed), "normal" (as a text), "widget" (an active input box from where users can enter directly a page to go to), "slider" (as a slider).'),
     '#required' => TRUE,
@@ -373,8 +373,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('none', 'after_current', 'first', 'last'));
   $form['display_container']['total_display'] = array(
     '#type' => 'select',
-    '#title' =>  t('Total pages/items'),
-    '#options' =>  $options,
+    '#title' => t('Total pages/items'),
+    '#options' => $options,
     '#default_value' => $v['total_display'],
     '#description' => t('Select whether and where to render a text element indicating the total pages (or items). Options are "none" (not displayed), "after_current" (just after current page), "first" (at the beginning), "last" (at the end).'),
     '#required' => TRUE,
@@ -391,8 +391,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['first_link'] = array(
     '#type' => 'select',
-    '#title' =>  t('First'),
-    '#options' =>  $options,
+    '#title' => t('First'),
+    '#options' => $options,
     '#default_value' => $v['first_link'],
     '#description' => t('Select when to render a link to the first page (e.g. "<< first"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed).'),
     '#required' => TRUE,
@@ -400,8 +400,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['previous_link'] = array(
     '#type' => 'select',
-    '#title' =>  t('Previous'),
-    '#options' =>  $options,
+    '#title' => t('Previous'),
+    '#options' => $options,
     '#default_value' => $v['previous_link'],
     '#description' => t('Select when to render a link to the previous page (e.g. "<< previous"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed).'),
     '#required' => TRUE,
@@ -409,8 +409,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['next_link'] = array(
     '#type' => 'select',
-    '#title' =>  t('Next'),
-    '#options' =>  $options,
+    '#title' => t('Next'),
+    '#options' => $options,
     '#default_value' => $v['next_link'],
     '#description' => t('Select when to render a link to the next page (e.g. "next >"). Options are "never" (not displayed), "not_on_last" (not displayed if current page is the last), "always" (always displayed).'),
     '#required' => TRUE,
@@ -418,8 +418,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['last_link'] = array(
     '#type' => 'select',
-    '#title' =>  t('Last'),
-    '#options' =>  $options,
+    '#title' => t('Last'),
+    '#options' => $options,
     '#default_value' => $v['last_link'],
     '#description' => t('Select when to render a link to the last page (e.g. "last >>"). Options are "never" (not displayed), "not_on_last" (not displayed if current page is the last), "always" (always displayed).'),
     '#required' => TRUE,
@@ -428,8 +428,8 @@ function pagerer_pane_settings_form($form, &$form_state) {
     $options = drupal_map_assoc(array('relative', 'absolute'));
     $form['links_container']['progr_links'] = array(
       '#type' => 'select',
-      '#title' =>  t('Outer pages'),
-      '#options' =>  $options,
+      '#title' => t('Outer pages'),
+      '#options' => $options,
       '#default_value' => $v['progr_links'],
       '#description' => t('Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as "absolute" page numbers (or items/item ranges) or as "relative" offsets from current (e.g. "+10 +100 +1000").'),
       '#required' => TRUE,
@@ -446,19 +446,19 @@ function pagerer_pane_settings_form($form, &$form_state) {
   );
   $form['separators_container']['pager_breaker'] = array(
     '#type' => 'textfield',
-    '#title' =>  t('Breaker'),
+    '#title' => t('Breaker'),
     '#default_value' => $v['pager_breaker'],
     '#description' => t('Text to render a break in the page sequence.'),
   );
   $form['separators_container']['pager_separator'] = array(
     '#type' => 'textfield',
-    '#title' =>  t('Element separator'),
+    '#title' => t('Element separator'),
     '#default_value' => $v['pager_separator'],
     '#description' => t('Text to fill between contiguous pages. "none" will prevent creating any filler.'),
   );
   $form['separators_container']['range_separator'] = array(
     '#type' => 'textfield',
-    '#title' =>  t('Range separator'),
+    '#title' => t('Range separator'),
     '#default_value' => $v['range_separator'],
     '#description' => t('Text to place between first and last item in a range.'),
   );

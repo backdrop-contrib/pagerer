@@ -704,7 +704,7 @@ function _pagerer_theme_handler($theme, $variables) {
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
       // Adaptive keys left pointed page.
       if (($pl > 0) and !isset($pages[$pl])) {
-        $pages[$pl]['interval'] = -$markers['pager_current'] + $pl + 1;
+        $pages[$pl]['interval'] = - $markers['pager_current'] + $pl + 1;
         $pages[$pl]['text'] = _pagerer_get_page_text($variables, $markers, -$markers['pager_current'] + $pl + 1, $variables['tags']['previous_progr'], $variables['progr_links']);
         $pages[$pl]['progressive'] = TRUE;
       }
@@ -1131,7 +1131,6 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       $text = $page_data['text'];
       if ($page_data['interval'] < 0) {
         // Link to page before the current.
-
         // Target page.
         $page_new = pager_load_array($page, $element, $pager_page_array);
 
@@ -1208,7 +1207,6 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       }
       elseif ($page_data['interval'] > 0) {
         // Link to page after the current.
-
         // Target page.
         $page_new = pager_load_array($page, $element, $pager_page_array);
 
@@ -1596,7 +1594,6 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare query parameters.
-
   // 'page' querystring fragment, overriding current 'page' with a text
   // that the js widget will then replace with the content of HTML 'value'
   // attribute.
