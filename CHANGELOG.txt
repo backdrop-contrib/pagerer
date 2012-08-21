@@ -1,0 +1,20 @@
+Pagerer 7.x-1.0-beta1, 2012-08-21
+---------------------------------
+- module: improved handling of the 'page_ak' querystring fragment for the
+  adaptive theme.
+- module: removed bypass for theme_pagerer() that was forcing a separator
+  item when configured to 'none', adjusted CSS to keep visual consistency.
+- js: added management of 'home', 'end' and 'esc' keys in widget, will go
+  to first/last/current page respectively.
+- js: added integration with Views AJAX.
+- README.txt: corrected formatting.
+- module: more graceful degradation if jQuery elements are not available.
+- module: added additional separators between first/last label and first/last
+  page to keep visualization consistent.
+- example.module: changed example not to display potentially sensitive
+  information, added a third query to improve demo.
+- module: jQuery update module needed also for mini pager.
+
+Pagerer 7.x-1.0-alpha1, 2012-07-06
+----------------------------------
+- First release.
