@@ -1,7 +1,7 @@
 Pagerer 7.x-1.0-beta1, 2012-08-21
 ---------------------------------
 - module: improved handling of the 'page_ak' querystring fragment for the
-  adaptive theme
+  adaptive theme.
 - module: removed bypass for theme_pagerer() that was forcing a separator
   item when configured to 'none', adjusted CSS to keep visual consistency.
 - js: added management of 'home', 'end' and 'esc' keys in widget, will go
