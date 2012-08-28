@@ -212,9 +212,27 @@ Drupal.behaviors.pagerer = {
 
     /**
      * Relocate client browser to target page.
+     *
+     * Relocation method is decided based on the context of the pager,
+     * being in order of priority:
+     *  - a Views preview area in a Views settings form - AJAX is used
+     *  - a page rendered through the admin overlay - BBQ is used
+     *  - a normal page - document.location is used
      */
     function pagererRelocate(element, root, path) {
-      if (window.Drupal.overlayChild) {
+      if ($(element).parents('#views-live-preview').length) {
+        // Element is in Views preview context.
+        var base = $(element).attr('id');
+        var element_settings = {
+          'event': 'click',
+          'progress': { 'type': 'throbber' },
+          'url': root + path,
+          'method': 'html',
+          'wrapper': 'views-live-preview',
+        };
+        Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
+        $(element).trigger('click');
+      } else if (window.Drupal.overlayChild) {
         // Drupal admin overlay
         window.parent.jQuery.bbq.pushState({'overlay': path});
       } else {

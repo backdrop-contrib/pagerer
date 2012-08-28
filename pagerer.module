@@ -877,7 +877,6 @@ function _pagerer_theme_handler($theme, $variables) {
       'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
     );
   }
-
   return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
     'items' => $items,
     'attributes' => array('class' => array('pager')),
@@ -1464,10 +1463,14 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
     default:
       switch ($variables['display']) {
         case 'item_ranges':
+          $min = ($c + $offset) * $pager_limits[$variables['element']] + 1;
           $max = min(($c + $offset + 1) * $pager_limits[$variables['element']], $markers['pager_item_max']);
-          $text = (($c + $offset) * $pager_limits[$variables['element']] + 1)
-                  . $variables['range_separator']
-                  . ($max);
+          $text = t('@min@separator@max', array(
+              '@min' => $min,
+              '@separator' => $variables['range_separator'],
+              '@max' => $max,
+            )
+          );
           break;
 
         case 'items':
@@ -1625,12 +1628,12 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare root and path to the page.
-  $path = url(request_path(), array('query' => $variables['parameters']));
+  $q_parms = drupal_get_query_parameters(NULL, array());
+  $path = url($q_parms['q'], array('query' => $variables['parameters']));
   $root = base_path();
   if (strpos($path, $root) == 0) {
     $path = drupal_substr($path, drupal_strlen($root));
   }
-
   // Prepare js widget state and title.
   $state = drupal_json_encode(array(
     'root'     => $root,
@@ -1642,14 +1645,13 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     'interval' => $interval,
     'display'  => $variables['display'],
   ));
-
   $items = array();
   if ($js_enabled) {
     switch ($element_type) {
       case 'widget':
         $title = t('Enter @text, and press Return.', array('@text' => $text));
         $items[] = array(
-          'class' => array('pager-current'),
+          'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
         );
         break;
@@ -1658,16 +1660,16 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         // Add ui.slider library.
         drupal_add_library('system', 'ui.slider');
         $items[] = array(
-          'class' => array('pager-item'),
+          'class' => array('pager-item', 'widget'),
           'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
         );
         $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
         $items[] = array(
-          'class' => array('pager-item'),
+          'class' => array('pager-item', 'widget'),
           'data' => "<div class='pagerer-slider' id='$state' title='$title'/>",
         );
         $items[] = array(
-          'class' => array('pager-item'),
+          'class' => array('pager-item', 'widget'),
           'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
         );
         break;
