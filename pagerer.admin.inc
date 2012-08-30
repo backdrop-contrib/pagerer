@@ -463,6 +463,48 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#description' => t('Text to place between first and last item in a range.'),
   );
 
+  // Advanced options configuration.
+  $form['advanced_options_container'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#description' => t('Configure advanced options.'),
+  );
+  $form['advanced_options_container']['slider'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Slider'),
+    '#collapsible' => FALSE,
+    '#description' => t('jQuery slider options.'),
+  );
+  $options = drupal_map_assoc(array('tickmark', 'timelapse', 'auto'));
+  $form['advanced_options_container']['slider']['slider_action'] = array(
+    '#type' => 'select',
+    '#title' => t('Action confirmation method'),
+    '#options' => $options,
+    '#default_value' => $v['slider_action'],
+    '#description' => t('Select how the page relocation should be triggered after it has been selected through the slider. Options are: "tickmark" (page relocation only occurs after user clicks a tickmark on the slider handle), "timelapse" (page relocation occurs after a grace time has elapsed), "auto" (the timelapse method is automatically selected based on the accuracy of the slider).'),
+    '#required' => TRUE,
+  );
+  $form['advanced_options_container']['slider']['slider_action_timelapse'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Confirmation timelapse'),
+    '#default_value' => $v['slider_action_timelapse'],
+    '#description' => t('The grace time (in milliseconds) to wait before the page is relocated, in case "timelapse" confirmation method is selected. "0" will trigger relocation immediately.'),
+    '#size' => 5,
+    '#maxlength' => 5,
+    '#required' => TRUE,
+  );
+  $options = drupal_map_assoc(array('yes', 'no', 'auto'));
+  $form['advanced_options_container']['slider']['slider_navigation_icons'] = array(
+    '#type' => 'select',
+    '#title' => t('Display navigation icons'),
+    '#options' => $options,
+    '#default_value' => $v['slider_navigation_icons'],
+    '#description' => t('Select whether to display +/- navigation icons on the sides of the slider. Options are "yes", "no", "auto" (the icons are automatically displayed based on the accuracy of the slider).'),
+    '#required' => TRUE,
+  );
+
   // Save configuration.
   $form['save'] = array(
     '#type' => 'submit',
@@ -511,6 +553,9 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
   if (isset($v['factors'])) {
     $vars[$p]['theme_variables']['factors'] = $v['factors'];
   }
+  $vars[$p]['theme_variables']['slider_action'] = $v['slider_action'];
+  $vars[$p]['theme_variables']['slider_action_timelapse'] = $v['slider_action_timelapse'];
+  $vars[$p]['theme_variables']['slider_navigation_icons'] = $v['slider_navigation_icons'];
   variable_set('pagerer', $vars);
   drupal_set_message(t('The configuration options have been saved.'), 'status');
   drupal_goto("admin/config/user-interface/pagerer");

@@ -62,102 +62,117 @@ function pagerer_theme() {
     ),
     'pagerer_standard' => array(
       'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_standard'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => $common_theme['pager']['variables']['quantity'],
-        'display'         => 'pages',
-        'label_display'   => 'none',
-        'current_display' => 'normal',
-        'total_display'   => 'none',
-        'first_link'      => 'not_on_first',
-        'previous_link'   => 'not_on_first',
-        'next_link'       => 'not_on_last',
-        'last_link'       => 'not_on_last',
-        'pager_breaker'   => '…',
-        'pager_separator' => 'none',
-        'range_separator' => '-',
+        'tags'                    => _pagerer_tags_merge_default('pagerer_standard'),
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display'                 => 'pages',
+        'label_display'           => 'none',
+        'current_display'         => 'normal',
+        'total_display'           => 'none',
+        'first_link'              => 'not_on_first',
+        'previous_link'           => 'not_on_first',
+        'next_link'               => 'not_on_last',
+        'last_link'               => 'not_on_last',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_progressive' => array(
       'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_progressive'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => 5,
-        'display'         => 'pages',
-        'label_display'   => 'none',
-        'current_display' => 'normal',
-        'total_display'   => 'none',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
-        'progr_links'     => 'relative',
-        'factors'         => '2.5,5,10',
-        'pager_breaker'   => '…',
-        'pager_separator' => 'none',
-        'range_separator' => '-',
+        'tags'                    => _pagerer_tags_merge_default('pagerer_progressive'),
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => 5,
+        'display'                 => 'pages',
+        'label_display'           => 'none',
+        'current_display'         => 'normal',
+        'total_display'           => 'none',
+        'first_link'              => 'never',
+        'previous_link'           => 'never',
+        'next_link'               => 'never',
+        'last_link'               => 'never',
+        'progr_links'             => 'relative',
+        'factors'                 => '2.5,5,10',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_mini' => array(
       'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_mini'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => $common_theme['pager']['variables']['quantity'],
-        'display'         => 'pages',
-        'label_display'   => 'before_current',
-        'current_display' => 'widget',
-        'total_display'   => 'after_current',
-        'first_link'      => 'always',
-        'previous_link'   => 'always',
-        'next_link'       => 'always',
-        'last_link'       => 'always',
-        'pager_breaker'   => '…',
-        'pager_separator' => 'none',
-        'range_separator' => '-',
+        'tags'                    => _pagerer_tags_merge_default('pagerer_mini'),
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display'                 => 'pages',
+        'label_display'           => 'before_current',
+        'current_display'         => 'widget',
+        'total_display'           => 'after_current',
+        'first_link'              => 'always',
+        'previous_link'           => 'always',
+        'next_link'               => 'always',
+        'last_link'               => 'always',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_slider' => array(
       'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_slider'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => $common_theme['pager']['variables']['quantity'],
-        'display'         => 'pages',
-        'label_display'   => 'before_current',
-        'current_display' => 'slider',
-        'total_display'   => 'after_current',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
-        'pager_breaker'   => '…',
-        'pager_separator' => 'none',
-        'range_separator' => '-',
+        'tags'                    => _pagerer_tags_merge_default('pagerer_slider'),
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display'                 => 'pages',
+        'label_display'           => 'before_current',
+        'current_display'         => 'slider',
+        'total_display'           => 'after_current',
+        'first_link'              => 'never',
+        'previous_link'           => 'never',
+        'next_link'               => 'never',
+        'last_link'               => 'never',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
       ),
     ),
   );
   if ($vars['pagerer_enable_adaptive']) {
     $theme['pagerer_adaptive'] = array(
       'variables' => array(
-        'tags'            => _pagerer_tags_merge_default('pagerer_adaptive'),
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'quantity'        => 5,
-        'display'         => 'pages',
-        'label_display'   => 'none',
-        'current_display' => 'normal',
-        'total_display'   => 'none',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
-        'progr_links'     => 'relative',
-        'pager_breaker'   => '…',
-        'pager_separator' => 'none',
-        'range_separator' => '-',
+        'tags'                    => _pagerer_tags_merge_default('pagerer_adaptive'),
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => 5,
+        'display'                 => 'pages',
+        'label_display'           => 'none',
+        'current_display'         => 'normal',
+        'total_display'           => 'none',
+        'first_link'              => 'never',
+        'previous_link'           => 'never',
+        'next_link'               => 'never',
+        'last_link'               => 'never',
+        'progr_links'             => 'relative',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
       ),
     );
   }
@@ -1634,8 +1649,9 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   if (strpos($path, $root) == 0) {
     $path = drupal_substr($path, drupal_strlen($root));
   }
-  // Prepare js widget state and title.
-  $state = drupal_json_encode(array(
+
+  // Prepare js widget state.
+  $state = array(
     'root'     => $root,
     'path'     => $path,
     'element'  => $variables['element'],
@@ -1644,7 +1660,15 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     'current'  => $current,
     'interval' => $interval,
     'display'  => $variables['display'],
-  ));
+  );
+  if ($element_type == 'slider') {
+    $state['action'] = $variables['slider_action'];
+    $state['timelapse'] = $variables['slider_action_timelapse'];
+    $state['icons'] = $variables['slider_navigation_icons'];
+  }
+  $state_encoded = drupal_json_encode($state);
+
+  // Create items.
   $items = array();
   if ($js_enabled) {
     switch ($element_type) {
@@ -1652,26 +1676,30 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         $title = t('Enter @text, and press Return.', array('@text' => $text));
         $items[] = array(
           'class' => array('pager-current', 'widget'),
-          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state' title=\"$title\" value=\"$current\" />",
+          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
         );
         break;
 
       case 'slider':
         // Add ui.slider library.
         drupal_add_library('system', 'ui.slider');
-        $items[] = array(
-          'class' => array('pager-item', 'widget'),
-          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
-        );
+        if ($variables['slider_navigation_icons'] <> 'no') {
+          $items[] = array(
+            'class' => array('pager-item', 'widget'),
+            'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
+          );
+        }
         $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
         $items[] = array(
           'class' => array('pager-item', 'widget'),
-          'data' => "<div class='pagerer-slider' id='$state' title='$title'/>",
+          'data' => "<div class='pagerer-slider' id='$state_encoded' title='$title'/>",
         );
-        $items[] = array(
-          'class' => array('pager-item', 'widget'),
-          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
-        );
+        if ($variables['slider_navigation_icons'] <> 'no') {
+          $items[] = array(
+            'class' => array('pager-item', 'widget'),
+            'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
+          );
+        }
         break;
     }
   }

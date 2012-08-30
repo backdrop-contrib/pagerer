@@ -237,6 +237,19 @@ Drupal core pager theme variables.
   separators are rendered.
 - range_separator: Text to place between first and last item in a range.
 
+Advanced:
+- slider_action: Determines how the page relocation should be triggered after
+  it has been selected through the jQuery slider. Options are: "tickmark"
+  (page relocation only occurs after user clicks a tickmark on the slider
+  handle), "timelapse" (page relocation occurs after a grace time has elapsed),
+  "auto" (the timelapse method is automatically selected based on the accuracy
+  of the slider).
+- slider_action_timelapse: The grace time (in milliseconds) to wait before the
+  page is relocated, in case "timelapse" slider_action method is selected for
+  the jQuery slider. "0" will trigger relocation immediately.
+- slider_navigation_icons: Determines whether to display +/- navigation icons
+  on the sides of the jQuery slider. Options are "yes", "no", "auto" (the icons
+  are automatically displayed based on the accuracy of the slider).
 
 pagerer theme variables
 =======================

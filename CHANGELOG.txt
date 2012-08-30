@@ -1,5 +1,7 @@
 Pagerer 7.x-1.0-beta2, xxxx-xx-xx
 ---------------------------------
+- example.module: added pagerer version to the example page title.
+- Issue #1745056 by mondrake: Introduced more options for the jQuery slider.
 - Issue #1757264 by mondrake: Fixed Views preview navigation.
 - css: fine tuning.
 - module: t-ed item range string building.

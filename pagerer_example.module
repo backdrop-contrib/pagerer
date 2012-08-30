@@ -25,16 +25,16 @@ function pagerer_example_menu() {
 }
 
 /**
- * Build the pager query.
- *
- * Uses the date_formats table since it is installed with ~35 rows
- * in it and we don't have to create fake data in order to show
- * this example.
+ * Build the pagerer example.
  *
  * @return array
- *   A render array completely set up with a pager.
+ *   A render array.
  */
 function pagerer_example_page() {
+
+  // Set the page title to show running pagerer version.
+  $module_info = system_get_info('module', 'pagerer');
+	drupal_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
 
   // It will not work for Internet Explorer below version 9. In such case,
   // raise a warning message.
