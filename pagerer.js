@@ -141,7 +141,12 @@ Drupal.behaviors.pagerer = {
       if (this.pagererState.icons == 'auto' && pixelsPerStep > 3) {
         $(this).parents('.pager').find('.pagerer-slider-control-icon').parent().hide();
       }
-
+      // Add indication to click on the tickmark to start page
+      // relocation.
+      if (this.pagererState.action == 'tickmark') {
+        var title = $(this).attr('title');
+        $(this).attr('title',  title + Drupal.t(' Then, click on the tickmark.'));
+      }
     })
     .bind('slide', function(event, ui) {
       if (actionInterval) {

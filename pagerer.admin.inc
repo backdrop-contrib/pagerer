@@ -267,7 +267,6 @@ function pagerer_settings_form_submit($form, &$form_state) {
   }
 }
 
-
 /**
  * Pagerer pane level settings admin form.
  */
@@ -530,6 +529,7 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
     $theme_registry = theme_get_registry();
     $default_theme_vars = $theme_registry[$theme]['variables'];
     $vars[$p]['theme_variables'] = $default_theme_vars;
+    unset($vars[$p]['theme_variables']['tags']);
     variable_set('pagerer', $vars);
     drupal_set_message(t('The pane configuration has been reset to default %theme theme variables.', array('%theme' => $theme)), 'status');
     drupal_goto('admin/config/user-interface/pagerer/' . $pane);

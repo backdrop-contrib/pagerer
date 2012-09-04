@@ -300,10 +300,10 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
 
     default:
       $default_tags = array(
-        'first'            => t('« @num'),
-        'previous'         => t('‹ @num'),
-        'next'             => t('@num ›'),
-        'last'             => t('@num »'),
+        'first'            => t('«'),
+        'previous'         => t('<'),
+        'next'             => t('>'),
+        'last'             => t('»'),
         'previous_progr'   => t('-@num'),
         'next_progr'       => t('+@num'),
         'total'            => t('of @total'),
@@ -978,16 +978,35 @@ function _pagerer_resolve_markers($variables) {
  *   pre-rendered items
  */
 function _pagerer_itemize_first_link($variables, $markers) {
+  global $pager_page_array;
   $c = $markers['pager_current'] - 1;
+  $li_first = NULL;
   list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['first']);
-  $li_first = theme(
-    'pager_first',
-    array(
-      'text' => t($variables['tags']['first'], array('@num' => $text)),
-      'element' => $variables['element'],
-      'parameters' => $variables['parameters'],
-    )
-  );
+
+  if ($c > 0) {
+    // Determine what is being displayed.
+    switch ($variables['display']) {
+      case 'pages':
+        $text_title = t('Go to first page');
+        break;
+
+      case 'items':
+      case 'item_ranges':
+        $text_title = t('Go to first item');
+        break;
+
+    }
+    $li_first = theme(
+      'pager_link',
+      array(
+        'text' => t($variables['tags']['first'], array('@num' => $text)),
+        'page_new' => pager_load_array(0, $variables['element'], $pager_page_array),
+        'element' => $variables['element'],
+        'parameters' => $variables['parameters'],
+        'attributes' => array('title' => $text_title)
+      )
+    );
+  }
   $items = array();
   $items[] = array(
     'class' => array('pager-first'),
@@ -1008,16 +1027,34 @@ function _pagerer_itemize_first_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_previous_link($variables, $markers) {
+  global $pager_page_array;
+  $c = $markers['pager_current'] - 1;
+  $li_previous = NULL;
   list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -1, $variables['tags']['previous']);
-  $li_previous = theme(
-    'pager_previous',
-    array(
-      'text' => t($variables['tags']['previous'], array('@num' => $text)),
-      'element' => $variables['element'],
-      'interval' => 1,
-      'parameters' => $variables['parameters'],
-    )
-  );
+
+  if ($c > 0) {
+    // Determine what is being displayed.
+    switch ($variables['display']) {
+      case 'pages':
+        $text_title = t('Go to previous page');
+        break;
+
+      case 'items':
+      case 'item_ranges':
+        $text_title = t('Go to previous items');
+        break;
+    }
+    $li_previous = theme(
+      'pager_link',
+      array(
+        'text' => t($variables['tags']['previous'], array('@num' => $text)),
+        'page_new' => pager_load_array($pager_page_array[$variables['element']] - 1, $variables['element'], $pager_page_array),
+        'element' => $variables['element'],
+        'parameters' => $variables['parameters'],
+        'attributes' => array('title' => $text_title)
+      )
+    );
+  }
   $items = array();
   $items[] = array(
     'class' => array('pager-previous'),
@@ -1038,16 +1075,35 @@ function _pagerer_itemize_previous_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_next_link($variables, $markers) {
+  global $pager_page_array;
+  $c = $markers['pager_current'] - 1;
+  $m = $markers['pager_max'] - 1;
+  $li_next = NULL;
   list($text, $text_title) = _pagerer_get_page_text($variables, $markers, 1, $variables['tags']['next']);
-  $li_next = theme(
-    'pager_next',
-    array(
-      'text' => t($variables['tags']['next'], array('@num' => $text)),
-      'element' => $variables['element'],
-      'interval' => 1,
-      'parameters' => $variables['parameters'],
-    )
-  );
+
+  if ($c < $m) {
+    // Determine what is being displayed.
+    switch ($variables['display']) {
+      case 'pages':
+        $text_title = t('Go to next page');
+        break;
+
+      case 'items':
+      case 'item_ranges':
+        $text_title = t('Go to next items');
+        break;
+    }
+    $li_next = theme(
+      'pager_link',
+      array(
+        'text' => t($variables['tags']['next'], array('@num' => $text)),
+        'page_new' => pager_load_array($pager_page_array[$variables['element']] + 1, $variables['element'], $pager_page_array),
+        'element' => $variables['element'],
+        'parameters' => $variables['parameters'],
+        'attributes' => array('title' => $text_title)
+      )
+    );
+  }
   $items = array();
   $items[] = array(
     'class' => array('pager-next'),
@@ -1068,17 +1124,36 @@ function _pagerer_itemize_next_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_last_link($variables, $markers) {
+  global $pager_page_array;
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
+  $li_last = NULL;
   list($text, $text_title) = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['last']);
-  $li_last = theme(
-    'pager_last',
-    array(
-      'text' => t($variables['tags']['last'], array('@num' => $text)),
-      'element' => $variables['element'],
-      'parameters' => $variables['parameters'],
-    )
-  );
+
+  if ($c < $m) {
+    // Determine what is being displayed.
+    switch ($variables['display']) {
+      case 'pages':
+        $text_title = t('Go to last page');
+        break;
+
+      case 'items':
+      case 'item_ranges':
+        $text_title = t('Go to last items');
+        break;
+
+    }
+    $li_last = theme(
+      'pager_link',
+      array(
+        'text' => t($variables['tags']['last'], array('@num' => $text)),
+        'page_new' => pager_load_array($m, $variables['element'], $pager_page_array),
+        'element' => $variables['element'],
+        'parameters' => $variables['parameters'],
+        'attributes' => array('title' => $text_title)
+      )
+    );
+  }
   $items = array();
   $items[] = array(
     'class' => array('pager-last'),
@@ -1706,7 +1781,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
             'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
           );
         }
-        $title = t('Drag handle to the @text, then click on the tickmark.', array('@text' => $text));
+        $title = t('Drag the handle to the @text required.', array('@text' => $text));
         $items[] = array(
           'class' => array('pager-item', 'widget'),
           'data' => "<div class='pagerer-slider' id='$state_encoded' title='$title'/>",
