@@ -95,12 +95,13 @@ Drupal.behaviors.pagerer = {
       // Create slider.
       var sliderBar = $(this);
       sliderBar.slider({ min : 1, range : 'min', animate: true });
+      var sliderHandle = $(this).find('.ui-slider-handle');
 
       // Adjust slider handle width and current page.
-      var sliderHandle = $(this).find('.ui-slider-handle')
       sliderHandle
         .width((String(this.pagererState.total).length + 2) + 'em')
-        .css('line-height', sliderHandle.height() + 'px')
+        .css('height', Math.max(sliderHandle.height(), 16) + 'px')
+        .css('line-height', Math.max(sliderHandle.height(), 16) + 'px')
         .css('margin-left', -sliderHandle.width() / 2)
         .text(this.pagererState.current)
         .bind('blur', function(event) {
@@ -182,7 +183,7 @@ Drupal.behaviors.pagerer = {
       var sliderBar = $(this);
       sliderHandle.text(ui.value + ' ');
       if (this.pagererState.action == 'timelapse') {
-        sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-clock'/>");
+        sliderHandle.append("<div class='pagerer-slider-handle-icon throbber'/>");
       } else {
         sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
       }
@@ -193,6 +194,9 @@ Drupal.behaviors.pagerer = {
         if (actionInterval) {
           clearTimeout(actionInterval);
         }
+        // Remove icon.
+        $(sliderBar[0]).find('.pagerer-slider-handle-icon').removeClass('throbber');
+        // Relocate.
         pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.root, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
         return false;
       });
@@ -203,8 +207,8 @@ Drupal.behaviors.pagerer = {
           clearTimeout(actionInterval);
         }
         actionInterval = setTimeout(function(){
-          // Remove clock icon.
-          $(sliderBar[0]).find('.pagerer-slider-handle-icon').removeClass('ui-icon');
+          // Remove icon.
+          $(sliderBar[0]).find('.pagerer-slider-handle-icon').removeClass('ui-icon').removeClass('throbber');
           // Relocate.
           pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.root, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
           return false;

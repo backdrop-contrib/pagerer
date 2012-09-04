@@ -707,12 +707,12 @@ function _pagerer_theme_handler($theme, $variables) {
       }
       // First.
       $pages[0]['interval'] = -$c;
-      $pages[0]['text'] = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['previous']);
+      list($pages[0]['text'], $pages[0]['text_title']) = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['previous']);
       $pages[0]['page_pl'] = 0;
       $pages[0]['page_pr'] = $m;
       // Last.
       $pages[$m]['interval'] = $m - $c;
-      $pages[$m]['text'] = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['next']);
+      list($pages[$m]['text'], $pages[$m]['text_title']) = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['next']);
       $pages[$m]['page_pl'] = 0;
       $pages[$m]['page_pr'] = $m;
       // Neighborhood.
@@ -720,13 +720,13 @@ function _pagerer_theme_handler($theme, $variables) {
       // Adaptive keys left pointed page.
       if (($pl > 0) and !isset($pages[$pl])) {
         $pages[$pl]['interval'] = $pl + 1 - $markers['pager_current'];
-        $pages[$pl]['text'] = _pagerer_get_page_text($variables, $markers, -$markers['pager_current'] + $pl + 1, $variables['tags']['previous_progr'], $variables['progr_links']);
+        list($pages[$pl]['text'], $pages[$pl]['text_title']) = _pagerer_get_page_text($variables, $markers, -$markers['pager_current'] + $pl + 1, $variables['tags']['previous_progr'], $variables['progr_links']);
         $pages[$pl]['progressive'] = TRUE;
       }
       // Adaptive keys right pointed page.
       if (($pr < $m) and !isset($pages[$pr])) {
         $pages[$pr]['interval'] = $pr - $markers['pager_current'] + 1;
-        $pages[$pr]['text'] = _pagerer_get_page_text($variables, $markers, $pr - $markers['pager_current'] + 1, $variables['tags']['next_progr'], $variables['progr_links']);
+        list($pages[$pr]['text'], $pages[$pr]['text_title']) = _pagerer_get_page_text($variables, $markers, $pr - $markers['pager_current'] + 1, $variables['tags']['next_progr'], $variables['progr_links']);
         $pages[$pr]['progressive'] = TRUE;
       }
       // Adaptive pages.
@@ -740,7 +740,8 @@ function _pagerer_theme_handler($theme, $variables) {
       // Enrich pages with adaptive markers.
       if ($pages) {
         $kpages = array_keys($pages);
-        // Determines first adaptive pages left and right of the neighborhood.
+        // Determines first adaptive pages left and right of the neighborhood,
+        // if existing.
         $la = $ra = NULL;
         for ($x = 1; $x < count($kpages) - 1; $x++) {
           if (isset($pages[$kpages[$x]]['progressive'])) {
@@ -756,6 +757,10 @@ function _pagerer_theme_handler($theme, $variables) {
         // Set adaptive markers.
         for ($x = 1; $x < count($kpages) - 1; $x++) {
           $d = &$pages[$kpages[$x]];
+          // Skip current page.
+          if ($kpages[$x] == $c) {
+            continue;
+          }
           // Adaptive page.
           if (isset($pages[$kpages[$x]]['progressive'])) {
             $d['page_pl'] = $kpages[$x - 1];
@@ -772,7 +777,8 @@ function _pagerer_theme_handler($theme, $variables) {
             $d['page_pl'] = !is_null($pl) ? $pl : 0;
             $d['page_pr'] = !is_null($pr) ? $pr : $m;
           }
-          // Set holding marker.
+          // Set holding marker - determine left and right offset
+          // of the page vs current page.
           $off = NULL;
           if ($kpages[$x] < $c) {
             $off = $la ? $kpages[$x] - $la : NULL;
@@ -780,13 +786,24 @@ function _pagerer_theme_handler($theme, $variables) {
           elseif ($kpages[$x] > $c) {
             $off = $ra ? $ra - $kpages[$x] : NULL;
           }
+          // If an offset exists, and is larger than half neighborhood,
+          // then an holding marker is set. If offset is null, then
+          // there are no left (or right) adaptive pointers, so we will
+          // reset adaptive keys.
           if ($off) {
             if ($off > $markers['pager_middle']) {
               $d['page_px'] = !is_null($px) ? $px : $c;
             }
           }
           else {
-            $d['page_px'] = !is_null($px) ? $px : $c;
+            if ($kpages[$x] < $c) {
+              $d['page_pl'] = 0;
+              $d['page_pr'] = $c;
+            }
+            elseif ($kpages[$x] > $c) {
+              $d['page_pl'] = $c;
+              $d['page_pr'] = $m;
+            }
           }
         }
       }
@@ -795,10 +812,10 @@ function _pagerer_theme_handler($theme, $variables) {
     case 'pagerer_progressive':
       // First.
       $pages[0]['interval'] = -$c;
-      $pages[0]['text'] = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['previous']);
+      list($pages[0]['text'], $pages[0]['text_title']) = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['previous']);
       // Last.
       $pages[$m]['interval'] = $m - $c;
-      $pages[$m]['text'] = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['next']);
+      list($pages[$m]['text'], $pages[$m]['text_title']) = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['next']);
       // Neighborhood.
       $pages += _pagerer_get_neighborhood_pages($variables, $markers);
       // Progressive.
@@ -815,7 +832,7 @@ function _pagerer_theme_handler($theme, $variables) {
     case 'pagerer_slider':
       // Current.
       $pages[$c]['interval'] = 0;
-      $pages[$c]['text'] = _pagerer_get_page_text($variables, $markers, 0);
+      list($pages[$c]['text'], $pages[$c]['text_title']) = _pagerer_get_page_text($variables, $markers, 0);
       break;
 
     case 'pagerer_standard':
@@ -962,7 +979,7 @@ function _pagerer_resolve_markers($variables) {
  */
 function _pagerer_itemize_first_link($variables, $markers) {
   $c = $markers['pager_current'] - 1;
-  $text = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['first']);
+  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -$c, $variables['tags']['first']);
   $li_first = theme(
     'pager_first',
     array(
@@ -991,7 +1008,7 @@ function _pagerer_itemize_first_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_previous_link($variables, $markers) {
-  $text = _pagerer_get_page_text($variables, $markers, -1, $variables['tags']['previous']);
+  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -1, $variables['tags']['previous']);
   $li_previous = theme(
     'pager_previous',
     array(
@@ -1021,7 +1038,7 @@ function _pagerer_itemize_previous_link($variables, $markers) {
  *   pre-rendered items
  */
 function _pagerer_itemize_next_link($variables, $markers) {
-  $text = _pagerer_get_page_text($variables, $markers, 1, $variables['tags']['next']);
+  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, 1, $variables['tags']['next']);
   $li_next = theme(
     'pager_next',
     array(
@@ -1053,7 +1070,7 @@ function _pagerer_itemize_next_link($variables, $markers) {
 function _pagerer_itemize_last_link($variables, $markers) {
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
-  $text = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['last']);
+  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, $m - $c, $variables['tags']['last']);
   $li_last = theme(
     'pager_last',
     array(
@@ -1143,6 +1160,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       // Sets previous page.
       $previous_page = $page;
       $text = $page_data['text'];
+      $text_title = $page_data['text_title'];
       if ($page_data['interval'] < 0) {
         // Link to page before the current.
         // Target page.
@@ -1178,7 +1196,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
             'attributes' => array(
               'title' => t('Go to @tag @text', array(
                 '@tag' => $tag,
-                '@text' => $text,
+                '@text' => $text_title,
             ))),
           )
         );
@@ -1254,7 +1272,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
             'attributes' => array(
               'title' => t('Go to @tag @text', array(
                 '@tag' => $tag,
-                '@text' => $text,
+                '@text' => $text_title,
             ))),
           )
         );
@@ -1315,7 +1333,7 @@ function _pagerer_get_neighborhood_pages($variables, $markers) {
   for (; $i <= $markers['pager_last'] && $i <= $markers['pager_max']; $i++) {
     $offset = $i - $markers['pager_current'];
     $pages[$i - 1]['interval'] = $offset;
-    $pages[$i - 1]['text'] = _pagerer_get_page_text($variables, $markers, $offset);
+    list($pages[$i - 1]['text'], $pages[$i - 1]['text_title']) = _pagerer_get_page_text($variables, $markers, $offset);
   }
   return $pages;
 }
@@ -1366,14 +1384,14 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
     if ($c - $offset > 0 and !isset($pages[$c - $offset])) {
       $pages[$c - $offset]['progressive'] = TRUE;
       $pages[$c - $offset]['interval'] = -$offset;
-      $pages[$c - $offset]['text'] = _pagerer_get_page_text($variables, $markers, -$offset, $variables['tags']['previous_progr'], $variables['progr_links']);
+      list($pages[$c - $offset]['text'], $pages[$c - $offset]['text_title']) = _pagerer_get_page_text($variables, $markers, -$offset, $variables['tags']['previous_progr'], $variables['progr_links']);
     }
     // Positive offset.
     if ($c + $offset < $markers['pager_max']
       and !isset($pages[$c + $offset])) {
       $pages[$c + $offset]['progressive'] = TRUE;
       $pages[$c + $offset]['interval'] = $offset;
-      $pages[$c + $offset]['text'] = _pagerer_get_page_text($variables, $markers, $offset, $variables['tags']['next_progr'], $variables['progr_links']);
+      list($pages[$c + $offset]['text'], $pages[$c + $offset]['text_title']) = _pagerer_get_page_text($variables, $markers, $offset, $variables['tags']['next_progr'], $variables['progr_links']);
     }
   }
   return $pages;
@@ -1418,14 +1436,14 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
     if ($p > $l and $p < $c and !isset($pages[$p]) and !(isset($pages[$p - 1]) or isset($pages[$p + 1]))) {
       $pages[$p]['progressive'] = TRUE;
       $pages[$p]['interval'] = $p - $c;
-      $pages[$p]['text'] = _pagerer_get_page_text($variables, $markers, $p - $c, $variables['tags']['previous_progr'], $variables['progr_links']);
+      list($pages[$p]['text'], $pages[$p]['text_title']) = _pagerer_get_page_text($variables, $markers, $p - $c, $variables['tags']['previous_progr'], $variables['progr_links']);
     }
     // Pages on the right.
     $p = $x + $off;
     if ($p < $r and $p > $c and !isset($pages[$p]) and !(isset($pages[$p - 1]) or isset($pages[$p + 1]))) {
       $pages[$p]['progressive'] = TRUE;
       $pages[$p]['interval'] = $p - $c;
-      $pages[$p]['text'] = _pagerer_get_page_text($variables, $markers, $p - $c, $variables['tags']['next_progr'], $variables['progr_links']);
+      list($pages[$p]['text'], $pages[$p]['text_title']) = _pagerer_get_page_text($variables, $markers, $p - $c, $variables['tags']['next_progr'], $variables['progr_links']);
     }
   }
   return $pages;
@@ -1450,8 +1468,9 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
  *   - 'absolute' returns the page/item/item range at offset
  *   - 'relative' returns the offset (pages/items) from current
  *
- * @return string
- *   fully qualified page text
+ * @return array
+ *   0 => qualified page text to be displayed on the page
+ *   1 => qualified page text to be used as the HTML title
  */
 function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $mode = 'absolute') {
   global $pager_limits;
@@ -1459,47 +1478,45 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
 
-  switch ($mode) {
-    case 'relative':
-      switch ($variables['display']) {
-        case 'item_ranges':
-        case 'items':
-          $text = t($tag, array('@num' => abs($offset * $pager_limits[$variables['element']])));
-          break;
-
-        case 'pages':
-        default:
-          $text = t($tag, array('@num' => abs($offset)));
-          break;
-      }
+  switch ($variables['display']) {
+    case 'item_ranges':
+      $min = ($c + $offset) * $pager_limits[$variables['element']] + 1;
+      $max = min(($c + $offset + 1) * $pager_limits[$variables['element']], $markers['pager_item_max']);
+      $text = t('@min@separator@max', array(
+          '@min' => $min,
+          '@separator' => $variables['range_separator'],
+          '@max' => $max,
+        )
+      );
       break;
 
-    case 'absolute':
+    case 'items':
+      $text = ($c + $offset) * $pager_limits[$variables['element']] + 1;
+      break;
+
+    case 'pages':
     default:
-      switch ($variables['display']) {
-        case 'item_ranges':
-          $min = ($c + $offset) * $pager_limits[$variables['element']] + 1;
-          $max = min(($c + $offset + 1) * $pager_limits[$variables['element']], $markers['pager_item_max']);
-          $text = t('@min@separator@max', array(
-              '@min' => $min,
-              '@separator' => $variables['range_separator'],
-              '@max' => $max,
-            )
-          );
-          break;
-
-        case 'items':
-          $text = ($c + $offset) * $pager_limits[$variables['element']] + 1;
-          break;
-
-        case 'pages':
-        default:
-          $text = $c + $offset + 1;
-          break;
-      }
+      $text = $c + $offset + 1;
       break;
   }
-  return $text;
+
+  $text_title = $text;
+
+  if ($mode == 'relative') {
+    switch ($variables['display']) {
+      case 'item_ranges':
+      case 'items':
+        $text = t($tag, array('@num' => abs($offset * $pager_limits[$variables['element']])));
+        break;
+
+      case 'pages':
+      default:
+        $text = t($tag, array('@num' => abs($offset)));
+        break;
+    }
+  }
+
+  return array($text, $text_title);
 }
 
 /**
