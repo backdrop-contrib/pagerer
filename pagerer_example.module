@@ -34,7 +34,7 @@ function pagerer_example_page() {
 
   // Set the page title to show running pagerer version.
   $module_info = system_get_info('module', 'pagerer');
-	drupal_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
+  drupal_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
 
   // It will not work for Internet Explorer below version 9. In such case,
   // raise a warning message.

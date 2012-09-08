@@ -1003,7 +1003,7 @@ function _pagerer_itemize_first_link($variables, $markers) {
         'page_new' => pager_load_array(0, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title)
+        'attributes' => array('title' => $text_title),
       )
     );
   }
@@ -1051,7 +1051,7 @@ function _pagerer_itemize_previous_link($variables, $markers) {
         'page_new' => pager_load_array($pager_page_array[$variables['element']] - 1, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title)
+        'attributes' => array('title' => $text_title),
       )
     );
   }
@@ -1100,7 +1100,7 @@ function _pagerer_itemize_next_link($variables, $markers) {
         'page_new' => pager_load_array($pager_page_array[$variables['element']] + 1, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title)
+        'attributes' => array('title' => $text_title),
       )
     );
   }
@@ -1150,7 +1150,7 @@ function _pagerer_itemize_last_link($variables, $markers) {
         'page_new' => pager_load_array($m, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title)
+        'attributes' => array('title' => $text_title),
       )
     );
   }

@@ -65,10 +65,10 @@ table.pagerer tbody tr td div.item-list ul.pager li.widget.pager-current {
   text-align: right;
 }
 div.pagerer-slider-handle-icon.throbber {
-  width: 16px;
-  height: 16px;
   background-image: url(images/throbber.gif);
   display: inline-block;
+  height: 16px;
+  width: 16px;
 }
 
 /* pagerer-page widget */

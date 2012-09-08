@@ -1,4 +1,4 @@
-﻿Pagerer
+Pagerer
 =======
 
 Pagerer is a module providing a collection of pager themes to enhance
