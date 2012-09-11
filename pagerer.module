@@ -651,11 +651,12 @@ function _pagerer_theme_handler($theme, $variables) {
   global $pager_total, $pager_limits;
 
   // Check if pager is needed; if not, return immediately.
-  if (($pager_total[$variables['element']] <= 1)
-        and $variables['first_link'] <> 'always'
-        and $variables['previous_link'] <> 'always'
-        and $variables['next_link'] <> 'always'
-        and $variables['last_link'] <> 'always') {
+  if ($pager_total[$variables['element']] == 0
+        or ($pager_total[$variables['element']] == 1
+          and $variables['first_link'] <> 'always'
+          and $variables['previous_link'] <> 'always'
+          and $variables['next_link'] <> 'always'
+          and $variables['last_link'] <> 'always')) {
     return NULL;
   }
   // Add Pagerer's css.
@@ -1695,11 +1696,11 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Slider will not work for Internet Explorer below version 9. In such case,
-  // revert to widget.
+  // degrade to widget.
   if ($element_type == 'slider') {
     $browser_info = _pagerer_browser_info();
     if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
-      $element_type = 'widget';
+      $element_type = 'slider_degraded';
     }
   }
 
@@ -1793,6 +1794,20 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
           );
         }
         break;
+
+      case 'slider_degraded':
+        // Basically, a widget with first/prev/next/last links.
+        $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers));
+        $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers));
+        $title = t('Enter @text, and press Return.', array('@text' => $text));
+        $items[] = array(
+          'class' => array('pager-current', 'widget'),
+          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
+        );
+        $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
+        $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers));
+        break;
+
     }
   }
   else {

@@ -258,7 +258,7 @@ function pagerer_example_page() {
     '#theme' => 'table',
     '#header' => $header_2,
     '#rows' => $rows_2,
-    '#empty' => t('There are no date formats found in the db'),
+    '#empty' => t('There are no menu routers found in the db'),
   );
 
   // Attach the pager themes.
