@@ -393,7 +393,7 @@ function _pagerer_override_theme_pager($v) {
 function theme_pagerer($variables) {
   global $pager_total, $pager_limits;
   // Check if pager is needed; if not, return immediately.
-  if ($pager_total[$variables['element']] == 1 or $pager_total[$variables['element']] == 0) {
+  if ($pager_total[$variables['element']] <= 1) {
     return NULL;
   }
   // Left pane.
@@ -651,12 +651,7 @@ function _pagerer_theme_handler($theme, $variables) {
   global $pager_total, $pager_limits;
 
   // Check if pager is needed; if not, return immediately.
-  if ($pager_total[$variables['element']] == 0
-        or ($pager_total[$variables['element']] == 1
-          and $variables['first_link'] <> 'always'
-          and $variables['previous_link'] <> 'always'
-          and $variables['next_link'] <> 'always'
-          and $variables['last_link'] <> 'always')) {
+  if ($pager_total[$variables['element']] <= 1) {
     return NULL;
   }
   // Add Pagerer's css.
@@ -871,19 +866,19 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers));
+    $items[] = _pagerer_itemize_first_link($variables, $markers);
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
-    $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers));
+    $items[] = _pagerer_itemize_previous_link($variables, $markers);
   }
   // 3 - Pages.
   $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, (($theme == 'pagerer_mini' or $theme == 'pagerer_slider') ? FALSE : TRUE)));
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
+    $items[] = _pagerer_itemize_next_link($variables, $markers);
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
-    $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers));
+    $items[] = _pagerer_itemize_last_link($variables, $markers);
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
@@ -968,7 +963,7 @@ function _pagerer_resolve_markers($variables) {
 }
 
 /**
- * Return rendered items representing the link to "first" element in the pager.
+ * Return item representing the link to "first" element in the pager.
  *
  * @param array $variables
  *   theme's variables
@@ -976,7 +971,7 @@ function _pagerer_resolve_markers($variables) {
  *   precalculated markers for the pager
  *
  * @return array
- *   pre-rendered items
+ *   pre-rendered item
  */
 function _pagerer_itemize_first_link($variables, $markers) {
   global $pager_page_array;
@@ -1008,16 +1003,14 @@ function _pagerer_itemize_first_link($variables, $markers) {
       )
     );
   }
-  $items = array();
-  $items[] = array(
+  return array(
     'class' => array('pager-first'),
     'data' => $li_first ? _pagerer_resolve_link_data($li_first) : t($variables['tags']['first'], array('@num' => $text)),
   );
-  return $items;
 }
 
 /**
- * Return items representing the link to "previous" element in the pager.
+ * Return item representing the link to "previous" element in the pager.
  *
  * @param array $variables
  *   theme's variables
@@ -1025,7 +1018,7 @@ function _pagerer_itemize_first_link($variables, $markers) {
  *   precalculated markers for the pager
  *
  * @return array
- *   pre-rendered items
+ *   pre-rendered item
  */
 function _pagerer_itemize_previous_link($variables, $markers) {
   global $pager_page_array;
@@ -1056,16 +1049,14 @@ function _pagerer_itemize_previous_link($variables, $markers) {
       )
     );
   }
-  $items = array();
-  $items[] = array(
+  return array(
     'class' => array('pager-previous'),
     'data' => $li_previous ? _pagerer_resolve_link_data($li_previous) : t($variables['tags']['previous'], array('@num' => $text)),
   );
-  return $items;
 }
 
 /**
- * Return rendered items representing the link to "next" element in the pager.
+ * Return item representing the link to "next" element in the pager.
  *
  * @param array $variables
  *   theme's variables
@@ -1105,16 +1096,14 @@ function _pagerer_itemize_next_link($variables, $markers) {
       )
     );
   }
-  $items = array();
-  $items[] = array(
+  return array(
     'class' => array('pager-next'),
     'data' => $li_next ? _pagerer_resolve_link_data($li_next) : t($variables['tags']['next'], array('@num' => $text)),
   );
-  return $items;
 }
 
 /**
- * Return rendered items representing the link to "last" element in the pager.
+ * Return item representing the link to "last" element in the pager.
  *
  * @param array $variables
  *   theme's variables
@@ -1122,7 +1111,7 @@ function _pagerer_itemize_next_link($variables, $markers) {
  *   precalculated markers for the pager
  *
  * @return array
- *   pre-rendered items
+ *   pre-rendered item
  */
 function _pagerer_itemize_last_link($variables, $markers) {
   global $pager_page_array;
@@ -1155,12 +1144,10 @@ function _pagerer_itemize_last_link($variables, $markers) {
       )
     );
   }
-  $items = array();
-  $items[] = array(
+  return array(
     'class' => array('pager-last'),
     'data' => $li_last ? _pagerer_resolve_link_data($li_last) : t($variables['tags']['last'], array('@num' => $text)),
   );
-  return $items;
 }
 
 /**
@@ -1797,15 +1784,15 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
       case 'slider_degraded':
         // Basically, a widget with first/prev/next/last links.
-        $items = array_merge($items, _pagerer_itemize_first_link($variables, $markers));
-        $items = array_merge($items, _pagerer_itemize_previous_link($variables, $markers));
+        $items[] = _pagerer_itemize_first_link($variables, $markers);
+        $items[] = _pagerer_itemize_previous_link($variables, $markers);
         $title = t('Enter @text, and press Return.', array('@text' => $text));
         $items[] = array(
           'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
         );
-        $items = array_merge($items, _pagerer_itemize_next_link($variables, $markers));
-        $items = array_merge($items, _pagerer_itemize_last_link($variables, $markers));
+        $items[] = _pagerer_itemize_next_link($variables, $markers);
+        $items[] = _pagerer_itemize_last_link($variables, $markers);
         break;
 
     }

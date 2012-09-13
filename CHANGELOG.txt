@@ -1,10 +1,16 @@
 Pagerer 7.x-1.0-beta2, xxxx-xx-xx
 ---------------------------------
+- module: simplified logic for itemisation of first/prev/next/ last nav
+  links.
+- module: fixed - pager was showing up in some cases when no items were
+  in the pager.
+- module: slider degradation when no jQuery - added nav links.
 - module: corrected generation of HTML title attributes - display absolute
   values always also for relative mode progressive/adaptive pagers.
-- module: corrected adaptive slider behaviour - when no l/r adaptive locks 
+- module: corrected adaptive slider behaviour - when no l/r adaptive locks
   exist then release lock.
-- example.module: added pagerer version to the example page title.
+- example.module: added pagerer version to the example page title, small
+  layout cosmetics.
 - Issue #1745056 by mondrake: Introduced more options for the jQuery slider.
 - Issue #1757264 by mondrake: Fixed Views preview navigation.
 - css: fine tuning.
