@@ -1,4 +1,4 @@
-Pagerer 7.x-1.0-beta2, xxxx-xx-xx
+Pagerer 7.x-1.0-beta2, 2012-09-17
 ---------------------------------
 - module: simplified logic for itemisation of first/prev/next/ last nav
   links.
