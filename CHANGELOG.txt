@@ -1,3 +1,8 @@
+Pagerer 7.x-1.0-xxxx, xxxx-xx-xx
+--------------------------------
+- Issue #1818292 by joelrosen, mondrake: fixed creation of faulty URLs
+  for js enabled elements if HTTPS is set.
+
 Pagerer 7.x-1.0-beta2, 2012-09-17
 ---------------------------------
 - module: simplified logic for itemisation of first/prev/next/ last nav

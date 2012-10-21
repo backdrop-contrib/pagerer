@@ -1723,9 +1723,19 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare root and path to the page.
+  // Query parameters.
   $q_parms = drupal_get_query_parameters(NULL, array());
-  $path = url($q_parms['q'], array('query' => $variables['parameters']));
+  // Resolve full URL.
+  $url = url($q_parms['q'], array('query' => $variables['parameters'], 'absolute' => TRUE));
+  // Split URL in its components.
+  $url_components = parse_url($url);
+  // Root part of the path.
   $root = base_path();
+  // Path equals path?query#fragment of the url, less the root part
+  // at the beginning.
+  $path = isset($url_components['path']) ? $url_components['path'] : NULL;
+  $path .= isset($url_components['query']) ? ('?' . $url_components['query']) : NULL;
+  $path .= isset($url_components['fragment']) ? ('#' . $url_components['fragment']) : NULL;
   if (strpos($path, $root) == 0) {
     $path = drupal_substr($path, drupal_strlen($root));
   }
