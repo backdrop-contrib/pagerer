@@ -21,6 +21,19 @@ function pagerer_settings_form($form, &$form_state) {
   $theme_registry = theme_get_registry();
   $vars = _pagerer_get_variables();
 
+  // Check if jQuery update is installed.
+  if (module_exists('jquery_update')) {
+    $js_enabled = TRUE;
+  }
+  else {
+    $js_enabled = FALSE;
+    drupal_set_message(
+      t('To enable the jQuery based themes "pagerer_mini" and "pagerer_slider", Pagerer requires the "jQuery update" module to be installed and enabled.'),
+      'status',
+      FALSE
+    );
+  }
+
   // Global option for pager override.
   $form['pagerer_override_pager'] = array(
     '#type' => 'checkbox',
@@ -43,11 +56,20 @@ function pagerer_settings_form($form, &$form_state) {
   $options = array(
     'none',
     'pagerer_standard',
-    'pagerer_mini',
-    'pagerer_slider',
-    'pagerer_progressive',
-    'pagerer_adaptive',
   );
+  // Mini and Slider are only available with jQuery update installed.
+  if ($js_enabled) {
+    $options = array_merge($options, array(
+        'pagerer_mini',
+        'pagerer_slider',
+      )
+    );
+  }
+  $options[] = 'pagerer_progressive';
+  // Adaptive is only available with the flag set in config.
+  if ($vars['pagerer_enable_adaptive']) {
+    $options[] = 'pagerer_adaptive';
+  }
   $options = drupal_map_assoc($options);
 
   // Panes configuration.
@@ -271,6 +293,20 @@ function pagerer_settings_form_submit($form, &$form_state) {
  * Pagerer pane level settings admin form.
  */
 function pagerer_pane_settings_form($form, &$form_state) {
+
+  // Check if jQuery update is installed.
+  if (module_exists('jquery_update')) {
+    $js_enabled = TRUE;
+  }
+  else {
+    $js_enabled = FALSE;
+    drupal_set_message(
+      t('To enable the jQuery elements "widget" and "slider" for current page, Pagerer requires the "jQuery update" module to be installed and enabled.'),
+      'status',
+      FALSE
+    );
+  }
+
   // Pane to be configured.
   $pane = $form_state['build_info']['args'][0];
   switch ($pane) {
@@ -360,7 +396,12 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#description' => t('Select whether and where to render a text "label" element (e.g. "Page:"). Options are "none" (not displayed), "before_current" (in front of current page), "first" (at the beginning), "last" (at the end).'),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('none', 'normal', 'widget', 'slider'));
+  $options = array('none', 'normal');
+  // Widget and Slider are only available with jQuery update installed.
+  if ($js_enabled) {
+    $options = array_merge($options, array('widget', 'slider'));
+  }
+  $options = drupal_map_assoc($options);
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
     '#title' => t('Current page'),

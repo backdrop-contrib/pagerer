@@ -1674,11 +1674,6 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     else {
       // Degrade.
       $js_enabled = FALSE;
-      drupal_set_message(
-        t('Pagerer module requires "jQuery update" module to be installed and enabled to use properly jQuery elements.'),
-        'error',
-        FALSE
-      );
     }
   }
 

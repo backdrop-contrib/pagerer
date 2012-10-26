@@ -1,5 +1,7 @@
 Pagerer 7.x-1.0-xxxx, xxxx-xx-xx
 --------------------------------
+- Issue #1817798 by mondrake: fixed presenting options for jQuery-enabled
+  themes/elements when jQuery Update is not installed.
 - Issue #1818292 by joelrosen, mondrake: fixed creation of faulty URLs
   for js enabled elements if HTTPS is set.
 
