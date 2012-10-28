@@ -62,7 +62,6 @@ function pagerer_theme() {
     ),
     'pagerer_standard' => array(
       'variables' => array(
-        'tags'                    => _pagerer_tags_merge_default('pagerer_standard'),
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
@@ -84,7 +83,6 @@ function pagerer_theme() {
     ),
     'pagerer_progressive' => array(
       'variables' => array(
-        'tags'                    => _pagerer_tags_merge_default('pagerer_progressive'),
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => 5,
@@ -108,7 +106,6 @@ function pagerer_theme() {
     ),
     'pagerer_mini' => array(
       'variables' => array(
-        'tags'                    => _pagerer_tags_merge_default('pagerer_mini'),
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
@@ -130,7 +127,6 @@ function pagerer_theme() {
     ),
     'pagerer_slider' => array(
       'variables' => array(
-        'tags'                    => _pagerer_tags_merge_default('pagerer_slider'),
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
@@ -154,7 +150,6 @@ function pagerer_theme() {
   if ($vars['pagerer_enable_adaptive']) {
     $theme['pagerer_adaptive'] = array(
       'variables' => array(
-        'tags'                    => _pagerer_tags_merge_default('pagerer_adaptive'),
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => 5,
@@ -355,7 +350,7 @@ function _pagerer_override_theme_pager($v) {
       $variables['right_pane']['theme_variables']['quantity'] = $v['quantity'];
     }
   }
-  // Supercede some 'tags' if set from theme call.
+  // Tags, if set from theme call, need to be mapped to pagerer tags structure.
   if (isset($v['tags']) and !empty($v['tags'])) {
     if ($config_vars['left_pane']['theme_name'] <> 'none') {
       $variables['left_pane']['theme_variables']['tags']['first'] = $v['tags'][0];
@@ -658,8 +653,8 @@ function _pagerer_theme_handler($theme, $variables) {
   drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
   // Get pagerer configuration.
   $pagerer_vars = _pagerer_get_variables();
-  // Resolve default tags.
-  $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['tags']);
+  // Resolve tags. The tags key bears already localised strings.
+  $variables['tags'] = _pagerer_tags_merge_default($theme, isset($variables['tags']) ? $variables['tags'] : array());
   // Resolve markers.
   $markers = _pagerer_resolve_markers($variables);
   // Short to main markers.
@@ -855,7 +850,7 @@ function _pagerer_theme_handler($theme, $variables) {
   if ($variables['total_display'] == 'first') {
     $items[] = array(
       'class' => array('pager-item'),
-      'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
+      'data' => format_string($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
     );
     if ($variables['pager_separator'] != 'none') {
       $items[] = array(
@@ -902,7 +897,7 @@ function _pagerer_theme_handler($theme, $variables) {
     }
     $items[] = array(
       'class' => array('pager-item'),
-      'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
+      'data' => format_string($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
     );
   }
   return '<h2 class="element-invisible">' . t('Pages') . '</h2>' . theme('item_list', array(
@@ -995,7 +990,7 @@ function _pagerer_itemize_first_link($variables, $markers) {
     $li_first = theme(
       'pager_link',
       array(
-        'text' => t($variables['tags']['first'], array('@num' => $text)),
+        'text' => format_string($variables['tags']['first'], array('@num' => $text)),
         'page_new' => pager_load_array(0, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
@@ -1005,7 +1000,7 @@ function _pagerer_itemize_first_link($variables, $markers) {
   }
   return array(
     'class' => array('pager-first'),
-    'data' => $li_first ? _pagerer_resolve_link_data($li_first) : t($variables['tags']['first'], array('@num' => $text)),
+    'data' => $li_first ? _pagerer_resolve_link_data($li_first) : format_string($variables['tags']['first'], array('@num' => $text)),
   );
 }
 
@@ -1041,7 +1036,7 @@ function _pagerer_itemize_previous_link($variables, $markers) {
     $li_previous = theme(
       'pager_link',
       array(
-        'text' => t($variables['tags']['previous'], array('@num' => $text)),
+        'text' => format_string($variables['tags']['previous'], array('@num' => $text)),
         'page_new' => pager_load_array($pager_page_array[$variables['element']] - 1, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
@@ -1051,7 +1046,7 @@ function _pagerer_itemize_previous_link($variables, $markers) {
   }
   return array(
     'class' => array('pager-previous'),
-    'data' => $li_previous ? _pagerer_resolve_link_data($li_previous) : t($variables['tags']['previous'], array('@num' => $text)),
+    'data' => $li_previous ? _pagerer_resolve_link_data($li_previous) : format_string($variables['tags']['previous'], array('@num' => $text)),
   );
 }
 
@@ -1088,7 +1083,7 @@ function _pagerer_itemize_next_link($variables, $markers) {
     $li_next = theme(
       'pager_link',
       array(
-        'text' => t($variables['tags']['next'], array('@num' => $text)),
+        'text' => format_string($variables['tags']['next'], array('@num' => $text)),
         'page_new' => pager_load_array($pager_page_array[$variables['element']] + 1, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
@@ -1098,7 +1093,7 @@ function _pagerer_itemize_next_link($variables, $markers) {
   }
   return array(
     'class' => array('pager-next'),
-    'data' => $li_next ? _pagerer_resolve_link_data($li_next) : t($variables['tags']['next'], array('@num' => $text)),
+    'data' => $li_next ? _pagerer_resolve_link_data($li_next) : format_string($variables['tags']['next'], array('@num' => $text)),
   );
 }
 
@@ -1136,7 +1131,7 @@ function _pagerer_itemize_last_link($variables, $markers) {
     $li_last = theme(
       'pager_link',
       array(
-        'text' => t($variables['tags']['last'], array('@num' => $text)),
+        'text' => format_string($variables['tags']['last'], array('@num' => $text)),
         'page_new' => pager_load_array($m, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
@@ -1146,7 +1141,7 @@ function _pagerer_itemize_last_link($variables, $markers) {
   }
   return array(
     'class' => array('pager-last'),
-    'data' => $li_last ? _pagerer_resolve_link_data($li_last) : t($variables['tags']['last'], array('@num' => $text)),
+    'data' => $li_last ? _pagerer_resolve_link_data($li_last) : format_string($variables['tags']['last'], array('@num' => $text)),
   );
 }
 
@@ -1296,7 +1291,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
         if ($variables['total_display'] == 'after_current') {
           $items[] = array(
             'class' => array('pager-item'),
-            'data' => t($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
+            'data' => format_string($variables['tags']['total'], array('@total' => _pagerer_get_total($variables, $markers))),
           );
         }
       }
@@ -1525,7 +1520,7 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
  * @param integer $offset
  *   offset of page to be rendered, from current page
  * @param string  $tag
- *   tag to be used to render the text
+ *   tag to be used to render the text - already localised
  * @param string  $mode
  *   ['absolute'|'relative']
  *   - 'absolute' returns the page/item/item range at offset
@@ -1569,12 +1564,12 @@ function _pagerer_get_page_text($variables, $markers, $offset, $tag = '@num', $m
     switch ($variables['display']) {
       case 'item_ranges':
       case 'items':
-        $text = t($tag, array('@num' => abs($offset * $pager_limits[$variables['element']])));
+        $text = format_string($tag, array('@num' => abs($offset * $pager_limits[$variables['element']])));
         break;
 
       case 'pages':
       default:
-        $text = t($tag, array('@num' => abs($offset)));
+        $text = format_string($tag, array('@num' => abs($offset)));
         break;
     }
   }
@@ -1614,7 +1609,7 @@ function _pagerer_get_label_tag($variables) {
 /**
  * Return total number of pages or items in the pager.
  *
- * Depending on $variables['display'], return either a number in
+ * Depending on $variables['display'], return a number either in
  * pages or in items.
  *
  * @param array $variables

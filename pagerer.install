@@ -36,3 +36,22 @@ function pagerer_uninstall() {
     }
   }
 }
+
+/**
+ * Update Pagerer variable and themes.
+ */
+function pagerer_update_7100() {
+  // Ensure latest theme definitions are loaded in registry.
+  drupal_theme_rebuild();
+  // Get rid of any leftover 'tags' keys in pagerer variable.
+  $vars = _pagerer_get_variables();
+  if (isset($vars['tags'])) {
+    unset($vars['tags']);
+  }
+  foreach (array('left_pane', 'center_pane', 'right_pane') as $p) {
+    if (isset($vars[$p]['theme_variables']['tags'])) {
+      unset($vars[$p]['theme_variables']['tags']);
+    }
+  }
+  variable_set('pagerer', $vars);
+}
