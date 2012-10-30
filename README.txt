@@ -277,9 +277,16 @@ The 'tags' variable in Pagerer
 ==============================
 
 The 'tags' variable in pagerer_xxxx themes is an associative array of
-tags to be used to render the pager. It differs from Drupal core pager
-'tags' variable, which is a simple array.
+tags to be used to render any of the textual elements of the pager. It
+differs from Drupal core pager 'tags' variable, which is a simple array.
+Any of the textual elements specified can contain a '@number' and/or a
+'@total' placeholder that at runtime will be replaced respectively with
+the target page and the total number of pages in the pager. If the pager
+is set to display 'items' or 'item ranges', the replacement will be with
+the corresponding element.
 
+- page: Text to use to render the target page/item/item range. Defaults
+  to: '@number'.
 - first: Text to use to render the link to the first page (e.g. "<<
   first").
 - previous: Text to use to render the link to the previous page
@@ -288,17 +295,73 @@ tags to be used to render the pager. It differs from Drupal core pager
 - last: Text to use to render the link to the last page (e.g. "last >>").
 - previous_progr: pagerer_progressive and pagerer_adaptive themes only.
   Text to use to render the link to a previous page outside of the
-  neighborhood (e.g. "-100").
+  neighborhood (e.g. "-100"). Defaults to: '-@number'.
 - next_progr: pagerer_progressive and pagerer_adaptive themes only. Text
   to use to render the link to a next page outside of the neighborhood
-  (e.g. "+100").
-- total: Text to use to render the total pages/items on the pager (e.g.
-  "of 100"). Use '@total' placeholder to enable the actual total number
-  be shown at runtime.
-- page_label: Text to use to render a 'Page' label.
-- item_label: Text to use to render a 'Item' label.
-- item_range_label: Text to use to render a 'Items range' label.
+  (e.g. "+100"). Defaults to: '+@number'.
+- total: Text to use to render the total pages/items on the pager. Defaults
+  to: 'of @total'.
 
-In the 'first', 'previous', 'next', 'last', 'previous_progr' and
-'next_progr' tags you can use a '@num' placeholder to enable the actual
-offset to be shown at runtime.
+- page_label: Text to use to render a 'page' label. Defaults to: 'Page'.
+- item_label: Text to use to render a 'item' label. Defaults to: 'Item'.
+- item_range_label: Text to use to render a 'items range' label. Defaults
+  to: 'Items'.
+
+- pages_page_title: Help text used when hovering to a 'page' link, and
+  the pager is set to display 'pages'. Defaults to: 'Go to page @number'.
+- pages_first_title: Help text used when hovering to a 'first' link, and
+  the pager is set to display 'pages'. Defaults to: 'Go to first page'.
+- pages_previous_title: Help text used when hovering to a 'previous' link, and
+  the pager is set to display 'pages'. Defaults to: 'Go to previous page'.
+- pages_next_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'pages'. Defaults to: 'Go to next page'.
+- pages_last_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'pages'. Defaults to: 'Go to last page'.
+
+- items_page_title: Help text used when hovering to a 'page' link, and
+  the pager is set to display 'items'. Defaults to: 'Go to item @number'.
+- items_first_title: Help text used when hovering to a 'first' link, and
+  the pager is set to display 'items'. Defaults to: 'Go to first item'.
+- items_previous_title: Help text used when hovering to a 'previous' link, and
+  the pager is set to display 'items'. Defaults to: 'Go to previous items'.
+- items_next_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'items'. Defaults to: 'Go to next items'.
+- items_last_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'items'. Defaults to: 'Go to last items'.
+
+- item_ranges_page_title: Help text used when hovering to a 'page' link, and
+  the pager is set to display 'item_ranges'. Defaults to: 'Go to items
+  @number'.
+- item_ranges_first_title: Help text used when hovering to a 'first' link, and
+  the pager is set to display 'item_ranges'. Defaults to: 'Go to first items'.
+- item_ranges_previous_title: Help text used when hovering to a 'previous'
+  link, and the pager is set to display 'item_ranges'. Defaults to:
+  'Go to previous items'.
+- item_ranges_next_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'item_ranges'. Defaults to: 'Go to next items'.
+- item_ranges_last_title: Help text used when hovering to a 'next' link, and
+  the pager is set to display 'item_ranges'. Defaults to: 'Go to last items'.
+
+- pages_widget_title: Help text used when hovering the direct input widget,
+  and the pager is set to display 'pages'. Defaults to:
+  'Enter page, then press Return.'.
+- items_widget_title: Help text used when hovering the direct input widget,
+  and the pager is set to display 'items'. Defaults to:
+  'Enter item, then press Return.'.
+- item_ranges_widget_title: Help text used when hovering the direct input
+  widget, and the pager is set to display 'item_ranges'. Defaults to:
+  'Enter item, then press Return.'.
+
+- pages_slider_title: Help text used when hovering the slider, and the pager
+  is set to display 'pages'. Defaults to:
+  'Drag the handle to the page required.'.
+- items_slider_title: Help text used when hovering the slider, and the pager
+  is set to display 'items'. Defaults to:
+  'Drag the handle to the item required.'.
+- item_ranges_slider_title: Help text used when hovering the slider, and the
+  pager is set to display 'item_ranges'. Defaults to:
+  'Drag the handle to the item required.'.
+
+- slider_tickmark_title: Help text appended to the slider help when user is
+  expected to click on the tickmark to start page relocation. Defaults to:
+  'Then, click on the tickmark.'.

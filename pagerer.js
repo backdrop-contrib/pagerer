@@ -145,7 +145,7 @@ Drupal.behaviors.pagerer = {
       // relocation.
       if (this.pagererState.action == 'tickmark') {
         var title = $(this).attr('title');
-        $(this).attr('title',  title + Drupal.t(' Then, click on the tickmark.'));
+        $(this).attr('title',  title + ' ' + this.pagererState.tickmark_title);
       }
     })
     .bind('slide', function(event, ui) {

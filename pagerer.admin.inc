@@ -28,7 +28,7 @@ function pagerer_settings_form($form, &$form_state) {
   else {
     $js_enabled = FALSE;
     drupal_set_message(
-      t('To enable the jQuery based themes "pagerer_mini" and "pagerer_slider", Pagerer requires the "jQuery update" module to be installed and enabled.'),
+      t("To enable the jQuery based themes 'pagerer_mini' and 'pagerer_slider', Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
     );
@@ -37,8 +37,8 @@ function pagerer_settings_form($form, &$form_state) {
   // Global option for pager override.
   $form['pagerer_override_pager'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Replace standard pager with Pagerer'),
-    '#description' => t('Check to enable Pagerer features on any pager served by Drupal core.'),
+    '#title' => t("Replace standard pager with Pagerer"),
+    '#description' => t("Check to enable Pagerer features on any pager served by Drupal core."),
     '#default_value' => $vars['pagerer_override_pager'],
     '#disabled' => !_pagerer_theme_override_safe($theme_registry, 'pager', 'theme_pager', 'system'),
   );
@@ -46,8 +46,8 @@ function pagerer_settings_form($form, &$form_state) {
   // Global option to enable adaptive pager.
   $form['pagerer_enable_adaptive'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable adaptive pager'),
-    '#description' => t('Check to enable Pagerer adaptive pager theme.'),
+    '#title' => t("Enable adaptive pager"),
+    '#description' => t("Check to enable Pagerer adaptive pager theme."),
     '#default_value' => $vars['pagerer_enable_adaptive'],
     '#disabled' => !_pagerer_theme_override_safe($theme_registry, 'pager_link', 'theme_pager_link', 'system'),
   );
@@ -75,14 +75,14 @@ function pagerer_settings_form($form, &$form_state) {
   // Panes configuration.
   $form['panes_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Pagerer panes configuration'),
-    '#description' => t('Select the themes to be rendered in each Pagerer pane. Click "Configure" to change each theme behaviour.'),
+    '#title' => t("Pagerer panes configuration"),
+    '#description' => t("Select the themes to be rendered in each Pagerer pane. Click 'Configure' to change each theme behaviour."),
   );
 
   // Table container to render the 3 pane config boxes inline.
   $form['panes_container']['panes'] = array(
     '#tree'          => TRUE,
-    '#title'         => t('Panes'),
+    '#title'         => t("Panes"),
     '#theme'         => 'table',
     '#header'        => array(),
     '#rows'          => array(),
@@ -91,50 +91,50 @@ function pagerer_settings_form($form, &$form_state) {
   // Left pane.
   $left_pane = array(
     '#type' => 'fieldset',
-    '#title' => t('Left pane'),
+    '#title' => t("Left pane"),
   );
   $left_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' => t('Theme'),
+    '#title' => t("Theme"),
     '#options' => $options,
     '#default_value' => $vars['left_pane']['theme_name'],
   );
   $left_pane['configure'] = array(
     '#type' => 'submit',
     '#name' => 'config_left',
-    '#value' => t('Configure'),
+    '#value' => t("Configure"),
   );
   // Center pane.
   $center_pane = array(
     '#type' => 'fieldset',
-    '#title' => t('Center pane'),
+    '#title' => t("Center pane"),
   );
   $center_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' => t('Theme'),
+    '#title' => t("Theme"),
     '#options' => $options,
     '#default_value' => $vars['center_pane']['theme_name'],
   );
   $center_pane['configure'] = array(
     '#type' => 'submit',
     '#name' => 'config_center',
-    '#value' => t('Configure'),
+    '#value' => t("Configure"),
   );
   // Right pane.
   $right_pane = array(
     '#type' => 'fieldset',
-    '#title' => t('Right pane'),
+    '#title' => t("Right pane"),
   );
   $right_pane['theme_name'] = array(
     '#type' => 'select',
-    '#title' => t('Theme'),
+    '#title' => t("Theme"),
     '#options' => $options,
     '#default_value' => $vars['right_pane']['theme_name'],
   );
   $right_pane['configure'] = array(
     '#type' => 'submit',
     '#name' => 'config_right',
-    '#value' => t('Configure'),
+    '#value' => t("Configure"),
   );
   // Container elements - FAPI accessible.
   $form['panes_container']['panes']['e'] = array(
@@ -153,7 +153,7 @@ function pagerer_settings_form($form, &$form_state) {
   pager_default_initialize(47884, 50);
   $form['preview'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Pagerer preview'),
+    '#title' => t("Pagerer preview"),
   );
   $form['preview']['pagerer'] = array(
     '#markup' => theme('pagerer', array(
@@ -167,7 +167,7 @@ function pagerer_settings_form($form, &$form_state) {
   $form['save'] = array(
     '#type' => 'submit',
     '#name' => 'save',
-    '#value' => t('Save configuration'),
+    '#value' => t("Save configuration"),
   );
 
   return $form;
@@ -183,19 +183,19 @@ function pagerer_settings_form_validate($form, &$form_state) {
     if ($v['panes']['e']['left']['data']['theme_name'] == 'pagerer_adaptive') {
       form_set_error(
         'panes][e][left][data',
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
+        t("Turn on the 'Enable adaptive pager' option to select the adaptive pager.")
       );
     }
     if ($v['panes']['e']['center']['data']['theme_name'] == 'pagerer_adaptive') {
       form_set_error(
         'panes][e][center][data',
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
+        t("Turn on the 'Enable adaptive pager' option to select the adaptive pager.")
       );
     }
     if ($v['panes']['e']['right']['data']['theme_name'] == 'pagerer_adaptive') {
       form_set_error(
         'panes][e][right][data',
-        t('Turn on the "Enable adaptive pager" option to select the adaptive pager.', array())
+        t("Turn on the 'Enable adaptive pager' option to select the adaptive pager.")
       );
     }
   }
@@ -206,7 +206,7 @@ function pagerer_settings_form_validate($form, &$form_state) {
     if ($v['panes']['e'][$pane]['data']['theme_name'] == 'none') {
       form_set_error(
         'panes][e][' . $pane . '][data',
-        t('Select a theme before clicking "Configure".', array())
+        t("Select a theme before clicking 'Configure'.")
       );
     }
   }
@@ -301,7 +301,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   else {
     $js_enabled = FALSE;
     drupal_set_message(
-      t('To enable the jQuery elements "widget" and "slider" for current page, Pagerer requires the "jQuery update" module to be installed and enabled.'),
+      t("To enable the jQuery elements 'widget' and 'slider' for current page, Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
     );
@@ -309,19 +309,6 @@ function pagerer_pane_settings_form($form, &$form_state) {
 
   // Pane to be configured.
   $pane = $form_state['build_info']['args'][0];
-  switch ($pane) {
-    case 'left':
-      $pane_t = t('Left');
-      break;
-
-    case 'center':
-      $pane_t = t('Center');
-      break;
-
-    case 'right':
-      $pane_t = t('Right');
-      break;
-  }
 
   // Merge configuration variables with those coming from default theme
   // variables.
@@ -338,33 +325,46 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $v = array_merge($default_theme_vars, $theme_vars);
 
   // Pane theme.
+  switch ($pane) {
+    case 'left':
+      $pane_title = t("Left pane theme");
+      break;
+
+    case 'center':
+      $pane_title = t("Center pane theme");
+      break;
+
+    case 'right':
+      $pane_title = t("Right pane theme");
+      break;
+  }
   $form['theme_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('@pane_t pane theme', array('@pane_t' => $pane_t)),
+    '#title' => $pane_title,
     '#default_value' => $theme,
-    '#description' => t('To change the pane theme, go back to main Pagerer configuration.'),
+    '#description' => t("To change the pane theme, go back to main Pagerer configuration."),
     '#disabled' => TRUE,
   );
   $form['reset_theme'] = array(
     '#type' => 'submit',
     '#name' => 'reset_theme',
-    '#value' => t('Reset theme defaults'),
+    '#value' => t("Reset theme defaults"),
   );
 
   $options = drupal_map_assoc(array('pages', 'items', 'item_ranges'));
   $form['display'] = array(
     '#type' => 'select',
-    '#title' => t('Display'),
+    '#title' => t("Display"),
     '#options' => $options,
     '#default_value' => $v['display'],
-    '#description' => t('Select whether to display pages, or items, or item ranges.'),
+    '#description' => t("Select whether to display pages, or items, or item ranges."),
     '#required' => TRUE,
   );
   $form['quantity'] = array(
     '#type' => 'textfield',
-    '#title' => t('Quantity'),
+    '#title' => t("Quantity"),
     '#default_value' => $v['quantity'],
-    '#description' => t('The number of pages in the pager list.'),
+    '#description' => t("The number of pages in the pager list."),
     '#required' => TRUE,
     '#size' => 3,
     '#maxlength' => 3,
@@ -372,9 +372,9 @@ function pagerer_pane_settings_form($form, &$form_state) {
   if ($theme == 'pagerer_progressive') {
     $form['factors'] = array(
       '#type' => 'textfield',
-      '#title' => t('Scale factors'),
+      '#title' => t("Scale factors"),
       '#default_value' => $v['factors'],
-      '#description' => t('Comma delimited string of factors to use to determine progressive links.'),
+      '#description' => t("Comma delimited string of factors to use to determine progressive links."),
       '#required' => TRUE,
     );
   }
@@ -382,18 +382,18 @@ function pagerer_pane_settings_form($form, &$form_state) {
   // Display configuration.
   $form['display_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Main elements'),
+    '#title' => t("Main elements"),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#description' => t('Configure main pager elements as "label", "current page" and "total".'),
+    '#description' => t("Configure main pager elements as 'label', 'current page' and 'total'."),
   );
   $options = drupal_map_assoc(array('none', 'before_current', 'first', 'last'));
   $form['display_container']['label_display'] = array(
     '#type' => 'select',
-    '#title' => t('Label'),
+    '#title' => t("Label"),
     '#options' => $options,
     '#default_value' => $v['label_display'],
-    '#description' => t('Select whether and where to render a text "label" element (e.g. "Page:"). Options are "none" (not displayed), "before_current" (in front of current page), "first" (at the beginning), "last" (at the end).'),
+    '#description' => t("Select whether and where to render a text 'label' element (e.g. 'Page'). Options are 'none' (not displayed), 'before_current' (in front of current page), 'first' (at the beginning), 'last' (at the end)."),
     '#required' => TRUE,
   );
   $options = array('none', 'normal');
@@ -404,74 +404,74 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc($options);
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
-    '#title' => t('Current page'),
+    '#title' => t("Current page"),
     '#options' => $options,
     '#default_value' => $v['current_display'],
-    '#description' => t('Select how the current page is rendered in the pager. Options are "none" (not displayed), "normal" (as a text), "widget" (an active input box from where users can enter directly a page to go to), "slider" (as a slider).'),
+    '#description' => t("Select how the current page is rendered in the pager. Options are 'none' (not displayed), 'normal' (as a text), 'widget' (an active input box from where users can enter directly a page to go to), 'slider' (as a slider)."),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('none', 'after_current', 'first', 'last'));
   $form['display_container']['total_display'] = array(
     '#type' => 'select',
-    '#title' => t('Total pages/items'),
+    '#title' => t("Total pages/items"),
     '#options' => $options,
     '#default_value' => $v['total_display'],
-    '#description' => t('Select whether and where to render a text element indicating the total pages (or items). Options are "none" (not displayed), "after_current" (just after current page), "first" (at the beginning), "last" (at the end).'),
+    '#description' => t("Select whether and where to render a text element indicating the total pages (or items). Options are 'none' (not displayed), 'after_current' (just after current page), 'first' (at the beginning), 'last' (at the end)."),
     '#required' => TRUE,
   );
 
   // Links configuration.
   $form['links_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Links'),
+    '#title' => t("Links"),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#description' => t('Configure link elements like "<< first", "< previous", "next >" and "last >>".'),
+    '#description' => t("Configure link elements like '<< first', '< previous', 'next >' and 'last >>'."),
   );
   $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['first_link'] = array(
     '#type' => 'select',
-    '#title' => t('First'),
+    '#title' => t("First"),
     '#options' => $options,
     '#default_value' => $v['first_link'],
-    '#description' => t('Select when to render a link to the first page (e.g. "<< first"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed).'),
+    '#description' => t("Select when to render a link to the first page (e.g. '<< first'). Options are 'never' (not displayed), 'not_on_first' (not displayed if current page is the first), 'always' (always displayed)."),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['previous_link'] = array(
     '#type' => 'select',
-    '#title' => t('Previous'),
+    '#title' => t("Previous"),
     '#options' => $options,
     '#default_value' => $v['previous_link'],
-    '#description' => t('Select when to render a link to the previous page (e.g. "<< previous"). Options are "never" (not displayed), "not_on_first" (not displayed if current page is the first), "always" (always displayed).'),
+    '#description' => t("Select when to render a link to the previous page (e.g. '<< previous'). Options are 'never' (not displayed), 'not_on_first' (not displayed if current page is the first), 'always' (always displayed)."),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['next_link'] = array(
     '#type' => 'select',
-    '#title' => t('Next'),
+    '#title' => t("Next"),
     '#options' => $options,
     '#default_value' => $v['next_link'],
-    '#description' => t('Select when to render a link to the next page (e.g. "next >"). Options are "never" (not displayed), "not_on_last" (not displayed if current page is the last), "always" (always displayed).'),
+    '#description' => t("Select when to render a link to the next page (e.g. 'next >'). Options are 'never' (not displayed), 'not_on_last' (not displayed if current page is the last), 'always' (always displayed)."),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['last_link'] = array(
     '#type' => 'select',
-    '#title' => t('Last'),
+    '#title' => t("Last"),
     '#options' => $options,
     '#default_value' => $v['last_link'],
-    '#description' => t('Select when to render a link to the last page (e.g. "last >>"). Options are "never" (not displayed), "not_on_last" (not displayed if current page is the last), "always" (always displayed).'),
+    '#description' => t("Select when to render a link to the last page (e.g. 'last >>'). Options are 'never' (not displayed), 'not_on_last' (not displayed if current page is the last), 'always' (always displayed)."),
     '#required' => TRUE,
   );
   if ($theme == 'pagerer_adaptive' or $theme == 'pagerer_progressive') {
     $options = drupal_map_assoc(array('relative', 'absolute'));
     $form['links_container']['progr_links'] = array(
       '#type' => 'select',
-      '#title' => t('Outer pages'),
+      '#title' => t("Outer pages"),
       '#options' => $options,
       '#default_value' => $v['progr_links'],
-      '#description' => t('Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as "absolute" page numbers (or items/item ranges) or as "relative" offsets from current (e.g. "+10 +100 +1000").'),
+      '#description' => t("Progressive and Adaptive pagers render links to pages far from the current. Select whether to render these links as 'absolute' page numbers (or items/item ranges) or as 'relative' offsets from current (e.g. +10 +100 +1000)."),
       '#required' => TRUE,
     );
   }
@@ -479,58 +479,58 @@ function pagerer_pane_settings_form($form, &$form_state) {
   // Separators configuration.
   $form['separators_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Separators'),
+    '#title' => t("Separators"),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#description' => t('Configure separators text.'),
+    '#description' => t("Configure separators text."),
   );
   $form['separators_container']['pager_breaker'] = array(
     '#type' => 'textfield',
-    '#title' => t('Breaker'),
+    '#title' => t("Breaker"),
     '#default_value' => $v['pager_breaker'],
-    '#description' => t('Text to render a break in the page sequence.'),
+    '#description' => t("Text to render a break in the page sequence."),
   );
   $form['separators_container']['pager_separator'] = array(
     '#type' => 'textfield',
-    '#title' => t('Element separator'),
+    '#title' => t("Element separator"),
     '#default_value' => $v['pager_separator'],
-    '#description' => t('Text to fill between contiguous pages. "none" will prevent creating any filler.'),
+    '#description' => t("Text to fill between contiguous pages. 'none' will prevent creating any filler."),
   );
   $form['separators_container']['range_separator'] = array(
     '#type' => 'textfield',
-    '#title' => t('Range separator'),
+    '#title' => t("Range separator"),
     '#default_value' => $v['range_separator'],
-    '#description' => t('Text to place between first and last item in a range.'),
+    '#description' => t("Text to place between first and last item in a range."),
   );
 
   // Advanced options configuration.
   $form['advanced_options_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Advanced options'),
+    '#title' => t("Advanced options"),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#description' => t('Configure advanced options.'),
+    '#description' => t("Configure advanced options."),
   );
   $form['advanced_options_container']['slider'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Slider'),
+    '#title' => t("Slider"),
     '#collapsible' => FALSE,
-    '#description' => t('jQuery slider options.'),
+    '#description' => t("jQuery slider options."),
   );
   $options = drupal_map_assoc(array('tickmark', 'timelapse', 'auto'));
   $form['advanced_options_container']['slider']['slider_action'] = array(
     '#type' => 'select',
-    '#title' => t('Action confirmation method'),
+    '#title' => t("Action confirmation method"),
     '#options' => $options,
     '#default_value' => $v['slider_action'],
-    '#description' => t('Select how the page relocation should be triggered after it has been selected through the slider. Options are: "tickmark" (page relocation only occurs after user clicks a tickmark on the slider handle), "timelapse" (page relocation occurs after a grace time has elapsed), "auto" (the timelapse method is automatically selected based on the accuracy of the slider).'),
+    '#description' => t("Select how the page relocation should be triggered after it has been selected through the slider. Options are: 'tickmark' (page relocation only occurs after user clicks a tickmark on the slider handle), 'timelapse' (page relocation occurs after a grace time has elapsed), 'auto' (the timelapse method is automatically selected based on the accuracy of the slider)."),
     '#required' => TRUE,
   );
   $form['advanced_options_container']['slider']['slider_action_timelapse'] = array(
     '#type' => 'textfield',
-    '#title' => t('Confirmation timelapse'),
+    '#title' => t("Confirmation timelapse"),
     '#default_value' => $v['slider_action_timelapse'],
-    '#description' => t('The grace time (in milliseconds) to wait before the page is relocated, in case "timelapse" confirmation method is selected. "0" will trigger relocation immediately.'),
+    '#description' => t("The grace time (in milliseconds) to wait before the page is relocated, in case 'timelapse' confirmation method is selected. '0' will trigger relocation immediately."),
     '#size' => 5,
     '#maxlength' => 5,
     '#required' => TRUE,
@@ -538,10 +538,10 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $options = drupal_map_assoc(array('yes', 'no', 'auto'));
   $form['advanced_options_container']['slider']['slider_navigation_icons'] = array(
     '#type' => 'select',
-    '#title' => t('Display navigation icons'),
+    '#title' => t("Display navigation icons"),
     '#options' => $options,
     '#default_value' => $v['slider_navigation_icons'],
-    '#description' => t('Select whether to display +/- navigation icons on the sides of the slider. Options are "yes", "no", "auto" (the icons are automatically displayed based on the accuracy of the slider).'),
+    '#description' => t("Select whether to display +/- navigation icons on the sides of the slider. Options are 'yes', 'no', 'auto' (the icons are automatically displayed based on the accuracy of the slider)."),
     '#required' => TRUE,
   );
 
@@ -549,7 +549,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   $form['save'] = array(
     '#type' => 'submit',
     '#name' => 'save',
-    '#value' => t('Save configuration'),
+    '#value' => t("Save configuration"),
   );
 
   return $form;

@@ -24,7 +24,7 @@ function pagerer_install() {
  * Implements hook_uninstall().
  */
 function pagerer_uninstall() {
-  // Removes all variables whose name begins with 'pagerer'.
+  // Remove all variables whose name begins with 'pagerer'.
   $res = db_select('variable', 'v')
       ->fields('v')
       ->condition('name', 'pagerer%', 'LIKE')
