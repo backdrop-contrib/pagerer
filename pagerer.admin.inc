@@ -340,7 +340,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   }
   $form['theme_name'] = array(
     '#type' => 'textfield',
-    '#title' => $pane_title,
+    '#title' => check_plain($pane_title),
     '#default_value' => $theme,
     '#description' => t("To change the pane theme, go back to main Pagerer configuration."),
     '#disabled' => TRUE,

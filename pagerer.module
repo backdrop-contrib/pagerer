@@ -245,8 +245,18 @@ function _pagerer_theme_override_safe($theme_registry, $theme, $function, $modul
 
 /**
  * Default tags for Pagerer's themes.
+ *
+ * @param string $theme
+ *   theme name
+ * @param string $display_mode
+ *   what is being displayed within [pages|items|item_ranges]
+ * @param array $tags
+ *   an array of tags to be merged with defaults
+ *
+ * @return array
+ *   merged array of custom and default tags
  */
-function _pagerer_tags_merge_default($theme, $tags = NULL) {
+function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
   switch ($theme) {
     case 'pagerer_standard':
       $default_tags = array(
@@ -279,30 +289,45 @@ function _pagerer_tags_merge_default($theme, $tags = NULL) {
       break;
 
   }
-  $default_titles = array(
-    'pages_page_title'           => t("Go to page @number"),
-    'pages_first_title'          => t("Go to first page"),
-    'pages_previous_title'       => t("Go to previous page"),
-    'pages_next_title'           => t("Go to next page"),
-    'pages_last_title'           => t("Go to last page"),
-    'items_page_title'           => t("Go to item @number"),
-    'items_first_title'          => t("Go to first item"),
-    'items_previous_title'       => t("Go to previous items"),
-    'items_next_title'           => t("Go to next items"),
-    'items_last_title'           => t("Go to last items"),
-    'item_ranges_page_title'     => t("Go to items @number"),
-    'item_ranges_first_title'    => t("Go to first items"),
-    'item_ranges_previous_title' => t("Go to previous items"),
-    'item_ranges_next_title'     => t("Go to next items"),
-    'item_ranges_last_title'     => t("Go to last items"),
-    'pages_widget_title'         => t("Enter page, then press Return."),
-    'items_widget_title'         => t("Enter item, then press Return."),
-    'item_ranges_widget_title'   => t("Enter item, then press Return."),
-    'pages_slider_title'         => t("Drag the handle to the page required."),
-    'items_slider_title'         => t("Drag the handle to the item required."),
-    'item_ranges_slider_title'   => t("Drag the handle to the item required."),
-    'slider_tickmark_title'      => t("Then, click on the tickmark."),
-  );
+  switch ($display_mode) {
+    case 'pages':
+      $default_titles = array(
+        'page_title'     => t("Go to page @number"),
+        'first_title'    => t("Go to first page"),
+        'previous_title' => t("Go to previous page"),
+        'next_title'     => t("Go to next page"),
+        'last_title'     => t("Go to last page"),
+        'widget_title'   => t("Enter page, then press Return."),
+        'slider_title'   => t("Drag the handle to the page required."),
+      );
+      break;
+
+    case 'items':
+      $default_titles = array(
+        'page_title'     => t("Go to item @number"),
+        'first_title'    => t("Go to first item"),
+        'previous_title' => t("Go to previous items"),
+        'next_title'     => t("Go to next items"),
+        'last_title'     => t("Go to last items"),
+        'widget_title'   => t("Enter item, then press Return."),
+        'slider_title'   => t("Drag the handle to the item required."),
+      );
+      break;
+
+    case 'item_ranges':
+      $default_titles = array(
+        'page_title'     => t("Go to items @number"),
+        'first_title'    => t("Go to first items"),
+        'previous_title' => t("Go to previous items"),
+        'next_title'     => t("Go to next items"),
+        'last_title'     => t("Go to last items"),
+        'widget_title'   => t("Enter item, then press Return."),
+        'slider_title'   => t("Drag the handle to the item required."),
+      );
+      break;
+
+  }
+  $default_titles['slider_tickmark_title'] = "Then, click on the tickmark.";
   $default_tags += $default_titles;
   if ($tags) {
     return array_merge($default_tags, $tags);
@@ -650,7 +675,7 @@ function _pagerer_theme_handler($theme, $variables) {
   // Get pagerer configuration.
   $pagerer_vars = _pagerer_get_variables();
   // Resolve tags. The tags key bears already localised strings.
-  $variables['tags'] = _pagerer_tags_merge_default($theme, isset($variables['tags']) ? $variables['tags'] : array());
+  $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['display'], isset($variables['tags']) ? $variables['tags'] : array());
   // Resolve markers.
   $markers = _pagerer_resolve_markers($variables);
   // Short to main markers.
@@ -1520,7 +1545,7 @@ function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page
 
   // Format the HTML title, used by the browser to display microhelp text.
   $text_title = format_string(
-    $variables['tags'][$variables['display'] . '_' . $title_tag . '_title'],
+    $variables['tags'][$title_tag . '_title'],
     array(
       '@number' => $absolute_page_num,
       '@total' => _pagerer_get_total($variables, $markers),
@@ -1705,7 +1730,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   if ($js_enabled) {
     switch ($element_type) {
       case 'widget':
-        $title = $variables['tags'][$variables['display'] . '_widget_title'];
+        $title = $variables['tags']['widget_title'];
         $items[] = array(
           'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
@@ -1721,7 +1746,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
             'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
           );
         }
-        $title = $variables['tags'][$variables['display'] . '_slider_title'];
+        $title = $variables['tags']['slider_title'];
         $items[] = array(
           'class' => array('pager-item', 'widget'),
           'data' => "<div class='pagerer-slider' id='$state_encoded' title='$title'/>",
@@ -1738,7 +1763,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         // Basically, a widget with first/prev/next/last links.
         $items[] = _pagerer_itemize_first_link($variables, $markers);
         $items[] = _pagerer_itemize_previous_link($variables, $markers);
-        $title = $variables['tags'][$variables['display'] . '_widget_title'];
+        $title = $variables['tags']['widget_title'];
         $items[] = array(
           'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",

@@ -159,7 +159,7 @@ function pagerer_example_page() {
   $build['l_pagerer_adaptive_0'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   if (!$vars['pagerer_enable_adaptive']) {
     $build['pagerer_adaptive_0'] = array(
-      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>." , array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
+      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>.", array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
     );
   }
   else {
@@ -205,7 +205,7 @@ function pagerer_example_page() {
   $build['l_pagerer_adaptive_1'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   if (!$vars['pagerer_enable_adaptive']) {
     $build['pagerer_adaptive_1'] = array(
-      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>." , array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
+      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>.", array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
     );
   }
   else {
@@ -229,8 +229,8 @@ function pagerer_example_page() {
       'theme_name' => 'pagerer_mini',
       'theme_variables' => array(
         'tags'            => array(
-          'items_first_title'    => t("Go to the beginning of the recordset"),
-          'items_previous_title' => t("Go to the previous range of records"),
+          'first_title'    => t("Go to the beginning of the recordset"),
+          'previous_title' => t("Go to the previous range of records"),
         ),
         'display'         => 'items',
         'label_display'   => 'none',
@@ -247,7 +247,7 @@ function pagerer_example_page() {
       'theme_variables' => array(
         'tags'            => array(
           'item_label'           => t("Record"),
-          'items_widget_title'   => t("Enter record and press Return. Up/Down arrow keys are enabled."),
+          'widget_title'   => t("Enter record and press Return. Up/Down arrow keys are enabled."),
         ),
         'display'         => 'items',
         'label_display'   => 'before_current',
@@ -263,8 +263,8 @@ function pagerer_example_page() {
       'theme_name' => 'pagerer_mini',
       'theme_variables' => array(
         'tags'            => array(
-          'items_next_title'     => t("Go to the next range of records"),
-          'items_last_title'     => t("Go to the end of the recordset"),
+          'next_title'     => t("Go to the next range of records"),
+          'last_title'     => t("Go to the end of the recordset"),
         ),
         'display'         => 'items',
         'label_display'   => 'none',
@@ -296,7 +296,7 @@ function pagerer_example_page() {
   $build['l_pagerer_adaptive_2'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   if (!$vars['pagerer_enable_adaptive']) {
     $build['pagerer_adaptive_2'] = array(
-      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>." , array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
+      '#markup' => '<br/>' . t("'pagerer_adaptive' pager theme is not enabled in <a href='@url'>configuration</a>.", array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
     );
   }
   else {

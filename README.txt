@@ -307,61 +307,21 @@ the corresponding element.
 - item_range_label: Text to use to render a 'items range' label. Defaults
   to: 'Items'.
 
-- pages_page_title: Help text used when hovering to a 'page' link, and
-  the pager is set to display 'pages'. Defaults to: 'Go to page @number'.
-- pages_first_title: Help text used when hovering to a 'first' link, and
-  the pager is set to display 'pages'. Defaults to: 'Go to first page'.
-- pages_previous_title: Help text used when hovering to a 'previous' link, and
-  the pager is set to display 'pages'. Defaults to: 'Go to previous page'.
-- pages_next_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'pages'. Defaults to: 'Go to next page'.
-- pages_last_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'pages'. Defaults to: 'Go to last page'.
+- page_title: Help text used when hovering a page link (e.g. 'Go to page
+  @number').
+- first_title: Help text used when hovering a first page link (e.g. 'Go to
+  first page').
+- previous_title: Help text used when hovering a previous page link (e.g.
+  'Go to previous page').
+- next_title: Help text used when hovering a next page link (e.g. 'Go to
+  next page').
+- last_title: Help text used when hovering a next page link (e.g. 'Go to
+  last page').
 
-- items_page_title: Help text used when hovering to a 'page' link, and
-  the pager is set to display 'items'. Defaults to: 'Go to item @number'.
-- items_first_title: Help text used when hovering to a 'first' link, and
-  the pager is set to display 'items'. Defaults to: 'Go to first item'.
-- items_previous_title: Help text used when hovering to a 'previous' link, and
-  the pager is set to display 'items'. Defaults to: 'Go to previous items'.
-- items_next_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'items'. Defaults to: 'Go to next items'.
-- items_last_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'items'. Defaults to: 'Go to last items'.
-
-- item_ranges_page_title: Help text used when hovering to a 'page' link, and
-  the pager is set to display 'item_ranges'. Defaults to: 'Go to items
-  @number'.
-- item_ranges_first_title: Help text used when hovering to a 'first' link, and
-  the pager is set to display 'item_ranges'. Defaults to: 'Go to first items'.
-- item_ranges_previous_title: Help text used when hovering to a 'previous'
-  link, and the pager is set to display 'item_ranges'. Defaults to:
-  'Go to previous items'.
-- item_ranges_next_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'item_ranges'. Defaults to: 'Go to next items'.
-- item_ranges_last_title: Help text used when hovering to a 'next' link, and
-  the pager is set to display 'item_ranges'. Defaults to: 'Go to last items'.
-
-- pages_widget_title: Help text used when hovering the direct input widget,
-  and the pager is set to display 'pages'. Defaults to:
-  'Enter page, then press Return.'.
-- items_widget_title: Help text used when hovering the direct input widget,
-  and the pager is set to display 'items'. Defaults to:
-  'Enter item, then press Return.'.
-- item_ranges_widget_title: Help text used when hovering the direct input
-  widget, and the pager is set to display 'item_ranges'. Defaults to:
-  'Enter item, then press Return.'.
-
-- pages_slider_title: Help text used when hovering the slider, and the pager
-  is set to display 'pages'. Defaults to:
-  'Drag the handle to the page required.'.
-- items_slider_title: Help text used when hovering the slider, and the pager
-  is set to display 'items'. Defaults to:
-  'Drag the handle to the item required.'.
-- item_ranges_slider_title: Help text used when hovering the slider, and the
-  pager is set to display 'item_ranges'. Defaults to:
-  'Drag the handle to the item required.'.
-
+- widget_title: Help text used when hovering the direct input widget (e.g.
+  'Enter page, then press Return.').
+- slider_title: Help text used when hovering the slider (e.g. 'Drag the handle
+  to the page required.').
 - slider_tickmark_title: Help text appended to the slider help when user is
   expected to click on the tickmark to start page relocation. Defaults to:
   'Then, click on the tickmark.'.
