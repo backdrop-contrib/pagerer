@@ -1,5 +1,5 @@
-Pagerer 7.x-1.0-xxxx, xxxx-xx-xx
---------------------------------
+Pagerer 7.x-1.0-beta3, 2012-11-05
+---------------------------------
 - Issue #1825492 by mondrake: fixed usage of t() calls.
 - Issue #1818272 by mondrake: fixed tag labels do not translate.
 - Issue #1817798 by mondrake: fixed presenting options for jQuery-enabled
