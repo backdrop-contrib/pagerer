@@ -4,3 +4,4 @@ package = User interface
 core = 7.x
 
 configure = admin/config/user-interface/pagerer
+files[] = pagerer.test
