@@ -500,7 +500,9 @@ function theme_pagerer($variables) {
     ),
     'no_striping' => TRUE,
   );
-  $output = theme_table(array(
+  $output = theme(
+    'table',
+    array(
       'header'     => array(),
       'rows'       => array($row),
       'attributes' => array('class' => array('pagerer')),

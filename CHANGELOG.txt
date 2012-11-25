@@ -1,5 +1,7 @@
 Pagerer 7.x-1.0-xxxxx, xxxx-xx-xx
 ---------------------------------
+- Issue #1843026 by mondrake: replaced theme_table(...) with
+  theme('table', ...).
 - Issue #1843026 by mondrake: implement test case for core pager replacement.
 
 Pagerer 7.x-1.0-beta3, 2012-11-05
