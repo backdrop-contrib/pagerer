@@ -49,7 +49,7 @@ Drupal.behaviors.pagerer = {
             }
             newPage = parseInt(item / parseInt(this.pagererState.interval));
           }
-          pagererRelocate(this, this, this.pagererState.root, this.pagererState.path.replace(/pagererpage/, newPage));
+          pagererRelocate(this, this, this.pagererState.path.replace(/pagererpage/, newPage));
           event.stopPropagation();
           event.preventDefault();
           return false;
@@ -179,7 +179,7 @@ Drupal.behaviors.pagerer = {
       if (this.pagererState.action == 'timelapse' && this.pagererState.timelapse == 0) {
         sliderHandle.append("<div class='pagerer-slider-handle-icon'/>");
         var sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
-        pagererRelocate(this, sliderHandleIcon, this.pagererState.root, this.pagererState.path.replace(/pagererpage/, newPage));
+        pagererRelocate(this, sliderHandleIcon, this.pagererState.path.replace(/pagererpage/, newPage));
         return false;
       }
 
@@ -202,7 +202,7 @@ Drupal.behaviors.pagerer = {
         // Remove icon.
         $(sliderBar[0]).find('.pagerer-slider-handle-icon').removeClass('throbber');
         // Relocate.
-        pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.root, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
+        pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
         return false;
       });
 
@@ -215,7 +215,7 @@ Drupal.behaviors.pagerer = {
           // Remove icon.
           $(sliderBar[0]).find('.pagerer-slider-handle-icon').removeClass('ui-icon').removeClass('throbber');
           // Relocate.
-          pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.root, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
+          pagererRelocate(sliderBar[0], sliderHandleIcon, sliderBar[0].pagererState.path.replace(/pagererpage/, newPage));
           return false;
         }, this.pagererState.timelapse);
       }
@@ -278,7 +278,7 @@ Drupal.behaviors.pagerer = {
      *  - a page rendered through the admin overlay - BBQ is used
      *  - a normal page - document.location is used
      */
-    function pagererRelocate(element, ajaxAttachElement, root, path) {
+    function pagererRelocate(element, ajaxAttachElement, path) {
       // Check we are not relocating already.
       if (element.pagererState.relocating) {
         return false;
@@ -289,7 +289,7 @@ Drupal.behaviors.pagerer = {
       var viewsAjaxContext = pagererInViewsAjaxContext(element);
       if (viewsAjaxContext) {
         // Element is in Views AJAX context.
-        pagererAttachViewsAjax(ajaxAttachElement, 'doViewsAjax', viewsAjaxContext, root, path);
+        pagererAttachViewsAjax(ajaxAttachElement, 'doViewsAjax', viewsAjaxContext, path);
         $(ajaxAttachElement).trigger('doViewsAjax');
       } else if ($(element).parents('#views-live-preview').length) {
         // Element is in Views preview context.
@@ -297,7 +297,7 @@ Drupal.behaviors.pagerer = {
         var element_settings = {
           'event': 'doViewsAjax',
           'progress': { 'type': 'throbber' },
-          'url': root + path,
+          'url': Drupal.settings.basePath + path,
           'method': 'html',
           'wrapper': 'views-live-preview',
         };
@@ -309,7 +309,7 @@ Drupal.behaviors.pagerer = {
         window.parent.jQuery.bbq.pushState({'overlay': path});
       } else {
         // Normal page
-        document.location = root + path;
+        document.location = Drupal.settings.basePath + path;
       }
     };
 
@@ -363,7 +363,7 @@ Drupal.behaviors.pagerer = {
     /**
      * Views - Attach Views AJAX behaviour to an element.
      */
-    function pagererAttachViewsAjax(element, event, viewContext, root, path) {
+    function pagererAttachViewsAjax(element, event, viewContext, path) {
 
       // Link to the element.
       var $link = $(element);
@@ -387,13 +387,13 @@ Drupal.behaviors.pagerer = {
         }
       }
 
-      // Load view's settings and parse pagerer root/path.
+      // Load view's settings and parse pagerer path.
       var viewData = {};
       $.extend(
         viewData,
         viewContext.settings,
-        Drupal.Views.parseQueryString(root + path),
-        Drupal.Views.parseViewArgs(root + path, viewContext.settings.view_base_path)
+        Drupal.Views.parseQueryString(Drupal.settings.basePath + path),
+        Drupal.Views.parseViewArgs(Drupal.settings.basePath + path, viewContext.settings.view_base_path)
       );
 
       // Load AJAX element_settings object and attach AJAX behaviour.

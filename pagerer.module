@@ -76,6 +76,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'fl_breakers'             => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -99,6 +100,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'fl_breakers'             => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -120,6 +122,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'fl_breakers'             => FALSE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -141,6 +144,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'fl_breakers'             => FALSE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -884,19 +888,35 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
-    $items[] = _pagerer_itemize_first_link($variables, $markers);
+    $items[] = _pagerer_itemize_link(
+      'first',
+      $variables,
+      $markers
+    );
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
-    $items[] = _pagerer_itemize_previous_link($variables, $markers);
+    $items[] = _pagerer_itemize_link(
+      'previous',
+      $variables,
+      $markers
+    );
   }
   // 3 - Pages.
-  $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages, (($theme == 'pagerer_mini' or $theme == 'pagerer_slider') ? FALSE : TRUE)));
+  $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages));
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
-    $items[] = _pagerer_itemize_next_link($variables, $markers);
+    $items[] = _pagerer_itemize_link(
+      'next',
+      $variables,
+      $markers
+    );
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
-    $items[] = _pagerer_itemize_last_link($variables, $markers);
+    $items[] = _pagerer_itemize_link(
+      'last',
+      $variables,
+      $markers
+    );
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
@@ -981,169 +1001,91 @@ function _pagerer_resolve_markers($variables) {
 }
 
 /**
- * Return item representing the link to "first" element in the pager.
+ * Return link/button to first/previous/next/last element in the pager.
  *
+ * @param string $scope
+ *   target page [first|previous|next|last]
  * @param array $variables
  *   theme's variables
  * @param array $markers
  *   precalculated markers for the pager
+ * @param string $type
+ *   @todo
  *
  * @return array
  *   pre-rendered item
  */
-function _pagerer_itemize_first_link($variables, $markers) {
+function _pagerer_itemize_link($scope, $variables, $markers, $type = 'anchor') {
   global $pager_page_array;
-  $c = $markers['pager_current'] - 1;
-  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -$c, 'first', 'absolute', 'first');
-  if ($c > 0) {
-    $li_first = theme(
-      'pager_link',
-      array(
-        'text' => $text,
-        'page_new' => pager_load_array(0, $variables['element'], $pager_page_array),
-        'element' => $variables['element'],
-        'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title),
-      )
-    );
-  }
-  else {
-    $li_first = NULL;
-  }
-  return array(
-    'class' => array('pager-first'),
-    'data' => $li_first ? _pagerer_resolve_link_data($li_first) : $text,
-  );
-}
+  $current_page = $markers['pager_current'] - 1;
+  $max_page = $markers['pager_max'] - 1;
 
-/**
- * Return item representing the link to "previous" element in the pager.
- *
- * @param array $variables
- *   theme's variables
- * @param array $markers
- *   precalculated markers for the pager
- *
- * @return array
- *   pre-rendered item
- */
-function _pagerer_itemize_previous_link($variables, $markers) {
-  global $pager_page_array;
-  $c = $markers['pager_current'] - 1;
-  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, -1, 'previous', 'absolute', 'previous');
-  if ($c > 0) {
-    $li_previous = theme(
-      'pager_link',
-      array(
-        'text' => $text,
-        'page_new' => pager_load_array($pager_page_array[$variables['element']] - 1, $variables['element'], $pager_page_array),
-        'element' => $variables['element'],
-        'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title),
-      )
-    );
-  }
-  else {
-    $li_previous = NULL;
-  }
-  return array(
-    'class' => array('pager-previous'),
-    'data' => $li_previous ? _pagerer_resolve_link_data($li_previous) : $text,
-  );
-}
+  // Determine the offset to current page and whether the link is
+  // active or not.
+  switch ($scope) {
+    case 'first':
+      $offset = -$current_page;
+      $active_link = ($current_page > 0);
+      break;
 
-/**
- * Return item representing the link to "next" element in the pager.
- *
- * @param array $variables
- *   theme's variables
- * @param array $markers
- *   precalculated markers for the pager
- *
- * @return array
- *   pre-rendered items
- */
-function _pagerer_itemize_next_link($variables, $markers) {
-  global $pager_page_array;
-  $c = $markers['pager_current'] - 1;
-  $m = $markers['pager_max'] - 1;
-  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, 1, 'next', 'absolute', 'next');
-  if ($c < $m) {
-    $li_next = theme(
-      'pager_link',
-      array(
-        'text' => $text,
-        'page_new' => pager_load_array($pager_page_array[$variables['element']] + 1, $variables['element'], $pager_page_array),
-        'element' => $variables['element'],
-        'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title),
-      )
-    );
-  }
-  else {
-    $li_next = NULL;
-  }
-  return array(
-    'class' => array('pager-next'),
-    'data' => $li_next ? _pagerer_resolve_link_data($li_next) : $text,
-  );
-}
+    case 'previous':
+      $offset = -1;
+      $active_link = ($current_page > 0);
+      break;
 
-/**
- * Return item representing the link to "last" element in the pager.
- *
- * @param array $variables
- *   theme's variables
- * @param array $markers
- *   precalculated markers for the pager
- *
- * @return array
- *   pre-rendered item
- */
-function _pagerer_itemize_last_link($variables, $markers) {
-  global $pager_page_array;
-  $c = $markers['pager_current'] - 1;
-  $m = $markers['pager_max'] - 1;
-  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, $m - $c, 'last', 'absolute', 'last');
-  if ($c < $m) {
-    $li_last = theme(
+    case 'next':
+      $offset = 1;
+      $active_link = ($current_page < $max_page);
+      break;
+
+    case 'last':
+      $offset = $max_page - $current_page;
+      $active_link = ($current_page < $max_page);
+      break;
+
+  }
+
+  list($text, $text_title) = _pagerer_get_page_text($variables, $markers, $offset, $scope, 'absolute', $scope);
+
+  if ($active_link and $type == 'anchor') {
+    $li_data = theme(
       'pager_link',
       array(
         'text' => $text,
-        'page_new' => pager_load_array($m, $variables['element'], $pager_page_array),
+        'page_new' => pager_load_array($current_page + $offset, $variables['element'], $pager_page_array),
         'element' => $variables['element'],
         'parameters' => $variables['parameters'],
         'attributes' => array('title' => $text_title),
       )
     );
   }
-  else {
-    $li_last = NULL;
+  elseif ($type == 'button') {
+    $li_data = "<button class='pagerer-button pagerer-$scope' title='$text_title'>$text</button>";
   }
+  else {
+    $li_data = NULL;
+  }
+
   return array(
-    'class' => array('pager-last'),
-    'data' => $li_last ? _pagerer_resolve_link_data($li_last) : $text,
+    'class' => array('pager-' . $scope),
+    'data' => $li_data ? _pagerer_resolve_link_data($li_data) : $text,
   );
 }
 
 /**
  * Return rendered items representing the links to 'page' elements in the pager.
  *
- * @param array   $variables
+ * @param array $variables
  *   theme's variables
- * @param array   $markers
+ * @param array $markers
  *   precalculated markers for the pager
- * @param array   $pages
+ * @param array $pages
  *   the pages that are to be displayed in the pager
- * @param boolean $fl_breakers
- *   if TRUE, breakers are put before and after the pager's page list if
- *   first/last page in the pager list do not coincide with overall first/last
- *   page
  *
  * @return array
  *   pre-rendered items
  */
-function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers = TRUE) {
+function _pagerer_itemize_page_links($variables, $markers, $pages) {
   global $pager_page_array, $_pagerer_ak_array;
 
   $element = $variables['element'];
@@ -1173,7 +1115,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
           );
         }
       }
-      elseif ($page <> 0 and $fl_breakers) {
+      elseif ($page <> 0 and $variables['fl_breakers']) {
         // If on first link, but current page is not first, introduce a
         // breaker before the new link.
         $items[] = array(
@@ -1183,8 +1125,8 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       }
       // Sets previous page.
       $previous_page = $page;
-      $text = $page_data['text'];
-      $text_title = $page_data['text_title'];
+      $text = isset($page_data['text']) ? $page_data['text'] : NULL;
+      $text_title = isset($page_data['text_title']) ? $page_data['text_title'] : NULL;
       if ($page_data['interval'] < 0) {
         // Link to page before the current.
         // Target page.
@@ -1299,7 +1241,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages, $fl_breakers 
       }
       $i++;
     }
-    if (($page <> $m) and $fl_breakers) {
+    if (($page <> $m) and $variables['fl_breakers']) {
       $items[] = array(
         'class' => array('pager-item', 'breaker'),
         'data' => $variables['pager_breaker'],
@@ -1670,11 +1612,8 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   ksort($page_new);
   $variables['parameters']['page'] = implode(',', $page_new);
 
-  // Querystring parameters from url.
-  $query_parameters = drupal_get_query_parameters();
-
-  // Any other parameter gets appended here.
-  $variables['parameters'] = array_merge($query_parameters, $variables['parameters']);
+  // Combine query parameters with those coming from the current request URL.
+  $variables['parameters'] = array_merge(pager_get_query_parameters(), $variables['parameters']);
 
   // Are we displaying pages or items; 'value' HTML attribute will bear
   // the current $current value; $total is passed to the js widget to
@@ -1690,27 +1629,11 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     $interval = $pager_limits[$variables['element']];
   }
 
-  // Prepare root and path to the page.
-  // Query parameters.
-  $q_parms = drupal_get_query_parameters(NULL, array());
-  // Resolve full URL.
-  $url = url($q_parms['q'], array('query' => $variables['parameters'], 'absolute' => TRUE));
-  // Split URL in its components.
-  $url_components = parse_url($url);
-  // Root part of the path.
-  $root = base_path();
-  // Path equals path?query#fragment of the url, less the root part
-  // at the beginning.
-  $path = isset($url_components['path']) ? $url_components['path'] : NULL;
-  $path .= isset($url_components['query']) ? ('?' . $url_components['query']) : NULL;
-  $path .= isset($url_components['fragment']) ? ('#' . $url_components['fragment']) : NULL;
-  if (strpos($path, $root) == 0) {
-    $path = drupal_substr($path, drupal_strlen($root));
-  }
+  // Prepare path to the page.
+  $path = request_path() . '?' . drupal_http_build_query($variables['parameters']);
 
   // Prepare js widget state.
   $state = array(
-    'root'     => $root,
     'path'     => $path,
     'element'  => $variables['element'],
     'quantity' => $variables['quantity'],
@@ -1763,15 +1686,15 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
       case 'slider_degraded':
         // Basically, a widget with first/prev/next/last links.
-        $items[] = _pagerer_itemize_first_link($variables, $markers);
-        $items[] = _pagerer_itemize_previous_link($variables, $markers);
+        $items[] = _pagerer_itemize_link('first', $variables, $markers);
+        $items[] = _pagerer_itemize_link('previous', $variables, $markers);
         $title = $variables['tags']['widget_title'];
         $items[] = array(
           'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
         );
-        $items[] = _pagerer_itemize_next_link($variables, $markers);
-        $items[] = _pagerer_itemize_last_link($variables, $markers);
+        $items[] = _pagerer_itemize_link('next', $variables, $markers);
+        $items[] = _pagerer_itemize_link('last', $variables, $markers);
         break;
 
     }

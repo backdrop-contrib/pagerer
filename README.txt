@@ -238,6 +238,9 @@ Drupal core pager theme variables.
 - pager_separator: Text to fill between contiguous pages. If 'none', no
   separators are rendered.
 - range_separator: Text to place between first and last item in a range.
+- fl_breakers: (internal) Determine if breakers (...) need to be rendered
+  between the first/previous/next/last links and the sequence of page numbers
+  that build the pager.
 
 Advanced:
 - slider_action: Determines how the page relocation should be triggered after
