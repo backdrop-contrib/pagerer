@@ -178,7 +178,7 @@ function pagerer_example_page() {
     '#theme' => 'pagerer_scrollpane',
     '#element' => 0,
     '#quantity' => 5,
-    '#display' => 'pages'
+    '#display' => 'pages',
   );
   $build['l_pagerer_slider_0'] = array('#markup' => '<br/><b>' . t("'pagerer_slider' pager theme:") . '</b>');
   $build['pagerer_slider_0'] = array(

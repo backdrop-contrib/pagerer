@@ -124,7 +124,7 @@ ul.pager li.pagerer-scrollpane ul.pager {
 }
 /* scrollpane embedded pager elements */
 ul.pager li.pagerer-scrollpane ul.pager li.pager-current,
-ul.pager li.pagerer-scrollpane ul.pager li.pager-item  {
+ul.pager li.pagerer-scrollpane ul.pager li.pager-item {
   /*border: dashed thin black;*/
   position: absolute;
 }

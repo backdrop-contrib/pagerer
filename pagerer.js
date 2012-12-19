@@ -355,7 +355,7 @@ Drupal.behaviors.pagerer = {
       var pagerLeftElement = pagerCurrentElement - Math.floor(pager.pagererState.quantity / 2);
       if (pagerLeftElement < 0) {
         pagerLeftElement = 0;
-      } else if (pagerLeftElement >  pagerElements.length - pager.pagererState.quantity) {
+      } else if (pagerLeftElement > pagerElements.length - pager.pagererState.quantity) {
         pagerLeftElement = pagerElements.length - pager.pagererState.quantity;
       }
       var pagerLeftOffset = $(pagerElements[pagerLeftElement]).css('left');
@@ -437,7 +437,7 @@ Drupal.behaviors.pagerer = {
           // There's space on the left side to shift pager.
           if (scrollpaneAddPagerElements(pager, PAGERER_RIGHT, last + 1, 1, true)) {
             // An element was added to the right, so shift pager to the left.
-            scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration, +1, -1);
+            scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration, 1, -1);
           } else {
             // No further elements on the right, end of run.
             return false;
@@ -447,12 +447,12 @@ Drupal.behaviors.pagerer = {
           if (scrollpaneAddPagerElements(pager, PAGERER_RIGHT, last + 1, 1, false)) {
             // An element was added to the right, so shift elements to the left.
             scrollpaneRemovePagerElements(pager, PAGERER_LEFT, 1, false);
-            scrollpaneShiftPagerElements(pager, PAGERER_LEFT, 1, duration, +1, -1);
+            scrollpaneShiftPagerElements(pager, PAGERER_LEFT, 1, duration, 1, -1);
           } else {
             // End of run to the right. If pager allows, shift it.
             if (pager.pagererState.pagerElementsRightOverflow > 0) {
               scrollpaneRemovePagerElements(pager, PAGERER_LEFT, 1, true);
-              scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration, +1, -1);
+              scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration, 1, -1);
             } else {
               // End of run, can't move.
               return false;
@@ -469,7 +469,7 @@ Drupal.behaviors.pagerer = {
           // There's space on the right side to shift pager.
           if (scrollpaneAddPagerElements(pager, PAGERER_LEFT, first - 1, 1, true)) {
             // An element was added to the left, so shift pager to the right.
-            scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration, -1, +1);
+            scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration, -1, 1);
           } else {
             // No further elements on the left, end of run.
             return false;
@@ -479,12 +479,12 @@ Drupal.behaviors.pagerer = {
           if (scrollpaneAddPagerElements(pager, PAGERER_LEFT, first - 1, 1, false)) {
             // An element was added to the left, so shift elements to the right.
             scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, 1, false);
-            scrollpaneShiftPagerElements(pager, PAGERER_RIGHT, 1, duration, -1, +1);
+            scrollpaneShiftPagerElements(pager, PAGERER_RIGHT, 1, duration, -1, 1);
           } else {
             // End of run to the left. If pager allows, shift it.
             if (pager.pagererState.pagerElementsLeftOverflow > 0) {
               scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, 1, true);
-              scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration, -1, +1);
+              scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration, -1, 1);
             } else {
               // End of run, can't move.
               return false;

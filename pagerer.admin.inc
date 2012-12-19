@@ -9,8 +9,6 @@
  * @author   mondrake <mondrake@mondrake.org>
  */
 
-// @todo manage widget_resize
-
 /**
  * Main Pagerer settings admin form.
  */
@@ -59,7 +57,8 @@ function pagerer_settings_form($form, &$form_state) {
     'none',
     'pagerer_standard',
   );
-  // Mini, Slider and Scrollpane are only available with jQuery update installed.
+  // Mini, Slider and Scrollpane are only available with jQuery update
+  // installed.
   if ($js_enabled) {
     $options = array_merge($options, array(
         'pagerer_mini',
@@ -515,6 +514,18 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#collapsed' => TRUE,
     '#description' => t("Configure advanced options."),
   );
+  $form['advanced_options_container']['widget'] = array(
+    '#type' => 'fieldset',
+    '#title' => t("Widget"),
+    '#collapsible' => FALSE,
+    '#description' => t("jQuery widget options."),
+  );
+  $form['advanced_options_container']['widget']['widget_resize'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Automatic width adjustment"),
+    '#default_value' => $v['widget_resize'],
+    '#description' => t("If set, the widget's width will be adjusted dynamically based on the total number of pages/items. When unset, style width will prevail."),
+  );
   $form['advanced_options_container']['slider'] = array(
     '#type' => 'fieldset',
     '#title' => t("Slider"),
@@ -597,6 +608,7 @@ function pagerer_pane_settings_form_submit($form, $form_state) {
   if (isset($v['factors'])) {
     $vars[$p]['theme_variables']['factors'] = $v['factors'];
   }
+  $vars[$p]['theme_variables']['widget_resize'] = $v['widget_resize'];
   $vars[$p]['theme_variables']['slider_action'] = $v['slider_action'];
   $vars[$p]['theme_variables']['slider_action_timelapse'] = $v['slider_action_timelapse'];
   $vars[$p]['theme_variables']['slider_navigation_icons'] = $v['slider_navigation_icons'];
