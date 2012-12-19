@@ -16,8 +16,12 @@
  */
 function pagerer_install() {
   $t = get_t();
-  drupal_set_message($t('The Pagerer module has been installed. Visit <a href="@url">configure</a> for configuration.',
-                     array('@url' => url('admin/config/user-interface/pagerer'))));
+  drupal_set_message(
+    $t(
+      'The Pagerer module has been installed. Visit <a href="@url">configure</a> for configuration.',
+      array('@url' => url('admin/config/user-interface/pagerer'))
+    )
+  );
 }
 
 /**

@@ -77,6 +77,7 @@ function pagerer_theme() {
         'pager_separator'         => 'none',
         'range_separator'         => '-',
         'fl_breakers'             => TRUE,
+        'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -101,6 +102,7 @@ function pagerer_theme() {
         'pager_separator'         => 'none',
         'range_separator'         => '-',
         'fl_breakers'             => TRUE,
+        'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -123,6 +125,7 @@ function pagerer_theme() {
         'pager_separator'         => 'none',
         'range_separator'         => '-',
         'fl_breakers'             => FALSE,
+        'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -145,6 +148,30 @@ function pagerer_theme() {
         'pager_separator'         => 'none',
         'range_separator'         => '-',
         'fl_breakers'             => FALSE,
+        'widget_resize'           => TRUE,
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
+      ),
+    ),
+    'pagerer_scrollpane' => array(
+      'variables' => array(
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display'                 => 'pages',
+        'label_display'           => 'none',
+        'current_display'         => 'scrollpane',
+        'total_display'           => 'none',
+        'first_link'              => 'always',
+        'previous_link'           => 'always',
+        'next_link'               => 'always',
+        'last_link'               => 'always',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
+        'fl_breakers'             => FALSE,
+        'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -169,6 +196,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
@@ -657,6 +685,15 @@ function theme_pagerer_slider($variables) {
 }
 
 /**
+ * This theme displays a scrollpane embedding a full pager.
+ *
+ * Page navigation is managed via a javascript.
+ */
+function theme_pagerer_scrollpane($variables) {
+  return _pagerer_theme_handler('pagerer_scrollpane', $variables);
+}
+
+/**
  * Pagerer's theme handler.
  *
  * Calls to any theme_pagerer_xxx() function are channeled to this handler.
@@ -853,6 +890,11 @@ function _pagerer_theme_handler($theme, $variables) {
       list($pages[$c]['text'], $pages[$c]['text_title']) = _pagerer_get_page_text($variables, $markers, 0);
       break;
 
+    case 'pagerer_scrollpane':
+      // Current.
+      $pages[$c]['interval'] = 0;
+      break;
+
     case 'pagerer_standard':
     default:
       // Neighborhood.
@@ -891,14 +933,16 @@ function _pagerer_theme_handler($theme, $variables) {
     $items[] = _pagerer_itemize_link(
       'first',
       $variables,
-      $markers
+      $markers,
+      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
     );
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
     $items[] = _pagerer_itemize_link(
       'previous',
       $variables,
-      $markers
+      $markers,
+      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
     );
   }
   // 3 - Pages.
@@ -908,14 +952,16 @@ function _pagerer_theme_handler($theme, $variables) {
     $items[] = _pagerer_itemize_link(
       'next',
       $variables,
-      $markers
+      $markers,
+      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
     );
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
     $items[] = _pagerer_itemize_link(
       'last',
       $variables,
-      $markers
+      $markers,
+      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
     );
   }
   // 5 - Labels.
@@ -1060,7 +1106,7 @@ function _pagerer_itemize_link($scope, $variables, $markers, $type = 'anchor') {
     );
   }
   elseif ($type == 'button') {
-    $li_data = "<button class='pagerer-button pagerer-$scope' title='$text_title'>$text</button>";
+    $li_data = "<div class='pagerer-scrollpane-button pagerer-$scope' title='$text_title'>$text</div>";
   }
   else {
     $li_data = NULL;
@@ -1182,6 +1228,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
 
           case 'widget':
           case 'slider':
+          case 'scrollpane':
             $items = array_merge($items, _pagerer_itemize_js_element($variables['current_display'], $variables, $markers));
             break;
 
@@ -1270,7 +1317,6 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
  *   keys/values
  */
 function _pagerer_get_neighborhood_pages($variables, $markers) {
-  global $pager_limits;
 
   // Prepare for generation loop.
   $i = $markers['pager_first'];
@@ -1318,7 +1364,6 @@ function _pagerer_get_neighborhood_pages($variables, $markers) {
  *   a key 'progressive' set to TRUE is also added as a marker
  */
 function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_factor, $ratio, $limit = NULL) {
-  global $pager_limits;
 
   // Avoid endless loop in converging series.
   if ($ratio < 1) {
@@ -1563,7 +1608,8 @@ function _pagerer_get_total($variables, $markers) {
  * enabled element.
  *
  * @param string $element_type
- *   'widget' for an active input box, 'slider' for a jquery ui slider
+ *   'widget' for an active input box, 'slider' for a jquery ui slider,
+ *   'scrollpane' for a scrolling pager
  * @param array $variables
  *   theme's variables
  * @param array $markers
@@ -1616,16 +1662,13 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   $variables['parameters'] = array_merge(pager_get_query_parameters(), $variables['parameters']);
 
   // Are we displaying pages or items; 'value' HTML attribute will bear
-  // the current $current value; $total is passed to the js widget to
-  // ensure input is not bigger.
+  // the current $current value.
   if ($variables['display'] == 'pages') {
     $current = $markers['pager_current'];
-    $total = $markers['pager_max'];
     $interval = 1;
   }
   else {
     $current = $markers['pager_current_first_item'];
-    $total = $markers['pager_item_max'];
     $interval = $pager_limits[$variables['element']];
   }
 
@@ -1634,19 +1677,34 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
   // Prepare js widget state.
   $state = array(
-    'path'     => $path,
-    'element'  => $variables['element'],
-    'quantity' => $variables['quantity'],
-    'total'    => $total,
-    'current'  => $current,
-    'interval' => $interval,
-    'display'  => $variables['display'],
+    'path'           => $path,
+    'element'        => $variables['element'],
+    'quantity'       => $variables['quantity'],
+    'total'          => $markers['pager_max'],
+    'totalItems'     => $markers['pager_item_max'],
+    'current'        => $markers['pager_current'] -1,
+    'interval'       => $interval,
+    'display'        => $variables['display'],
+    'rangeSeparator' => $variables['range_separator'],
   );
-  if ($element_type == 'slider') {
-    $state['action'] = $variables['slider_action'];
-    $state['timelapse'] = $variables['slider_action_timelapse'];
-    $state['icons'] = $variables['slider_navigation_icons'];
-    $state['tickmark_title'] = $variables['tags']['slider_tickmark_title'];
+  switch ($element_type) {
+    case 'widget':
+      $state['widgetResize'] = $variables['widget_resize'];
+      break;
+
+    case 'slider':
+      $state['action'] = $variables['slider_action'];
+      $state['timelapse'] = $variables['slider_action_timelapse'];
+      $state['icons'] = $variables['slider_navigation_icons'];
+      $state['tickmarkTitle'] = $variables['tags']['slider_tickmark_title'];
+      break;
+
+    case 'scrollpane':
+      $state['pageTitle'] = $variables['tags']['page_title'];
+      $state['firstTitle'] = $variables['tags']['first_title'];
+      $state['lastTitle'] = $variables['tags']['last_title'];
+      break;
+
   }
   $state_encoded = drupal_json_encode($state);
 
@@ -1659,6 +1717,21 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         $items[] = array(
           'class' => array('pager-current', 'widget'),
           'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
+        );
+        break;
+
+      case 'scrollpane':
+        // Add ui.button library.
+        drupal_add_library('system', 'ui.button');
+        $variables['current_display'] = 'normal';
+        $variables['first_link'] = 'never';
+        $variables['previous_link'] = 'never';
+        $variables['next_link'] = 'never';
+        $variables['last_link'] = 'never';
+        $items[] = array(
+          'class' => array('pager-item', 'pagerer-scrollpane'),
+          'id' => $state_encoded,
+          'data' => theme('pagerer_standard', $variables),
         );
         break;
 

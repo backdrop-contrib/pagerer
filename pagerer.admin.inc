@@ -9,6 +9,8 @@
  * @author   mondrake <mondrake@mondrake.org>
  */
 
+// @todo manage widget_resize
+
 /**
  * Main Pagerer settings admin form.
  */
@@ -28,7 +30,7 @@ function pagerer_settings_form($form, &$form_state) {
   else {
     $js_enabled = FALSE;
     drupal_set_message(
-      t("To enable the jQuery based themes 'pagerer_mini' and 'pagerer_slider', Pagerer requires the 'jQuery update' module to be installed and enabled."),
+      t("To enable the jQuery based themes 'pagerer_mini', 'pagerer_slider' and 'pagerer_scrollpane', Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
     );
@@ -57,11 +59,12 @@ function pagerer_settings_form($form, &$form_state) {
     'none',
     'pagerer_standard',
   );
-  // Mini and Slider are only available with jQuery update installed.
+  // Mini, Slider and Scrollpane are only available with jQuery update installed.
   if ($js_enabled) {
     $options = array_merge($options, array(
         'pagerer_mini',
         'pagerer_slider',
+        'pagerer_scrollpane',
       )
     );
   }
@@ -301,7 +304,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
   else {
     $js_enabled = FALSE;
     drupal_set_message(
-      t("To enable the jQuery elements 'widget' and 'slider' for current page, Pagerer requires the 'jQuery update' module to be installed and enabled."),
+      t("To enable the jQuery elements 'widget', 'slider' and 'scrollpane' for current page, Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
     );
@@ -397,9 +400,10 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#required' => TRUE,
   );
   $options = array('none', 'normal');
-  // Widget and Slider are only available with jQuery update installed.
+  // Widget, Slider and Scrollpane are only available with jQuery update
+  // installed.
   if ($js_enabled) {
-    $options = array_merge($options, array('widget', 'slider'));
+    $options = array_merge($options, array('widget', 'slider', 'scrollpane'));
   }
   $options = drupal_map_assoc($options);
   $form['display_container']['current_display'] = array(
@@ -407,7 +411,7 @@ function pagerer_pane_settings_form($form, &$form_state) {
     '#title' => t("Current page"),
     '#options' => $options,
     '#default_value' => $v['current_display'],
-    '#description' => t("Select how the current page is rendered in the pager. Options are 'none' (not displayed), 'normal' (as a text), 'widget' (an active input box from where users can enter directly a page to go to), 'slider' (as a slider)."),
+    '#description' => t("Select how the current page is rendered in the pager. Options are 'none' (not displayed), 'normal' (as a text), 'widget' (an active input box for users to enter directly a page to go to), 'slider' (as a slider), 'scrollpane' (as a scrolling pane embedding a full pager)."),
     '#required' => TRUE,
   );
   $options = drupal_map_assoc(array('none', 'after_current', 'first', 'last'));

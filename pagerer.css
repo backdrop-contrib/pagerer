@@ -98,6 +98,37 @@ div.pagerer-slider-handle-icon {
   display: inline-block;
 }
 
+/* pagerer scrollpane */
+ul.pager li.pagerer-scrollpane {
+  display: inline-block;
+  padding: 0;
+  vertical-align: middle;
+}
+/* scrollpane viewport */
+ul.pager li.pagerer-scrollpane div.item-list {
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border: 1px solid;
+  border-radius: 6px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+/* scrollpane embedded pager */
+ul.pager li.pagerer-scrollpane ul.pager {
+  /*border: dashed thin black;*/
+  margin: 0;
+  padding: 0;
+  position: absolute;
+}
+/* scrollpane embedded pager elements */
+ul.pager li.pagerer-scrollpane ul.pager li.pager-current,
+ul.pager li.pagerer-scrollpane ul.pager li.pager-item  {
+  /*border: dashed thin black;*/
+  position: absolute;
+}
+
 /* Admin */
 table.pagerer_admin_panes_config,
 table.pagerer_admin_panes_config tbody,
