@@ -163,10 +163,10 @@ function pagerer_theme() {
         'label_display'           => 'none',
         'current_display'         => 'scrollpane',
         'total_display'           => 'none',
-        'first_link'              => 'always',
-        'previous_link'           => 'always',
-        'next_link'               => 'always',
-        'last_link'               => 'always',
+        'first_link'              => 'never',
+        'previous_link'           => 'never',
+        'next_link'               => 'never',
+        'last_link'               => 'never',
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
@@ -930,39 +930,19 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // 2 - First + previous links.
   if ($variables['first_link'] == 'always' or ($variables['first_link'] == 'not_on_first' and $c <> 0)) {
-    $items[] = _pagerer_itemize_link(
-      'first',
-      $variables,
-      $markers,
-      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
-    );
+    $items[] = _pagerer_itemize_link('first', $variables, $markers);
   }
   if ($variables['previous_link'] == 'always' or ($variables['previous_link'] == 'not_on_first' and $c <> 0)) {
-    $items[] = _pagerer_itemize_link(
-      'previous',
-      $variables,
-      $markers,
-      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
-    );
+    $items[] = _pagerer_itemize_link('previous', $variables, $markers);
   }
   // 3 - Pages.
   $items = array_merge($items, _pagerer_itemize_page_links($variables, $markers, $pages));
   // 4 - Next + last links.
   if ($variables['next_link'] == 'always' or ($variables['next_link'] == 'not_on_last' and $c <> $m)) {
-    $items[] = _pagerer_itemize_link(
-      'next',
-      $variables,
-      $markers,
-      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
-    );
+    $items[] = _pagerer_itemize_link('next', $variables, $markers);
   }
   if ($variables['last_link'] == 'always' or ($variables['last_link'] == 'not_on_last' and $c <> $m)) {
-    $items[] = _pagerer_itemize_link(
-      'last',
-      $variables,
-      $markers,
-      ($theme == 'pagerer_scrollpane') ? 'button' : 'anchor'
-    );
+    $items[] = _pagerer_itemize_link('last', $variables, $markers);
   }
   // 5 - Labels.
   if ($variables['label_display'] == 'last') {
@@ -1056,7 +1036,8 @@ function _pagerer_resolve_markers($variables) {
  * @param array $markers
  *   precalculated markers for the pager
  * @param string $type
- *   @todo
+ *   'anchor' returns a link via theme('pager_link', ...),
+ *   'button' returns a div that jQuery will transform in a ui button
  *
  * @return array
  *   pre-rendered item
@@ -1478,7 +1459,7 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
  *   1 => qualified page text to be used as the HTML title
  */
 function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page', $page_mode = 'absolute', $title_tag = 'page') {
-  global $pager_limits;
+  $pager_limits = $GLOBALS['pager_limits'];
 
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
@@ -1640,9 +1621,9 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     }
   }
 
-  // Slider will not work for Internet Explorer below version 9. In such case,
-  // degrade to widget.
-  if ($element_type == 'slider') {
+  // Slider and scrollpane will not work for Internet Explorer below version 9.
+  // In such case, degrade to widget.
+  if ($element_type == 'slider' or $element_type == 'scrollpane') {
     $browser_info = _pagerer_browser_info();
     if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
       $element_type = 'slider_degraded';
@@ -1723,6 +1704,12 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
       case 'scrollpane':
         // Add ui.button library.
         drupal_add_library('system', 'ui.button');
+
+        // Left buttons.
+        $items[] = _pagerer_itemize_link('first', $variables, $markers, 'button');
+        $items[] = _pagerer_itemize_link('previous', $variables, $markers, 'button');
+
+        // Scrollpane.
         $variables['current_display'] = 'normal';
         $variables['first_link'] = 'never';
         $variables['previous_link'] = 'never';
@@ -1733,11 +1720,17 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
           'id' => $state_encoded,
           'data' => theme('pagerer_standard', $variables),
         );
+
+        // Right buttons.
+        $items[] = _pagerer_itemize_link('next', $variables, $markers, 'button');
+        $items[] = _pagerer_itemize_link('last', $variables, $markers, 'button');
+
         break;
 
       case 'slider':
         // Add ui.slider library.
         drupal_add_library('system', 'ui.slider');
+
         if ($variables['slider_navigation_icons'] <> 'no') {
           $items[] = array(
             'class' => array('pager-item', 'widget'),

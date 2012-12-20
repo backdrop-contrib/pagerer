@@ -50,7 +50,7 @@ function pagerer_example_page() {
   $browser_info = _pagerer_browser_info();
   if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
     drupal_set_message(
-      t("Internet Explorer version 9 or higher is needed to display correctly the jQuery slider."),
+      t("Internet Explorer version 9+ is needed to display correctly the slider and the scrollpane elements."),
       'warning',
       FALSE
     );
