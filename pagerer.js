@@ -40,7 +40,7 @@ Drupal.settings.pagerer = {
   timeoutAction: 0,
   intervalAction: 0,
   intervalCount: 0,
-  isRelocating: false,
+  isRelocating: false
 }
 
 Drupal.behaviors.pagerer = {
@@ -136,7 +136,7 @@ Drupal.behaviors.pagerer = {
         step: 1,
         value: this.pagererState.current,
         range: 'min',
-        animate: true,
+        animate: true
       });
 
       // Adjust slider handle dimensions and text.
@@ -307,7 +307,7 @@ Drupal.behaviors.pagerer = {
         pagerElementWidth: 0,
         pagerElementLeftMargin: 0,
         pagerElementsLeftOverflow: 0,
-        pagerElementsRightOverflow: 0,
+        pagerElementsRightOverflow: 0
       });
 
       // Determine pager element width from maximum width possible.
@@ -326,15 +326,15 @@ Drupal.behaviors.pagerer = {
       var viewportWidth = Math.min(pager.pagererState.quantity * pager.pagererState.pagerElementWidth, pagerWidth);
       $(this).css({
         width: viewportWidth + 'px',
-        height: cellHeight + 'px',
+        height: cellHeight + 'px'
       });
       $(viewport).css({
         width: viewportWidth + 'px',
-        height: cellHeight + 'px',
+        height: cellHeight + 'px'
       });
       $(pager).css({
         width: pagerWidth + 'px',
-        height: cellHeight + 'px',
+        height: cellHeight + 'px'
       });
 
       // Allocate input pager elements to pager.
@@ -389,7 +389,7 @@ Drupal.behaviors.pagerer = {
     .ready().each(function(index) {
       this.pagererState = {
         scrollpane: $(this).parents('.pager').get(0),
-        pager: $(this).parents('.pager').find('.pagerer-scrollpane').find('.item-list').find('.pager').get(0),
+        pager: $(this).parents('.pager').find('.pagerer-scrollpane').find('.item-list').find('.pager').get(0)
       };
       $(this).button();
       $(this)
@@ -417,7 +417,7 @@ Drupal.behaviors.pagerer = {
       // Aligns viewport border color to button style.
       if ($(this).hasClass('pagerer-first')) {
         this.pagererState.pager.pagererState.viewport.css({
-          'border-color' : $(this).css('border-color'),
+          'border-color' : $(this).css('border-color')
         });
       }
       // Set button enable/disabled state.
@@ -570,7 +570,7 @@ console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow +
         if (side == PAGERER_LEFT) {
           $(pager).css({
             left: (parseInt($(pager).css('left')) - (pager.pagererState.pagerElementWidth * i)) + 'px',
-            '-webkit-transition-property': 'none',
+            '-webkit-transition-property': 'none'
           });
           scrollpaneShiftPagerElements(pager, PAGERER_RIGHT, i, 0, 0, 0);
         }
@@ -601,7 +601,7 @@ console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow +
         if (side == PAGERER_LEFT) {
           $(pager).css({
             left: (parseInt($(pager).css('left')) + (pager.pagererState.pagerElementWidth * count)) + 'px',
-            '-webkit-transition-property': 'none',
+            '-webkit-transition-property': 'none'
           });
           scrollpaneShiftPagerElements(pager, PAGERER_LEFT, i, 0, 0, 0);
         }
@@ -634,7 +634,7 @@ console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow +
       $(pager).css({
         left: (left + offset) + 'px',
         '-webkit-transition-property': 'left',
-        '-webkit-transition-duration': duration + 'ms',
+        '-webkit-transition-duration': duration + 'ms'
       });
       pager.pagererState.pagerElementsLeftOverflow += xxxload;
       pager.pagererState.pagerElementsRightOverflow += xxxroad;
@@ -705,7 +705,7 @@ console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow +
           return Drupal.t('@min@separator@max', {
             '@min': (index * state.interval) + 1,
             '@separator': state.rangeSeparator,
-            '@max': Math.min(((index + 1) * state.interval), state.totalItems),
+            '@max': Math.min(((index + 1) * state.interval), state.totalItems)
           });
           break;
 
@@ -827,7 +827,7 @@ console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow +
           'progress': { 'type': 'throbber' },
           'url': Drupal.settings.basePath + path,
           'method': 'html',
-          'wrapper': 'views-live-preview',
+          'wrapper': 'views-live-preview'
         };
         Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
         $(element).trigger('doViewsAjax');
