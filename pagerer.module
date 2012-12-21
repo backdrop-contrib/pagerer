@@ -1663,7 +1663,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     'quantity'       => $variables['quantity'],
     'total'          => $markers['pager_max'],
     'totalItems'     => $markers['pager_item_max'],
-    'current'        => $markers['pager_current'] -1,
+    'current'        => $markers['pager_current'] - 1,
     'interval'       => $interval,
     'display'        => $variables['display'],
     'rangeSeparator' => $variables['range_separator'],
