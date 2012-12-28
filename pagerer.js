@@ -25,12 +25,10 @@
  * @todo
  * Scrollpane -
  * - acceleration of shift
- * - left margin in pagererstate useless?
  * - queue only click to same button
  * - anchors in views ajax
  * - button exit immediately if end of run
  * - if pager include separation items?
- * - support firefox, ie
  * Slider -
  * - slider handle width with item ranges
  */
@@ -300,7 +298,7 @@ Drupal.behaviors.pagerer = {
       // Attach state variables to the wrapped pager.
       pager.pagererState = eval('(' + $(this).attr('id') + ');');
       $.extend(pager.pagererState, {
-        scrollpane: $(this),
+        scrollpane: $(this).parent(),
         viewport: viewport,
         pagerElementWidth: 0,
         pagerElementLeftMargin: 0,
@@ -398,30 +396,56 @@ Drupal.behaviors.pagerer = {
       };
       $(this).button();
       $(this)
+      .bind('click', function(event) {
+        var button = this;
+        var pager = button.pagererState.pager;
+        var scope;
+        if ($(button).hasClass('pagerer-next')) {
+          scope = 'next';
+        } else if ($(button).hasClass('pagerer-previous')) {
+          scope = 'previous';
+        } else if ($(button).hasClass('pagerer-first')) {
+          scope = 'first';
+        } else if ($(button).hasClass('pagerer-last')) {
+          scope = 'last';
+        }
+        pagererQueueTransition(pager, function(){scrollpaneButtonProcess(pager, scope, 500);}, 510);
+        //scrollpaneButtonProcess(pager, scope, 500);
+/*        $(pager).queue(function(next) {
+          scrollpaneButtonProcess(pager, scope, 500);
+          setTimeout(next, 510);
+        });*/
+      })
+/*      $(this)
       .bind('mousedown', function(event) {
         var button = this;
         $(button).focus();
         clearDelayedAction();
-        pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 500);}, 510);
+        //pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 500);}, 0);
+        scrollpaneButtonProcess(button, 500);
         if ($(button).hasClass('pagerer-previous') || $(button).hasClass('pagerer-next')) {
           state.intervalAction = setInterval(function(){
             state.intervalCount++;
-            if (state.intervalCount > 20) {
-              pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 20);}, 30);
+            if (state.intervalCount > 42) {
+              //pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 10);}, 0);
+              scrollpaneButtonProcess(button, 10);
             }
-          }, 25);
+          }, 12);
         }
       })
       .bind('mouseup mouseleave', function(event) {
         state.intervalCount = 0;
         clearInterval(state.intervalAction);
-      })
+      })*/
     })
     .load().each(function(index) {
       // Aligns viewport border color to button style.
       if ($(this).hasClass('pagerer-first')) {
         this.pagererState.pager.pagererState.viewport.css({
-          'border-color' : $(this).css('border-color')
+          'border-top-color' : $(this).css('border-top-color'),
+          'border-right-color' : $(this).css('border-right-color'),
+          'border-bottom-color' : $(this).css('border-bottom-color'),
+          'border-left-color' : $(this).css('border-left-color')
         });
       }
       // Set button enable/disabled state.
@@ -431,89 +455,90 @@ Drupal.behaviors.pagerer = {
     /**
      * Todo.
      */
-    function scrollpaneButtonProcess(button, duration) {
-      var pager = button.pagererState.pager;
+    function scrollpaneButtonProcess(pager, scope, duration) {
+console.log(scope);
       var pagerElements = $(pager).find('li');
       var first = valueToIndex($(pagerElements[0]).text(), pager.pagererState);
       var last = valueToIndex($(pagerElements[pagerElements.length - 1]).text(), pager.pagererState);
       var addedElements;
 
-      if ($(button).hasClass('pagerer-next')) {
+      switch(scope) {
         // ***** Next - shift left.
-
-        // Add a pager element on the right.
-        addedElements = scrollpaneAddPagerElements(pager, PAGERER_RIGHT, last + 1, 1);
-
-        if (pager.pagererState.pagerElementsLeftOverflow < pager.pagererState.quantity) {
-          // There's space on the left side to shift pager.
-          if (pager.pagererState.pagerElementsRightOverflow > 0) {
-            // Pager overflows to the right, so shift pager to the left.
-            scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration);
+        case 'next':
+          // Add a pager element on the right.
+          addedElements = scrollpaneAddPagerElements(pager, PAGERER_RIGHT, last + 1, 1);
+          if (pager.pagererState.pagerElementsLeftOverflow < pager.pagererState.quantity) {
+            // There's space on the left side to shift pager.
+            if (pager.pagererState.pagerElementsRightOverflow > 0) {
+              // Pager overflows to the right, so shift pager to the left.
+              scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration);
+            }
+          } else {
+            // No space on the left side to shift pager.
+            if (addedElements || pager.pagererState.pagerElementsRightOverflow > 0) {
+              // Remove first element on the left, then shift pager one
+              // position to the left.
+              scrollpaneRemovePagerElements(pager, PAGERER_LEFT, 1);
+              scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration);
+            }
           }
-        } else {
-          // No space on the left side to shift pager.
-          if (addedElements || pager.pagererState.pagerElementsRightOverflow > 0) {
-            // Remove first element on the left, then shift pager one
-            // position to the left.
-            scrollpaneRemovePagerElements(pager, PAGERER_LEFT, 1);
-            scrollpaneShiftPager(pager, PAGERER_LEFT, 1, duration);
-          }
-        }
-        $(button.pagererState.scrollpane).find('.ui-button').each(function() {
-          scrollpaneSetButtonState(this);
-        });
-      } else if ($(button).hasClass('pagerer-previous')) {
+          break;
+
         // ***** Previous - shift right.
-
-        // Add a pager element on the left.
-        addedElements = scrollpaneAddPagerElements(pager, PAGERER_LEFT, first - 1, 1);
-
-        if (pager.pagererState.pagerElementsRightOverflow < pager.pagererState.quantity) {
-          // There's space on the right side to shift pager.
-          if (pager.pagererState.pagerElementsLeftOverflow > 0) {
-            // Pager overflows to the left, so shift pager to the right.
-            scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration);
+        case 'previous':
+          // Add a pager element on the left.
+          addedElements = scrollpaneAddPagerElements(pager, PAGERER_LEFT, first - 1, 1);
+          if (pager.pagererState.pagerElementsRightOverflow < pager.pagererState.quantity) {
+            // There's space on the right side to shift pager.
+            if (pager.pagererState.pagerElementsLeftOverflow > 0) {
+              // Pager overflows to the left, so shift pager to the right.
+              scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration);
+            }
+          } else {
+            // No space on the right side to shift pager.
+            if (addedElements || pager.pagererState.pagerElementsLeftOverflow > 0) {
+              // Remove first element on the right, then shift pager one
+              // position to the right.
+              scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, 1);
+              scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration);
+            }
           }
-        } else {
-          // No space on the right side to shift pager.
-          if (addedElements || pager.pagererState.pagerElementsLeftOverflow > 0) {
-            // Remove first element on the right, then shift pager one
-            // position to the right.
-            scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, 1);
-            scrollpaneShiftPager(pager, PAGERER_RIGHT, 1, duration);
-          }
-        }
-        $(button.pagererState.scrollpane).find('.ui-button').each(function() {
-          scrollpaneSetButtonState(this);
-        });
-      } else if ($(button).hasClass('pagerer-first')) {
+          break;
+
         // ***** First.
+        case 'first':
+          var fromEl = Math.min((pager.pagererState.quantity * 2) - 1, first - 1);
+          addedElements = scrollpaneAddPagerElements(pager, PAGERER_LEFT, fromEl, pager.pagererState.quantity * 2);
+          scrollpaneShiftPager(
+            pager,
+            PAGERER_RIGHT,
+            pager.pagererState.pagerElementsLeftOverflow,
+            duration,
+            function() {
+              if (pager.pagererState.pagerElementsRightOverflow > pager.pagererState.quantity) {
+                scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, pager.pagererState.pagerElementsRightOverflow - pager.pagererState.quantity);
+              }
+            }
+          );
+          break;
 
-        var fromEl = Math.min((pager.pagererState.quantity * 2) - 1, first - 1);
-        addedElements = scrollpaneAddPagerElements(pager, PAGERER_LEFT, fromEl, pager.pagererState.quantity * 2);
-        scrollpaneShiftPager(pager, PAGERER_RIGHT, pager.pagererState.pagerElementsLeftOverflow, duration);
-        setTimeout(function() {
-          if (pager.pagererState.pagerElementsRightOverflow > pager.pagererState.quantity) {
-            scrollpaneRemovePagerElements(pager, PAGERER_RIGHT, pager.pagererState.pagerElementsRightOverflow - pager.pagererState.quantity);
-          }
-          $(button.pagererState.scrollpane).find('.ui-button').each(function() {
-            scrollpaneSetButtonState(this);
-          });
-        }, duration + 5);
-      } else if ($(button).hasClass('pagerer-last')) {
         // ***** Last.
+        case 'last':
+          var fromEl = Math.max((pager.pagererState.total - (pager.pagererState.quantity * 2)), last + 1);
+          addedElements = scrollpaneAddPagerElements(pager, PAGERER_RIGHT, fromEl, pager.pagererState.quantity * 2);
+          scrollpaneShiftPager(
+            pager,
+            PAGERER_LEFT,
+            pager.pagererState.pagerElementsRightOverflow,
+            duration,
+            function() {
+              if (pager.pagererState.pagerElementsLeftOverflow > pager.pagererState.quantity) {
+                scrollpaneRemovePagerElements(pager, PAGERER_LEFT, pager.pagererState.pagerElementsLeftOverflow - pager.pagererState.quantity);
+              }
+            }
+          );
+          break;
 
-        var fromEl = Math.max((pager.pagererState.total - (pager.pagererState.quantity * 2)) - 1, last + 1);
-        addedElements = scrollpaneAddPagerElements(pager, PAGERER_RIGHT, fromEl, pager.pagererState.quantity * 2);
-        scrollpaneShiftPager(pager, PAGERER_LEFT, pager.pagererState.pagerElementsRightOverflow, duration);
-        setTimeout(function() {
-          if (pager.pagererState.pagerElementsLeftOverflow > pager.pagererState.quantity) {
-            scrollpaneRemovePagerElements(pager, PAGERER_LEFT, pager.pagererState.pagerElementsLeftOverflow - pager.pagererState.quantity);
-          }
-          $(button.pagererState.scrollpane).find('.ui-button').each(function() {
-            scrollpaneSetButtonState(this);
-          });
-        }, duration + 5);
       }
     }
 
@@ -521,8 +546,6 @@ Drupal.behaviors.pagerer = {
      * Todo.
      */
     function scrollpaneAddPagerElements(pager, side, start, count) {
-//console.log('add start: ' + pager.pagererState.pagerElementsLeftOverflow + ' ' + pager.pagererState.pagerElementsRightOverflow);
-//console.log('side: ' + side + ' count: ' + count + ' start: ' + start);
       for (var i = 0; i < count; i++) {
         var pagerElements = $(pager).find('li');
         if (side == PAGERER_RIGHT) {
@@ -555,15 +578,12 @@ Drupal.behaviors.pagerer = {
           pager.pagererState.pagerElementsLeftOverflow++;
         }
       }
-//console.log('add (' + i + '): ' + pager.pagererState.pagerElementsLeftOverflow + ' ' + pager.pagererState.pagerElementsRightOverflow);
       // Resize pager.
       pagerElements = $(pager).find('li');
       $(pager).css('width', ((pagerElements.length) * pager.pagererState.pagerElementWidth) + 'px');
       if (side == PAGERER_LEFT) {
         $(pager).css({
-          left: (parseInt($(pager).css('left')) - (pager.pagererState.pagerElementWidth * i)) + 'px',
-          '-webkit-transition-property': 'none',
-          '-moz-transition-property': 'none'
+          left: (parseInt($(pager).css('left')) - (pager.pagererState.pagerElementWidth * i)) + 'px'
         });
         scrollpaneShiftPagerElements(pager, PAGERER_RIGHT, i);
       }
@@ -590,9 +610,7 @@ Drupal.behaviors.pagerer = {
       $(pager).css('width', ((pagerElements.length - 1) * pager.pagererState.pagerElementWidth) + 'px');
       if (side == PAGERER_LEFT) {
         $(pager).css({
-          left: (parseInt($(pager).css('left')) + (pager.pagererState.pagerElementWidth * count)) + 'px',
-          '-webkit-transition-property': 'none',
-          '-moz-transition-property': 'none'
+          left: (parseInt($(pager).css('left')) + (pager.pagererState.pagerElementWidth * count)) + 'px'
         });
         scrollpaneShiftPagerElements(pager, PAGERER_LEFT, i);
       }
@@ -614,23 +632,25 @@ Drupal.behaviors.pagerer = {
     /**
      * Todo.
      */
-    function scrollpaneShiftPager(pager, direction, count, duration) {
+    function scrollpaneShiftPager(pager, direction, count, duration, complete) {
       var left = parseInt($(pager).css('left'));
       var offset = direction * count * pager.pagererState.pagerElementWidth;
-      $(pager).css({
-        left: (left + offset) + 'px',
-        '-webkit-transition-property': 'left',
-        '-webkit-transition-duration': duration + 'ms',
-        '-moz-transition-property': 'left',
-        '-moz-transition-duration': duration + 'ms'
+      $(pager).animate({
+        left: (left + offset) + 'px'
+      },
+      {
+        duration: duration,
+        complete: function() {
+          pager.pagererState.pagerElementsLeftOverflow -= direction * count;
+          pager.pagererState.pagerElementsRightOverflow += direction * count;
+          if (typeof complete != 'undefined') {
+            complete();
+          }
+          $(pager.pagererState.scrollpane).find('.ui-button').each(function() {
+            scrollpaneSetButtonState(this);
+          });
+        }
       });
-      if (direction == PAGERER_LEFT) {
-        pager.pagererState.pagerElementsLeftOverflow += count;
-        pager.pagererState.pagerElementsRightOverflow -= count;
-      } else {
-        pager.pagererState.pagerElementsLeftOverflow -= count;
-        pager.pagererState.pagerElementsRightOverflow += count;
-      }
     };
 
     /**
@@ -649,6 +669,7 @@ Drupal.behaviors.pagerer = {
           anchor = $(element).find('a');
         }
         anchor[0].href = Drupal.settings.basePath + pager.pagererState.path.replace(/pagererpage/, targetPage);
+        // @todo Drupal.formatString
         anchor[0].title = Drupal.t('Go to page @number', { '@number': targetPage + 1});
         $(anchor[0]).text(indexToValue(targetPage, pager.pagererState));
       }
@@ -761,11 +782,11 @@ Drupal.behaviors.pagerer = {
      * Todo.
      */
     function pagererQueueTransition(element, action, delay) {
-        $(element).queue(function(next) {
-          action();
-          next();
-        });
-        $(element).delay(delay);
+      $(element).queue(function(next) {
+        action();
+        next();
+      });
+      $(element).delay(delay);
     }
 
     /**
