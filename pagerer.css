@@ -102,7 +102,7 @@ div.pagerer-slider-handle-icon {
 ul.pager li.pagerer-scrollpane {
   display: inline-block;
   padding: 0;
-  /*vertical-align: middle;*/
+  vertical-align: middle;
 }
 /* scrollpane viewport */
 ul.pager li.pagerer-scrollpane div.item-list {
@@ -111,13 +111,13 @@ ul.pager li.pagerer-scrollpane div.item-list {
   border: 1px solid;
   border-radius: 6px;
   margin: 0;
-  /*overflow: hidden;*/
+  overflow: hidden;
   padding: 0;
   position: absolute;
 }
 /* scrollpane embedded pager */
 ul.pager li.pagerer-scrollpane ul.pager {
-  border: dashed thin black;  /* temp */
+  /*border: dashed thin black;*/  /* temp */
   margin: 0;
   padding: 0;
   position: absolute;
@@ -125,7 +125,7 @@ ul.pager li.pagerer-scrollpane ul.pager {
 /* scrollpane embedded pager elements */
 ul.pager li.pagerer-scrollpane ul.pager li.pager-current,
 ul.pager li.pagerer-scrollpane ul.pager li.pager-item {
-  border: dashed thin black;  /* temp */
+  /*border: dashed thin black;*/  /* temp */
   position: absolute;
   white-space: nowrap;
 }

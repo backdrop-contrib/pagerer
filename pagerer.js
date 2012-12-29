@@ -303,7 +303,8 @@ Drupal.behaviors.pagerer = {
         pagerElementWidth: 0,
         pagerElementLeftMargin: 0,
         pagerElementsLeftOverflow: 0,
-        pagerElementsRightOverflow: 0
+        pagerElementsRightOverflow: 0,
+        spinning: false
       });
 
       // Determine pager element width from maximum width possible.
@@ -396,7 +397,7 @@ Drupal.behaviors.pagerer = {
       };
       $(this).button();
       $(this)
-      .bind('click', function(event) {
+      .bind('mousedown', function(event) {
         var button = this;
         var pager = button.pagererState.pager;
         var scope;
@@ -409,34 +410,20 @@ Drupal.behaviors.pagerer = {
         } else if ($(button).hasClass('pagerer-last')) {
           scope = 'last';
         }
-        pagererQueueTransition(pager, function(){scrollpaneButtonProcess(pager, scope, 500);}, 510);
-        //scrollpaneButtonProcess(pager, scope, 500);
-/*        $(pager).queue(function(next) {
-          scrollpaneButtonProcess(pager, scope, 500);
-          setTimeout(next, 510);
-        });*/
-      })
-/*      $(this)
-      .bind('mousedown', function(event) {
-        var button = this;
-        $(button).focus();
-        clearDelayedAction();
-        //pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 500);}, 0);
-        scrollpaneButtonProcess(button, 500);
-        if ($(button).hasClass('pagerer-previous') || $(button).hasClass('pagerer-next')) {
+        scrollpaneQueueTransition(pager, function() {scrollpaneButtonProcess(pager, scope, 500);}, 500);
+        if (scope == 'previous' || scope == 'next') {
           state.intervalAction = setInterval(function(){
             state.intervalCount++;
-            if (state.intervalCount > 42) {
-              //pagererQueueTransition(button.pagererState.pager, function(){scrollpaneButtonProcess(button, 10);}, 0);
-              scrollpaneButtonProcess(button, 10);
+            if (state.intervalCount > 27) {
+              scrollpaneQueueTransition(pager, function() {scrollpaneButtonProcess(pager, scope, 0);}, 0);
             }
-          }, 12);
+          }, 20);
         }
       })
       .bind('mouseup mouseleave', function(event) {
         state.intervalCount = 0;
         clearInterval(state.intervalAction);
-      })*/
+      })
     })
     .load().each(function(index) {
       // Aligns viewport border color to button style.
@@ -455,8 +442,27 @@ Drupal.behaviors.pagerer = {
     /**
      * Todo.
      */
+    function scrollpaneQueueTransition(element, action, duration) {
+      $(element).queue('testQueue', function() {
+        element.pagererState.spinning = true;
+        action();
+        setTimeout(function () {
+          if ($(element).queue('testQueue').length > 0) {
+            $(element).dequeue('testQueue');
+          } else {
+            element.pagererState.spinning = false;
+          }
+        }, duration + 20);
+      });
+      if (element.pagererState.spinning == false) {
+        $(element).dequeue('testQueue');
+      }
+    }
+
+    /**
+     * Todo.
+     */
     function scrollpaneButtonProcess(pager, scope, duration) {
-console.log(scope);
       var pagerElements = $(pager).find('li');
       var first = valueToIndex($(pagerElements[0]).text(), pager.pagererState);
       var last = valueToIndex($(pagerElements[pagerElements.length - 1]).text(), pager.pagererState);
@@ -640,6 +646,7 @@ console.log(scope);
       },
       {
         duration: duration,
+        queue: false,
         complete: function() {
           pager.pagererState.pagerElementsLeftOverflow -= direction * count;
           pager.pagererState.pagerElementsRightOverflow += direction * count;
@@ -776,17 +783,6 @@ console.log(scope);
           break;
 
       }
-    }
-
-    /**
-     * Todo.
-     */
-    function pagererQueueTransition(element, action, delay) {
-      $(element).queue(function(next) {
-        action();
-        next();
-      });
-      $(element).delay(delay);
     }
 
     /**
