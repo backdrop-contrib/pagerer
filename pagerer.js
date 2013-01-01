@@ -25,7 +25,6 @@
  * @todo
  * Scrollpane -
  * - acceleration of shift
- * - queue only click to same button
  * - anchors in views ajax
  * - if pager include separation items?
  * Slider -
@@ -68,7 +67,7 @@ Drupal.behaviors.pagerer = {
       }
     })
     .bind('focus', function(event) {
-      clearDelayedAction();
+      pagererReset();
       this.select();
       $(this).addClass('pagerer-page-has-focus');
     })
@@ -146,7 +145,7 @@ Drupal.behaviors.pagerer = {
         .css('margin-left', -sliderHandle.width() / 2)
         .text(indexToValue(this.pagererState.current, this.pagererState))
         .bind('blur', function(event) {
-          clearDelayedAction();
+          pagererReset();
           var sliderBar = $(this).parent().get(0);
           if (!sliderBar.pagererState.spinning) {
             sliderBar.pagererState.spinning = true;
@@ -185,7 +184,7 @@ Drupal.behaviors.pagerer = {
       }
     })
     .bind('slide', function(event, ui) {
-      clearDelayedAction();
+      pagererReset();
       $(this).find('.ui-slider-handle').text(indexToValue(ui.value, this.pagererState));
     })
     .bind('slidechange', function(event, ui) {
@@ -224,7 +223,7 @@ Drupal.behaviors.pagerer = {
       var sliderBar = this;
       var sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
       sliderHandleIcon.bind('mousedown', function(event) {
-        clearDelayedAction();
+        pagererReset();
         // Remove icon.
         $(sliderBar).find('.pagerer-slider-handle-icon').removeClass('throbber');
         // Relocate.
@@ -234,7 +233,8 @@ Drupal.behaviors.pagerer = {
 
       // Bind page relocation to timeout of timelapse.
       if (this.pagererState.action == 'timelapse') {
-        setDelayedAction(function() {
+        pagererReset();
+        state.timeoutAction = setTimeout(function() {
           // Remove icon.
           $(sliderBar).find('.pagerer-slider-handle-icon').removeClass('ui-icon').removeClass('throbber');
           // Relocate.
@@ -258,7 +258,7 @@ Drupal.behaviors.pagerer = {
       */
     $('.pagerer-slider-control-icon', context)
     .bind('mousedown', function(event) {
-      clearDelayedAction();
+      pagererReset();
       var slider = $(this).parents('.pager').find('.pagerer-slider').get(0);
       slider.pagererState.spinning = true;
       var offset = $(this).hasClass('ui-icon-circle-minus') ? PAGERER_LEFT : PAGERER_RIGHT;
@@ -398,13 +398,12 @@ Drupal.behaviors.pagerer = {
       $(this)
       .bind('mousedown', function(event) {
         var button = this;
+        var pager = button.pagererState.pager;
+        var scope;
 
         if ($(button).button('option', 'disabled')) {
           return false;
         }
-
-        var pager = button.pagererState.pager;
-        var scope;
 
         if ($(button).hasClass('pagerer-next')) {
           scope = 'next';
@@ -415,6 +414,11 @@ Drupal.behaviors.pagerer = {
         } else if ($(button).hasClass('pagerer-last')) {
           scope = 'last';
         }
+
+        if (pager.pagererState.spinning && pager.pagererState.spinning != scope) {
+          pagererReset();
+        }
+
         scrollpaneButtonProcessEnqueue(pager, scope, 500);
         if (scope == 'previous' || scope == 'next') {
           state.intervalAction = setInterval(function(){
@@ -448,9 +452,8 @@ Drupal.behaviors.pagerer = {
      * Todo.
      */
     function scrollpaneButtonProcessEnqueue(pager, scope, duration) {
-console.log('a ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQueue').length);
       $(pager).queue('pagererQueue', function() {
-        pager.pagererState.spinning = true;
+        pager.pagererState.spinning = scope;
 
         var pagerElements = $(pager).find('li');
         var first = valueToIndex($(pagerElements[0]).text(), pager.pagererState);
@@ -565,6 +568,28 @@ console.log('a ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQu
     /**
      * Todo.
      */
+    function scrollpaneSetButtonState(element) {
+      if ($(element).hasClass('pagerer-first') || $(element).hasClass('pagerer-previous')) {
+        if (element.pagererState.pager.pagererState.pagerElementsLeftOverflow == 0) {
+          $(element).mouseup().mouseleave();
+          $(element).button('disable');
+        } else {
+          $(element).button('enable');
+        }
+      }
+      if ($(element).hasClass('pagerer-next') || $(element).hasClass('pagerer-last')) {
+        if (element.pagererState.pager.pagererState.pagerElementsRightOverflow == 0) {
+          $(element).mouseup().mouseleave();
+          $(element).button('disable');
+        } else {
+          $(element).button('enable');
+        }
+      }
+    }
+
+    /**
+     * Todo.
+     */
     function scrollpaneAddPagerElements(pager, side, start, count) {
       for (var i = 0; i < count; i++) {
         var pagerElements = $(pager).find('li');
@@ -672,7 +697,6 @@ console.log('a ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQu
               scrollpaneSetButtonState(this);
             });
           }
-console.log('b ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQueue').length);
           scrollpaneButtonProcessDequeue(pager);
         }
       });
@@ -699,29 +723,6 @@ console.log('b ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQu
         $(anchor[0]).text(indexToValue(targetPage, pager.pagererState));
       }
     }
-
-    /**
-     * Todo.
-     */
-    function scrollpaneSetButtonState(elem) {
-      if ($(elem).hasClass('pagerer-first') || $(elem).hasClass('pagerer-previous')) {
-        if (elem.pagererState.pager.pagererState.pagerElementsLeftOverflow == 0) {
-          $(elem).mouseup().mouseleave();
-          $(elem).button('disable');
-        } else {
-          $(elem).button('enable');
-        }
-      }
-      if ($(elem).hasClass('pagerer-next') || $(elem).hasClass('pagerer-last')) {
-        if (elem.pagererState.pager.pagererState.pagerElementsRightOverflow == 0) {
-          $(elem).mouseup().mouseleave();
-          $(elem).button('disable');
-        } else {
-          $(elem).button('enable');
-        }
-      }
-    }
-
 
     /**
      * Helper functions
@@ -806,18 +807,16 @@ console.log('b ' + pager.pagererState.spinning + ' ' + $(pager).queue('pagererQu
     /**
      * Todo.
      */
-    function setDelayedAction(action, delay) {
-      clearDelayedAction();
-      state.timeoutAction = setTimeout(action, delay);
-    }
-
-    /**
-     * Todo.
-     */
-    function clearDelayedAction() {
+    function pagererReset() {
       if (state.timeoutAction) {
         clearTimeout(state.timeoutAction);
       }
+      $('.pagerer-scrollpane').find('.pager').each(function(index) {
+        var pager = this;
+        $(pager).clearQueue('pagererQueue');
+        $(pager).stop(false, true);
+        pager.pagererState.spinning = false;
+      });
     }
 
     /**
