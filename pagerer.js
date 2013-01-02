@@ -24,7 +24,7 @@
  *
  * @todo
  * Scrollpane -
- * - acceleration of shift
+ * - acceleration of shift =A3*-19,8+200
  * - anchors in views ajax
  * - if pager include separation items?
  * Slider -
@@ -303,7 +303,9 @@ Drupal.behaviors.pagerer = {
         pagerElementLeftMargin: 0,
         pagerElementsLeftOverflow: 0,
         pagerElementsRightOverflow: 0,
-        spinning: false
+        scrolling: false,
+        scrollingDuration: 0,
+        fastScrolling: 0
       });
 
       // Determine pager element width from maximum width possible.
@@ -415,23 +417,36 @@ Drupal.behaviors.pagerer = {
           scope = 'last';
         }
 
-        if (pager.pagererState.spinning && pager.pagererState.spinning != scope) {
+        if (pager.pagererState.scrolling && pager.pagererState.scrolling != scope) {
           pagererReset();
         }
 
-        scrollpaneButtonProcessEnqueue(pager, scope, 500);
-        if (scope == 'previous' || scope == 'next') {
-          state.intervalAction = setInterval(function(){
-            state.intervalCount++;
-            if (state.intervalCount > 52 && !$(button).button('option', 'disabled')) {
-              scrollpaneButtonProcessEnqueue(pager, scope, 5);
-            }
-          }, 10);
+        switch (pager.pagererState.scrollingDuration) {
+          case 0:
+            pager.pagererState.scrollingDuration = 500;
+            break;
+
+          case 500:
+          case 200:
+            pager.pagererState.scrollingDuration = 200;
+            break;
+
+        }
+        scrollpaneButtonProcessEnqueue(pager, scope, pager.pagererState.scrollingDuration);
+
+        if ((scope == 'previous' || scope == 'next') && !$(button).button('option', 'disabled')) {
+          state.timeoutAction = setTimeout(function() {
+            pager.pagererState.fastScrolling = 1;
+            scrollpaneButtonProcessEnqueue(pager, scope, scrollpaneResolveFastScrollDuration(pager));
+          }, pager.pagererState.scrollingDuration + 20);
         }
       })
       .bind('mouseup mouseleave', function(event) {
-        state.intervalCount = 0;
-        clearInterval(state.intervalAction);
+        var button = this;
+        var pager = button.pagererState.pager;
+
+        clearTimeout(state.timeoutAction);
+        pager.pagererState.fastScrolling = 0;
       })
     })
     .load().each(function(index) {
@@ -448,19 +463,29 @@ Drupal.behaviors.pagerer = {
       scrollpaneSetButtonState(this);
     });
 
+    function scrollpaneResolveFastScrollDuration(pager) {
+      var ret = ((pager.pagererState.fastScrolling - 1) * -19.8) + 200;
+      return (ret > 2) ? ret : 2;
+    }
+
     /**
      * Todo.
      */
     function scrollpaneButtonProcessEnqueue(pager, scope, duration) {
       $(pager).queue('pagererQueue', function() {
-        pager.pagererState.spinning = scope;
+        pager.pagererState.scrolling = scope;
+
+        if (pager.pagererState.fastScrolling) {
+          pager.pagererState.fastScrolling++;
+          scrollpaneButtonProcessEnqueue(pager, scope, scrollpaneResolveFastScrollDuration(pager));
+        }
 
         var pagerElements = $(pager).find('li');
         var first = valueToIndex($(pagerElements[0]).text(), pager.pagererState);
         var last = valueToIndex($(pagerElements[pagerElements.length - 1]).text(), pager.pagererState);
         var addedElements;
 
-        switch(scope) {
+        switch (scope) {
           // ***** Next - shift left.
           case 'next':
             // Add a pager element on the right.
@@ -549,7 +574,7 @@ Drupal.behaviors.pagerer = {
 
       });
 
-      if (pager.pagererState.spinning == false) {
+      if (pager.pagererState.scrolling == false) {
         $(pager).dequeue('pagererQueue');
       }
     }
@@ -561,7 +586,9 @@ Drupal.behaviors.pagerer = {
       if ($(pager).queue('pagererQueue').length > 0) {
         $(pager).dequeue('pagererQueue');
       } else {
-        pager.pagererState.spinning = false;
+        pager.pagererState.scrolling = false;
+        pager.pagererState.scrollingDuration = 0;
+        pager.pagererState.fastScrolling = 0;
       }
     }
 
@@ -815,7 +842,9 @@ Drupal.behaviors.pagerer = {
         var pager = this;
         $(pager).clearQueue('pagererQueue');
         $(pager).stop(false, true);
-        pager.pagererState.spinning = false;
+        pager.pagererState.scrolling = false;
+        pager.pagererState.scrollingDuration = 0;
+        pager.pagererState.fastScrolling = 0;
       });
     }
 
