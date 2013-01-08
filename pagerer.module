@@ -1666,6 +1666,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     'current'        => $markers['pager_current'] - 1,
     'interval'       => $interval,
     'display'        => $variables['display'],
+    'pagerSeparator' => $variables['pager_separator'],
     'rangeSeparator' => $variables['range_separator'],
   );
   switch ($element_type) {
@@ -1710,7 +1711,9 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
         $items[] = _pagerer_itemize_link('previous', $variables, $markers, 'button');
 
         // Scrollpane.
+        $variables['label_display'] = 'none';
         $variables['current_display'] = 'normal';
+        $variables['total_display'] = 'none';
         $variables['first_link'] = 'never';
         $variables['previous_link'] = 'never';
         $variables['next_link'] = 'never';
