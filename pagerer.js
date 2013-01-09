@@ -3,32 +3,41 @@
  *
  * Pagerer jquery scripts.
  *
- * @todo - document
- * pagererState
- * path: drupal *request* path inclusive of querystring fragment, no base path
- * element: integer to distinguish between multiple pagers on one page
- * quantity: number of page elements in the pager list
- * total: total number of pages in the query
- * totalItems: total number of items in the query
- * current: 0-base index of current page
- * interval: number of elements per page (1 if display = pages, items per page if display = items/item_ranges
- * display: pages|items|item_ranges indicates what is displayed in the page element
- * action:
- * timelapse:
- * icons:
- * tickmarkTitle:
- * pageTitle:
- * firstTitle:
- * lastTitle:
- * pagerSeparator:
- * rangeSeparator:
+ * All jQuery navigation widgets implemented by pagerer are configured at
+ * runtime by a JSON object prepared by the PHP part of the module, and
+ * stored in a 'pagererState' object attached to each widget.
  *
- * @todo
- * Scrollpane -
- * - anchors in views ajax
- * Slider -
- * - slider handle width with item ranges
+ * pagererState properties:
+ * - path: drupal *request* path inclusive of querystring fragment, no base
+ *   path
+ * - element: integer to distinguish between multiple pagers on one page
+ * - quantity: number of page elements in the pager list
+ * - total: total number of pages in the query
+ * - totalItems: total number of items in the query
+ * - current: 0-base index of current page
+ * - interval: number of elements per page (1 if display = pages, items per
+ *   page if display = items/item_ranges)
+ * - display: pages|items|item_ranges indicates what is displayed in the page
+ *   element
+ * - pagerSeparator: Text to fill between contiguous pages.
+ * - rangeSeparator: Text to place between first and last item in a range.
+ * - pageTag: Text to use to render the target page/item/item range.
+ * - widgetResize: (widget) determines if the widget width should be calculated
+ *   dynamically based on the width of the string of the last page/item number.
+ * - action: (slider) determines how the page relocation should be triggered
+ *   after it has been selected through the jQuery slider.
+ * - timelapse: (slider) the grace time (in milliseconds) to wait before the
+ *   page is relocated, in case "timelapse" action method is selected for
+ *   the jQuery slider.
+ * - icons: (slider) determines whether to display +/- navigation icons
+ *   on the sides of the jQuery slider.
+ * - tickmarkTitle: (slider) help text appended to the slider help when user is
+ *   expected to click on the tickmark to start page relocation.
+ * - pageTitle: (scrollpane) Help text used when hovering a page link.
+ * - firstTitle: (scrollpane) Help text used when hovering a first page link.
+ * - lastTitle: (scrollpane) Help text used when hovering a last page link.
  */
+
 (function ($) {
 Drupal.behaviors.pagerer = {
   attach: function(context, settings) {
@@ -47,7 +56,7 @@ Drupal.behaviors.pagerer = {
       intervalAction: 0,
       intervalCount: 0,
       isRelocating: false
-    }
+    };
 
      /**
      * 'pagerer-page' input box event binding
@@ -57,7 +66,7 @@ Drupal.behaviors.pagerer = {
       state.isRelocating = false;
       this.pagererState = eval('(' + $(this).attr('name') + ');');
       // Item ranges do not really work on widget.
-      if (this.pagererState.display == 'item_ranges') {
+      if (this.pagererState.display === 'item_ranges') {
         this.pagererState.display = 'items';
       }
       // Adjust width of the input box.
@@ -79,7 +88,7 @@ Drupal.behaviors.pagerer = {
         case 10:
           // Return key pressed, relocate.
           var targetPage = valueToIndex($(this).val(), this.pagererState);
-          if (targetPage != this.pagererState.current) {
+          if (targetPage !== this.pagererState.current) {
             pagererRelocate(this, this, targetPage);
           }
           event.stopPropagation();
@@ -145,7 +154,6 @@ Drupal.behaviors.pagerer = {
         .text(indexToValue(this.pagererState.current, this.pagererState))
         .bind('blur', function(event) {
           pagererReset();
-          // @todo possibl to use closure??
           var sliderBar = $(this).parent().get(0);
           if (!sliderBar.pagererState.spinning) {
             sliderBar.pagererState.spinning = true;
@@ -157,15 +165,14 @@ Drupal.behaviors.pagerer = {
 
       // Set slider bar dimensions.
       sliderBar
-        // @todo css width
-        .width((this.pagererState.quantity * 3) + 'em')
+        .css('width', ((this.pagererState.quantity * 3) + 'em'))
         .css('margin-left', sliderHandle.width() / 2)
         .css('margin-right', sliderHandle.width() / 2);
 
       var pixelsPerStep = sliderBar.width() / this.pagererState.total;
       // If autodetection of navigation action, determine whether to
       // use tickmark or timelapse.
-      if (this.pagererState.action == 'auto') {
+      if (this.pagererState.action === 'auto') {
         if (pixelsPerStep > 3) {
           this.pagererState.action = 'timelapse';
         } else {
@@ -174,12 +181,12 @@ Drupal.behaviors.pagerer = {
       }
       // If autodetection of navigation icons, determine whether to
       // hide icons.
-      if (this.pagererState.icons == 'auto' && pixelsPerStep > 3) {
+      if (this.pagererState.icons === 'auto' && pixelsPerStep > 3) {
         $(this).parents('.pager').find('.pagerer-slider-control-icon').parent().hide();
       }
       // Add information to user to click on the tickmark to start page
       // relocation.
-      if (this.pagererState.action == 'tickmark') {
+      if (this.pagererState.action === 'tickmark') {
         var title = $(this).attr('title');
         $(this).attr('title',  title + ' ' + this.pagererState.tickmarkTitle);
       }
@@ -190,7 +197,11 @@ Drupal.behaviors.pagerer = {
     })
     .bind('slidechange', function(event, ui) {
 
+      var sliderBar = this;
       var sliderHandle = $(this).find('.ui-slider-handle');
+      var sliderHandleIcon;
+
+      // Set handle text to widget value.
       sliderHandle.text(indexToValue(ui.value, this.pagererState));
 
       // If currently sliding the handle via navigation icons,
@@ -204,9 +215,9 @@ Drupal.behaviors.pagerer = {
 
       // Relocate immediately to target page if no
       // tickmark/timelapse confirmation required.
-      if (this.pagererState.action == 'timelapse' && this.pagererState.timelapse == 0) {
+      if (this.pagererState.action === 'timelapse' && this.pagererState.timelapse === 0) {
         sliderHandle.append("<div class='pagerer-slider-handle-icon'/>");
-        var sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
+        sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
         pagererRelocate(this, sliderHandleIcon, targetPage);
         return false;
       }
@@ -214,15 +225,14 @@ Drupal.behaviors.pagerer = {
       // Otherwise, add a tickmark or clock icon to the handle text,
       // to be clicked to activate page relocation.
       sliderHandle.text(indexToValue(ui.value, this.pagererState) + ' ');
-      if (this.pagererState.action == 'timelapse') {
+      if (this.pagererState.action === 'timelapse') {
         sliderHandle.append("<div class='pagerer-slider-handle-icon throbber'/>");
       } else {
         sliderHandle.append("<div class='pagerer-slider-handle-icon ui-icon ui-icon-check'/>");
       }
 
       // Bind page relocation to mouse clicking on the icon.
-      var sliderBar = this;
-      var sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
+      sliderHandleIcon = sliderHandle.find('.pagerer-slider-handle-icon');
       sliderHandleIcon.bind('mousedown', function(event) {
         pagererReset();
         // Remove icon.
@@ -233,7 +243,7 @@ Drupal.behaviors.pagerer = {
       });
 
       // Bind page relocation to timeout of timelapse.
-      if (this.pagererState.action == 'timelapse') {
+      if (this.pagererState.action === 'timelapse') {
         pagererReset();
         state.timeoutAction = setTimeout(function() {
           // Remove icon.
@@ -314,14 +324,14 @@ Drupal.behaviors.pagerer = {
       });
 
       // Determine pager element width from maximum width possible.
-      var dupe = $(pagerPages[0]).clone();
-      dupe.removeClass('pager-current first last');
-      dupe.addClass('pager-item pagerer-dupe');
-      dupe.text(indexToValue(pager.pagererState.total - 1, pager.pagererState));
-      $(pager).append(dupe);
-      pager.pagererState.pageWidth = Math.ceil($(dupe).outerWidth(true));
-      pager.pagererState.pageLeftMargin = parseInt($(dupe).css('margin-left'))
-      var cellHeight = Math.ceil($(dupe).outerHeight(true));
+      var pageDupe = $(pagerPages[0]).clone();
+      pageDupe.removeClass('pager-current first last');
+      pageDupe.addClass('pager-item pagerer-dupe');
+      pageDupe.text(indexToValue(pager.pagererState.total - 1, pager.pagererState));
+      $(pager).append(pageDupe);
+      pager.pagererState.pageWidth = Math.ceil($(pageDupe).outerWidth(true));
+      pager.pagererState.pageLeftMargin = parseInt($(pageDupe).css('margin-left'));
+      var cellHeight = Math.ceil($(pageDupe).outerHeight(true));
       $(pager).find('.pagerer-dupe').remove();
 
       // Determine pager separator width, if existing.
@@ -375,23 +385,25 @@ Drupal.behaviors.pagerer = {
       $(pager).css('left', '-' + pagerLeftOffset);
 
       // Left- and right-most pages.
-      var pagerLeftPage = valueToIndex($(pagerPages[0]).text(), pager.pagererState);
-      var pagerRightPage = valueToIndex($(pagerPages[pagerPages.length - 1]).text(), pager.pagererState);
+      var pagerLeftPageIndex = valueToIndex($(pagerPages[0]).text(), pager.pagererState);
+      var pagerRightPageIndex = valueToIndex($(pagerPages[pagerPages.length - 1]).text(), pager.pagererState);
 
       // Add elements to the left.
       pager.pagererState.leftOverflow = scrollpaneAddPagerElements(
         pager,
         PAGERER_LEFT,
-        pagerLeftPage - 1,
-        pager.pagererState.quantity
+        pagerLeftPageIndex - 1,
+        pager.pagererState.quantity,
+        true
       );
 
       // Add elements to the right.
       pager.pagererState.rightOverflow = scrollpaneAddPagerElements(
         pager,
         PAGERER_RIGHT,
-        pagerRightPage + 1,
-        pager.pagererState.quantity
+        pagerRightPageIndex + 1,
+        pager.pagererState.quantity,
+        true
       );
 
     });
@@ -409,7 +421,6 @@ Drupal.behaviors.pagerer = {
       * first/last page.
       */
     $('.pagerer-scrollpane-button', context)
-    // @todo first only??
     .ready().each(function(index) {
       this.pagererState = {
         scrollpane: $(this).parents('.pager').get(0),
@@ -422,10 +433,12 @@ Drupal.behaviors.pagerer = {
         var pager = button.pagererState.pager;
         var scope;
 
+        // Return immediately if button is disabled.
         if ($(button).button('option', 'disabled')) {
           return false;
         }
 
+        // Determine scope of scroll request.
         if ($(button).hasClass('pagerer-next')) {
           scope = 'next';
         } else if ($(button).hasClass('pagerer-previous')) {
@@ -436,10 +449,13 @@ Drupal.behaviors.pagerer = {
           scope = 'last';
         }
 
-        if (pager.pagererState.scrolling && pager.pagererState.scrolling != scope) {
+        // If scrollpane is currently transitioning, and a request for a
+        // different scope is received, reset all transitions.
+        if (pager.pagererState.scrolling && pager.pagererState.scrolling !== scope) {
           pagererReset();
         }
 
+        // Transition duration based on single click.
         switch (pager.pagererState.scrollingDuration) {
           case 0:
             pager.pagererState.scrollingDuration = 500;
@@ -451,22 +467,23 @@ Drupal.behaviors.pagerer = {
             break;
 
         }
-        scrollpaneButtonProcessEnqueue(pager, scope, pager.pagererState.scrollingDuration);
+        scrollpaneScrollRequestEnqueue(pager, scope, pager.pagererState.scrollingDuration);
 
-        if ((scope == 'previous' || scope == 'next') && !$(button).button('option', 'disabled')) {
+        // If button is kept pressed long enough, start fastScrolling mode.
+        if ((scope === 'previous' || scope === 'next') && !$(button).button('option', 'disabled')) {
           state.timeoutAction = setTimeout(function() {
             pager.pagererState.fastScrolling = 1;
-            scrollpaneButtonProcessEnqueue(pager, scope, scrollpaneResolveFastScrollDuration(pager));
+            scrollpaneScrollRequestEnqueue(pager, scope, scrollpaneGetScrollDuration(pager));
           }, pager.pagererState.scrollingDuration + 20);
         }
       })
       .bind('mouseup mouseleave', function(event) {
+        // Stop fastScrolling mode if active.
         var button = this;
         var pager = button.pagererState.pager;
-
         clearTimeout(state.timeoutAction);
         pager.pagererState.fastScrolling = 0;
-      })
+      });
     })
     .load().each(function(index) {
       // Aligns viewport border color to button style.
@@ -482,21 +499,190 @@ Drupal.behaviors.pagerer = {
       scrollpaneSetButtonState(this);
     });
 
-    function scrollpaneResolveFastScrollDuration(pager) {
-      var ret = ((pager.pagererState.fastScrolling - 1) * -19.8) + 200;
-      return (ret > 2) ? ret : 2;
+    /**
+     * Helper functions
+     */
+
+    /**
+     * Return page text from zero-based page index number.
+     */
+    function indexToValue(index, state) {
+      switch(state.display) {
+        case 'pages':
+          return Drupal.formatString(state.pageTag, {'@number': index + 1});
+
+        case 'items':
+          return Drupal.formatString(state.pageTag, {'@number': (index * state.interval) + 1});
+
+        case 'item_ranges':
+          return Drupal.formatString('@min@separator@max', {
+            '@min': Drupal.formatString(state.pageTag, {'@number': (index * state.interval) + 1}),
+            '@separator': state.rangeSeparator,
+            '@max': Drupal.formatString(state.pageTag, {'@number': Math.min(((index + 1) * state.interval), state.totalItems)})
+          });
+
+      }
     }
 
     /**
-     * Todo.
+     * Return zero-based page index number from textual value.
      */
-    function scrollpaneButtonProcessEnqueue(pager, scope, duration) {
+    function valueToIndex(value, state) {
+      switch(state.display) {
+        case 'pages':
+          if (isNaN(value)) {
+            return 0;
+          }
+          value = parseInt(value);
+          if (value < 1) {
+            return 0;
+          }
+          if (value > state.total) {
+            value = state.total;
+          }
+          return value - 1;
+
+        case 'items':
+          if (isNaN(value)) {
+            return 0;
+          }
+          value = parseInt(value);
+          if (value < 1) {
+            return 0;
+          }
+          if (value > state.totalItems) {
+            value = state.totalItems;
+          }
+          return parseInt((value - 1) / state.interval);
+
+        case 'item_ranges':
+          var values = value.split(state.rangeSeparator);
+          value = values[0];
+          if (isNaN(value)) {
+            return 0;
+          }
+          value = parseInt(value);
+          if (value < 1) {
+            return 0;
+          }
+          if (value > state.totalItems) {
+            value = state.totalItems;
+          }
+          return parseInt((value - 1) / state.interval);
+
+      }
+    }
+
+    /**
+     * Reset pending transitions.
+     *
+     * Cancel timeout-bound page relocation and any unprocessed scrollpane
+     * transition.
+     */
+    function pagererReset() {
+      if (state.timeoutAction) {
+        clearTimeout(state.timeoutAction);
+      }
+      $('.pagerer-scrollpane').find('.pager').each(function(index) {
+        var pager = this;
+        $(pager).clearQueue('pagererQueue');
+        $(pager).stop(false, true);
+        pager.pagererState.scrolling = false;
+        pager.pagererState.scrollingDuration = 0;
+        pager.pagererState.fastScrolling = 0;
+      });
+    }
+
+    /**
+     * Relocate client browser to target page.
+     *
+     * Relocation method is decided based on the context of the pager element,
+     * being in order of priority:
+     *  - a AJAX enabled Views context - AJAX is used
+     *  - a Views preview area in a Views settings form - AJAX is used
+     *  - a page rendered through the admin overlay - BBQ is used
+     *  - a normal page - document.location is used
+     */
+    function pagererRelocate(element, ajaxAttachElement, targetPage) {
+      // Check we are not relocating already.
+      if (state.isRelocating) {
+        return false;
+      }
+      state.isRelocating = true;
+
+      // Replace placeholder with page target.
+      var path = element.pagererState.path.replace(/pagererpage/, targetPage);
+
+      // Check if element is in Views AJAX context.
+      var viewsAjaxContext = getViewsAjaxContext(element);
+      if (viewsAjaxContext) {
+        // Element is in Views AJAX context.
+        attachViewsAjax(ajaxAttachElement, 'doViewsAjax', viewsAjaxContext, path);
+        $(ajaxAttachElement).trigger('doViewsAjax');
+
+      } else if ($(element).parents('#views-live-preview').length) {
+        // Element is in Views preview context.
+        var base = $(element).attr('id');
+        var element_settings = {
+          'event': 'doViewsAjax',
+          'progress': { 'type': 'throbber' },
+          'url': Drupal.settings.basePath + path,
+          'method': 'html',
+          'wrapper': 'views-live-preview'
+        };
+        Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
+        $(element).trigger('doViewsAjax');
+
+      } else if (window.Drupal.overlayChild) {
+        // Drupal admin overlay
+        window.parent.jQuery.bbq.pushState({'overlay': path});
+
+      } else {
+        // Normal page
+        document.location = Drupal.settings.basePath + path;
+
+      }
+    }
+
+    /**
+     * Widget - Update value based on an offset.
+     */
+    function widgetOffsetValue(element, offset) {
+      var widgetValue = valueToIndex($(element).val(), element.pagererState);
+      var newValue = widgetValue + offset;
+      if (newValue < 0) {
+        newValue = 0;
+      } else if (newValue >= element.pagererState.total) {
+        newValue = element.pagererState.total - 1;
+      }
+      $(element).val(indexToValue(newValue, element.pagererState));
+    }
+
+    /**
+     * Slider - Update value based on an offset.
+     */
+    function sliderOffsetValue(element, offset) {
+      var newValue = $(element).slider('option', 'value') + offset;
+      var maxValue = $(element).slider('option', 'max');
+      if (newValue >= 0 && newValue <= maxValue) {
+        $(element).slider('option', 'value', newValue);
+      }
+    }
+
+    /**
+     * Scrollpane - Enqueue a scrollpane scroll request.
+     *
+     * Scrolls embedded pager to first/previous/next/last 'scope' in a
+     * 'duration' timelapse.
+     */
+    function scrollpaneScrollRequestEnqueue(pager, scope, duration) {
       $(pager).queue('pagererQueue', function() {
         pager.pagererState.scrolling = scope;
 
+        // In fastScrolling mode, enqueue next iteration straight ahead.
         if (pager.pagererState.fastScrolling) {
           pager.pagererState.fastScrolling++;
-          scrollpaneButtonProcessEnqueue(pager, scope, scrollpaneResolveFastScrollDuration(pager));
+          scrollpaneScrollRequestEnqueue(pager, scope, scrollpaneGetScrollDuration(pager));
         }
 
         var pagerPages =  $(pager).find('li:not(.separator)');
@@ -567,7 +753,6 @@ Drupal.behaviors.pagerer = {
               }
             );
             return;
-            break;
 
           // ***** Last.
           case 'last':
@@ -585,23 +770,26 @@ Drupal.behaviors.pagerer = {
               }
             );
             return;
-            break;
 
         }
 
-        scrollpaneButtonProcessDequeue(pager);
+        // Dequeue next iteration in the queue.
+        scrollpaneScrollRequestDequeue(pager);
 
       });
 
-      if (pager.pagererState.scrolling == false) {
+      // Starts the queue processing.
+      if (pager.pagererState.scrolling === false) {
         $(pager).dequeue('pagererQueue');
       }
     }
 
     /**
-     * Todo.
+     * Scrollpane - Dequeue a scrollpane scroll request.
+     *
+     * If no more requests in the queue, clear state variables.
      */
-    function scrollpaneButtonProcessDequeue(pager) {
+    function scrollpaneScrollRequestDequeue(pager) {
       if ($(pager).queue('pagererQueue').length > 0) {
         $(pager).dequeue('pagererQueue');
       } else {
@@ -612,11 +800,19 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
-     * Todo.
+     * Scrollpane - Get duration of next scroll transition.
+     */
+    function scrollpaneGetScrollDuration(pager) {
+      var ret = ((pager.pagererState.fastScrolling - 1) * -19.8) + 200;
+      return (ret > 2) ? ret : 2;
+    }
+
+    /**
+     * Scrollpane - Enable/disable scrollpane buttons.
      */
     function scrollpaneSetButtonState(element) {
       if ($(element).hasClass('pagerer-first') || $(element).hasClass('pagerer-previous')) {
-        if (element.pagererState.pager.pagererState.leftOverflow == 0) {
+        if (element.pagererState.pager.pagererState.leftOverflow === 0) {
           $(element).mouseup().mouseleave();
           $(element).button('disable');
         } else {
@@ -624,7 +820,7 @@ Drupal.behaviors.pagerer = {
         }
       }
       if ($(element).hasClass('pagerer-next') || $(element).hasClass('pagerer-last')) {
-        if (element.pagererState.pager.pagererState.rightOverflow == 0) {
+        if (element.pagererState.pager.pagererState.rightOverflow === 0) {
           $(element).mouseup().mouseleave();
           $(element).button('disable');
         } else {
@@ -634,56 +830,72 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
-     * Todo.
+     * Scrollpane - Add pages to the embedded pager.
+     *
+     * Add 'count' pages and separators on left/right 'side', starting with
+     * page at index 'start'.
      */
-    function scrollpaneAddPagerElements(pager, side, start, count) {
+    function scrollpaneAddPagerElements(pager, side, start, count, onReady) {
+
+      // onReady will be true if function is invoked at .ready()
+      onReady = onReady || false;
+
+      var pagerPages;
+      var pagerLeftPage;
+      var pagerRightPage;
+      var pageWidth;
+      var pageLeftMargin;
+      var pageDupe;
+      var pagerSeparators;
+      var separatorWidth = 0;
+      var separatorDupe;
+
       for (var i = 0; i < count; i++) {
-        var pagerPages =  $(pager).find('li:not(.separator)');
-        var pagerSeparators = $(pager).find('li.separator');
+        pagerPages =  $(pager).find('li:not(.separator)');
+        pagerSeparators = $(pager).find('li.separator');
 
         // If we have separators, prepare dupe and set width.
         if (pagerSeparators.length) {
-          var dupeSep = $(pagerSeparators[0]).clone();
-          var separatorWidth = pager.pagererState.separatorWidth;
-        } else {
-          var separatorWidth = 0;
+          separatorDupe = $(pagerSeparators[0]).clone();
+          separatorWidth = pager.pagererState.separatorWidth;
         }
 
-        if (side == PAGERER_RIGHT) {
-          var pagerRightPage = pagerPages.length - 1;
+        // Add page and separator.
+        if (side === PAGERER_RIGHT) {
+          pagerRightPage = pagerPages.length - 1;
           if (valueToIndex($(pagerPages[pagerRightPage]).text(), pager.pagererState) >= (pager.pagererState.total - 1)) {
             break;
           }
-          var dupe = $(pagerPages[pagerRightPage]).clone();
+          pageDupe = $(pagerPages[pagerRightPage]).clone();
           $(pagerPages[pagerRightPage]).removeClass('last');
-          scrollpaneSetPagerElementHTML(dupe, pager, start + i);
+          scrollpaneSetPagerElementHTML(pageDupe, pager, start + i, onReady);
           if (separatorWidth) {
-            $(dupeSep).css('left', (parseInt($(dupe).css('left')) + pager.pagererState.pageWidth) + 'px');
-            $(pager).append(dupeSep);
+            $(separatorDupe).css('left', (parseInt($(pageDupe).css('left')) + pager.pagererState.pageWidth) + 'px');
+            $(pager).append(separatorDupe);
           }
-          $(dupe).css('left', (parseInt($(dupe).css('left')) + pager.pagererState.pageWidth + separatorWidth) + 'px');
-          $(pager).append(dupe);
-          var pageWidth = $(dupe).outerWidth(true);
-          var pageLeftMargin = pager.pagererState.pageLeftMargin + ((pager.pagererState.pageWidth - pageWidth) / 2);
-          $(dupe).css('margin-left', pageLeftMargin + 'px');
+          $(pageDupe).css('left', (parseInt($(pageDupe).css('left')) + pager.pagererState.pageWidth + separatorWidth) + 'px');
+          $(pager).append(pageDupe);
+          pageWidth = $(pageDupe).outerWidth(true);
+          pageLeftMargin = pager.pagererState.pageLeftMargin + ((pager.pagererState.pageWidth - pageWidth) / 2);
+          $(pageDupe).css('margin-left', pageLeftMargin + 'px');
           pager.pagererState.rightOverflow++;
-        } else if (side == PAGERER_LEFT) {
-          var pagerLeftPage = 0;
-          if (valueToIndex($(pagerPages[pagerLeftPage]).text(), pager.pagererState) == 0) {
+        } else if (side === PAGERER_LEFT) {
+          pagerLeftPage = 0;
+          if (valueToIndex($(pagerPages[pagerLeftPage]).text(), pager.pagererState) === 0) {
             break;
           }
-          var dupe = $(pagerPages[pagerLeftPage]).clone();
+          pageDupe = $(pagerPages[pagerLeftPage]).clone();
           $(pagerPages[pagerLeftPage]).removeClass('first');
-          scrollpaneSetPagerElementHTML(dupe, pager, start - i);
+          scrollpaneSetPagerElementHTML(pageDupe, pager, start - i, onReady);
           if (separatorWidth) {
-            $(dupeSep).css('left', (parseInt($(dupe).css('left')) - separatorWidth) + 'px');
-            $(pager).prepend(dupeSep);
+            $(separatorDupe).css('left', (parseInt($(pageDupe).css('left')) - separatorWidth) + 'px');
+            $(pager).prepend(separatorDupe);
           }
-          $(dupe).css('left', (parseInt($(dupe).css('left')) - pager.pagererState.pageWidth - separatorWidth) + 'px');
-          $(pager).prepend(dupe);
-          var pageWidth = $(dupe).outerWidth(true);
-          var pageLeftMargin = pager.pagererState.pageLeftMargin + ((pager.pagererState.pageWidth - pageWidth) / 2);
-          $(dupe).css('margin-left', pageLeftMargin + 'px');
+          $(pageDupe).css('left', (parseInt($(pageDupe).css('left')) - pager.pagererState.pageWidth - separatorWidth) + 'px');
+          $(pager).prepend(pageDupe);
+          pageWidth = $(pageDupe).outerWidth(true);
+          pageLeftMargin = pager.pagererState.pageLeftMargin + ((pager.pagererState.pageWidth - pageWidth) / 2);
+          $(pageDupe).css('margin-left', pageLeftMargin + 'px');
           pager.pagererState.leftOverflow++;
         }
       }
@@ -692,7 +904,9 @@ Drupal.behaviors.pagerer = {
       pagerSeparators = $(pager).find('li.separator');
       var pagerWidth = (pagerPages.length * pager.pagererState.pageWidth) + (pagerSeparators.length * pager.pagererState.separatorWidth);
       $(pager).css('width', pagerWidth + 'px');
-      if (side == PAGERER_LEFT) {
+      // If elements were added on the left side, pager and elements will be
+      // misplaced, so reposition the elements.
+      if (side === PAGERER_LEFT) {
         $(pager).css({
           left: (parseInt($(pager).css('left')) - (pager.pagererState.pageWidth * i) - (pager.pagererState.separatorWidth * i)) + 'px'
         });
@@ -702,20 +916,24 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
-     * Todo.
+     * Scrollpane - Remove pages from the embedded pager.
+     *
+     * Remove 'count' pages and separators on left/right 'side'.
      */
     function scrollpaneRemovePagerElements(pager, side, count) {
+      var pagerPages;
+      var pagerSeparators;
       for (var i = 0; i < count; i++) {
-        var pagerPages =  $(pager).find('li:not(.separator)');
-        var pagerSeparators = $(pager).find('li.separator');
-        if (side == PAGERER_RIGHT) {
+        pagerPages =  $(pager).find('li:not(.separator)');
+        pagerSeparators = $(pager).find('li.separator');
+        if (side === PAGERER_RIGHT) {
           $(pagerPages[pagerPages.length - 1]).remove();
           $(pagerPages[pagerPages.length - 1]).addClass('last');
           if (pagerSeparators.length) {
             $(pagerSeparators[pagerSeparators.length - 1]).remove();
           }
           pager.pagererState.rightOverflow--;
-        } else if (side == PAGERER_LEFT) {
+        } else if (side === PAGERER_LEFT) {
           $(pagerPages[0]).remove();
           $(pagerPages[0]).addClass('first');
           if (pagerSeparators.length) {
@@ -727,7 +945,9 @@ Drupal.behaviors.pagerer = {
       // Resize pager.
       var pagerWidth = ((pagerPages.length - 1) * pager.pagererState.pageWidth) + ((pagerSeparators.length - 1) * pager.pagererState.separatorWidth);
       $(pager).css('width', pagerWidth + 'px');
-      if (side == PAGERER_LEFT) {
+      // If elements were removed on the left side, the remaining ones will
+      // be misplaced wihin the pager, so reposition them.
+      if (side === PAGERER_LEFT) {
         $(pager).css({
           left: (parseInt($(pager).css('left')) + ((pager.pagererState.pageWidth + pager.pagererState.separatorWidth) * count)) + 'px'
         });
@@ -737,7 +957,10 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
-     * Todo.
+     * Scrollpane - Shift the embedded pager elements.
+     *
+     * Shift the elements of the embedded pager by 'count' pages in
+     * left/right 'direction'.
      */
     function scrollpaneShiftPagerElements(pager, direction, count) {
       var pagerElements = $(pager).find('li');
@@ -749,7 +972,14 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
-     * Todo.
+     * Scrollpane - Shift the embedded pager in the viewport.
+     *
+     * Shift the entire pager by 'count' pages in left/right 'direction'.
+     * If 'duration' is set (msec), the shift will be jQuery animated.
+     * A 'complete' callback is executed at completion if set.
+     * Overall pager shift is executed in a jQuery queue, so next action is
+     * dequeued at the end of the call (for execution after the animation
+     * is completed).
      */
     function scrollpaneShiftPager(pager, direction, count, duration, complete) {
       var left = parseInt($(pager).css('left'));
@@ -763,7 +993,7 @@ Drupal.behaviors.pagerer = {
         complete: function() {
           pager.pagererState.leftOverflow -= direction * count;
           pager.pagererState.rightOverflow += direction * count;
-          if (typeof complete != 'undefined') {
+          if (typeof complete !== 'undefined') {
             complete();
           }
           if (pager.pagererState.leftOverflow <= 1 || pager.pagererState.rightOverflow <= 1) {
@@ -771,19 +1001,20 @@ Drupal.behaviors.pagerer = {
               scrollpaneSetButtonState(this);
             });
           }
-          scrollpaneButtonProcessDequeue(pager);
+          scrollpaneScrollRequestDequeue(pager);
         }
       });
-    };
+    }
 
     /**
-     * Todo.
+     * Scrollpane - Set HTML of a page element in the pager.
      */
-    function scrollpaneSetPagerElementHTML(element, pager, targetPage) {
-      if (targetPage == pager.pagererState.current) {
-        $(element[0]).removeClass('pager-item').addClass('pager-current');
-        $(element[0]).text(indexToValue(targetPage, pager.pagererState));
-      } else {
+    function scrollpaneSetPagerElementHTML(element, pager, targetPage, onReady) {
+
+      // onReady will be true if function is invoked at .ready()
+      onReady = onReady || false;
+
+      if (targetPage !== pager.pagererState.current) {
         $(element[0]).removeClass('pager-current').addClass('pager-item');
         var anchor = $(element).find('a');
         if (!anchor.length) {
@@ -791,199 +1022,40 @@ Drupal.behaviors.pagerer = {
           $(element).append('<a></a>');
           anchor = $(element).find('a');
         }
+        // Format hyperlink.
         var path = pager.pagererState.path.replace(/pagererpage/, targetPage);
+        var pageText = indexToValue(targetPage, pager.pagererState);
         anchor[0].href = Drupal.settings.basePath + path;
-        // @todo Drupal.formatString
-        anchor[0].title = Drupal.t('Go to page @number', { '@number': targetPage + 1});
-        $(anchor[0]).text(indexToValue(targetPage, pager.pagererState));
-        if (pager.pagererState.viewsAjaxContext) {
-          attachViewsAjax(anchor[0], 'click', pager.pagererState.viewsAjaxContext, path);
-        }  else if ($(pager).parents('#views-live-preview').length) {
-          // Element is in Views preview context.
-          var base = $(element).attr('id');
-          var element_settings = {
-            'event': 'click',
-            'progress': { 'type': 'throbber' },
-            'url': Drupal.settings.basePath + path,
-            'method': 'html',
-            'wrapper': 'views-live-preview'
-          };
-          Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
+        $(anchor[0]).text(pageText);
+        if (targetPage === 0) {
+          anchor[0].title = Drupal.formatString(pager.pagererState.firstTitle, {'@number': pageText});
+        } else if (targetPage === pager.pagererState.total - 1) {
+          anchor[0].title = Drupal.formatString(pager.pagererState.lastTitle, {'@number': pageText});
+        } else {
+          anchor[0].title = Drupal.formatString(pager.pagererState.pageTitle, {'@number': pageText});
         }
-      }
-    }
-
-    /**
-     * Helper functions
-     */
-
-    /**
-     * Todo.
-     */
-    function indexToValue(index, state) {
-      // @todo formatted formatString
-      switch(state.display) {
-        case 'pages':
-          return index + 1;
-          break;
-
-        case 'items':
-          return (index * state.interval) + 1;
-          break;
-
-        case 'item_ranges':
-          return Drupal.t('@min@separator@max', {
-            '@min': (index * state.interval) + 1,
-            '@separator': state.rangeSeparator,
-            '@max': Math.min(((index + 1) * state.interval), state.totalItems)
-          });
-          break;
-
-      }
-    }
-
-    /**
-     * Todo.
-     */
-    function valueToIndex(value, state) {
-      switch(state.display) {
-        case 'pages':
-          if (isNaN(value)) {
-            return 0;
+        if (!onReady) {
+          // In views, add AJAX where appropriate.
+          if (pager.pagererState.viewsAjaxContext) {
+            // Element is in AJAX enabled view.
+            attachViewsAjax(anchor[0], 'click', pager.pagererState.viewsAjaxContext, path);
+          }  else if ($(pager).parents('#views-live-preview').length) {
+            // Element is in Views preview context.
+            var base = $(element).attr('id');
+            var element_settings = {
+              'event': 'click',
+              'progress': { 'type': 'throbber' },
+              'url': Drupal.settings.basePath + path,
+              'method': 'html',
+              'wrapper': 'views-live-preview'
+            };
+            Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
           }
-          value = parseInt(value);
-          if (value < 1) {
-            return 0;
-          }
-          if (value > state.total) {
-            value = state.total;
-          }
-          return value - 1;
-          break;
-
-        case 'items':
-          if (isNaN(value)) {
-            return 0;
-          }
-          value = parseInt(value);
-          if (value < 1) {
-            return 0;
-          }
-          if (value > state.totalItems) {
-            value = state.totalItems;
-          }
-          return parseInt((value - 1) / state.interval);
-          break;
-
-        case 'item_ranges':
-          var values = value.split(state.rangeSeparator);
-          value = values[0];
-          if (isNaN(value)) {
-            return 0;
-          }
-          value = parseInt(value);
-          if (value < 1) {
-            return 0;
-          }
-          if (value > state.totalItems) {
-            value = state.totalItems;
-          }
-          return parseInt((value - 1) / state.interval);
-          break;
-
-      }
-    }
-
-    /**
-     * Todo.
-     */
-    function pagererReset() {
-      if (state.timeoutAction) {
-        clearTimeout(state.timeoutAction);
-      }
-      $('.pagerer-scrollpane').find('.pager').each(function(index) {
-        var pager = this;
-        $(pager).clearQueue('pagererQueue');
-        $(pager).stop(false, true);
-        pager.pagererState.scrolling = false;
-        pager.pagererState.scrollingDuration = 0;
-        pager.pagererState.fastScrolling = 0;
-      });
-    }
-
-    /**
-     * Relocate client browser to target page.
-     *
-     * Relocation method is decided based on the context of the pager element,
-     * being in order of priority:
-     *  - a AJAX enabled Views context - AJAX is used
-     *  - a Views preview area in a Views settings form - AJAX is used
-     *  - a page rendered through the admin overlay - BBQ is used
-     *  - a normal page - document.location is used
-     */
-    function pagererRelocate(element, ajaxAttachElement, targetPage) {
-      // Check we are not relocating already.
-      if (state.isRelocating) {
-        return false;
-      }
-      state.isRelocating = true;
-
-      // Replace placeholder with page target.
-      var path = element.pagererState.path.replace(/pagererpage/, targetPage);
-
-      // Check if element is in Views AJAX context.
-      var viewsAjaxContext = getViewsAjaxContext(element);
-      if (viewsAjaxContext) {
-        // Element is in Views AJAX context.
-        attachViewsAjax(ajaxAttachElement, 'doViewsAjax', viewsAjaxContext, path);
-        $(ajaxAttachElement).trigger('doViewsAjax');
-
-      } else if ($(element).parents('#views-live-preview').length) {
-        // Element is in Views preview context.
-        var base = $(element).attr('id');
-        var element_settings = {
-          'event': 'doViewsAjax',
-          'progress': { 'type': 'throbber' },
-          'url': Drupal.settings.basePath + path,
-          'method': 'html',
-          'wrapper': 'views-live-preview'
-        };
-        Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
-        $(element).trigger('doViewsAjax');
-
-      } else if (window.Drupal.overlayChild) {
-        // Drupal admin overlay
-        window.parent.jQuery.bbq.pushState({'overlay': path});
-
+        }
       } else {
-        // Normal page
-        document.location = Drupal.settings.basePath + path;
-
-      }
-    };
-
-    /**
-     * Update widget value.
-     */
-    function widgetOffsetValue(element, offset) {
-      var widgetValue = valueToIndex($(element).val(), element.pagererState);
-      var newValue = widgetValue + offset;
-      if (newValue < 0) {
-        newValue = 0;
-      } else if (newValue >= element.pagererState.total) {
-        newValue = element.pagererState.total - 1;
-      }
-      $(element).val(indexToValue(newValue, element.pagererState));
-    };
-
-    /**
-     * Update slider value.
-     */
-    function sliderOffsetValue(element, offset) {
-      var newValue = $(element).slider('option', 'value') + offset;
-      var maxValue = $(element).slider('option', 'max');
-      if (newValue >= 0 && newValue <= maxValue) {
-        $(element).slider('option', 'value', newValue);
+        // Current page has its own class, and no href.
+        $(element[0]).removeClass('pager-item').addClass('pager-current');
+        $(element[0]).text(indexToValue(targetPage, pager.pagererState));
       }
     }
 
@@ -1020,7 +1092,7 @@ Drupal.behaviors.pagerer = {
       var ajax_path = Drupal.settings.views.ajax_path;
 
       // If there are multiple views this might've ended up showing up multiple times.
-      if (ajax_path.constructor.toString().indexOf('Array') != -1) {
+      if (ajax_path.constructor.toString().indexOf('Array') !== -1) {
         ajax_path = ajax_path[0];
       }
 

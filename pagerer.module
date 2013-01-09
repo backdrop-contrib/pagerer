@@ -232,8 +232,10 @@ function _pagerer_pane_settings_form_title($pane) {
   switch ($pane) {
     case 'left':
       return t("Left pane settings");
+
     case 'center':
       return t("Center pane settings");
+
     case 'right':
       return t("Right pane settings");
   }
@@ -251,7 +253,7 @@ function _pagerer_pane_settings_form_title($pane) {
  * @param string $module
  *   module name
  *
- * @return boolean
+ * @return bool
  *   TRUE = override safe; FALSE = theme blocked by some other module
  */
 function _pagerer_theme_override_safe($theme_registry, $theme, $function, $module) {
@@ -1332,11 +1334,11 @@ function _pagerer_get_neighborhood_pages($variables, $markers) {
  *   precalculated markers for the pager
  * @param array   $pages
  *   array of pages already enlisted, to prevent override
- * @param integer $scale_factor
+ * @param int $scale_factor
  *   scale factor to be used in the progressive series
- * @param integer $ratio
+ * @param int $ratio
  *   ratio to be used in the progressive series
- * @param integer $limit
+ * @param int $limit
  *   (optional) to be used to limit the quantity of pages enlisted
  *
  * @return array
@@ -1390,11 +1392,11 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
  *   precalculated markers for the pager
  * @param array   $pages
  *   array of pages already enlisted, to prevent override
- * @param integer $l
+ * @param int $l
  *   adaptive lock to left page
- * @param integer $r
+ * @param int $r
  *   adaptive lock to right page
- * @param integer $x
+ * @param int $x
  *   adaptive center lock for neighborhood
  *
  * @return array
@@ -1443,7 +1445,7 @@ function _pagerer_get_adaptive_pages($variables, $markers, &$pages, $l, $r, $x) 
  *   theme's variables
  * @param array   $markers
  *   precalculated markers for the pager
- * @param integer $offset
+ * @param int $offset
  *   offset of page to be rendered, from current page
  * @param string  $page_tag
  *   page tag [page|first|previous|next|last]
@@ -1541,16 +1543,13 @@ function _pagerer_get_page_tag($variables) {
   switch ($variables['display']) {
     case 'item_ranges':
       return $variables['tags']['item_range_label'];
-      break;
 
     case 'items':
       return $variables['tags']['item_label'];
-      break;
 
     case 'pages':
     default:
       return $variables['tags']['page_label'];
-      break;
   }
 }
 
@@ -1573,12 +1572,11 @@ function _pagerer_get_total($variables, $markers) {
     case 'items':
     case 'item_ranges':
       return $markers['pager_item_max'];
-      break;
 
     case 'pages':
     default:
       return $markers['pager_max'];
-      break;
+
   }
 }
 
@@ -1668,6 +1666,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     'display'        => $variables['display'],
     'pagerSeparator' => $variables['pager_separator'],
     'rangeSeparator' => $variables['range_separator'],
+    'pageTag'        => $variables['tags']['page'],
   );
   switch ($element_type) {
     case 'widget':
@@ -1936,7 +1935,7 @@ function _pagerer_browser_info($agent = NULL) {
 
   // Get the version number.
   $known = array('Version', $ub, 'other');
-  $pattern = '#(?<browser>' . join('|', $known) . ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
+  $pattern = '#(?<browser>' . implode('|', $known) . ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
   if (!preg_match_all($pattern, $agent, $matches)) {
     // We have no matching number just continue.
   }

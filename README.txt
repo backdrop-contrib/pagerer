@@ -324,7 +324,7 @@ the corresponding element.
   'Go to previous page').
 - next_title: Help text used when hovering a next page link (e.g. 'Go to
   next page').
-- last_title: Help text used when hovering a next page link (e.g. 'Go to
+- last_title: Help text used when hovering a last page link (e.g. 'Go to
   last page').
 
 - widget_title: Help text used when hovering the direct input widget (e.g.
