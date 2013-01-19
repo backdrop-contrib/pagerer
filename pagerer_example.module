@@ -125,17 +125,11 @@ function pagerer_example_page() {
 
   // Attach the pager themes.
   $build['l_pager_pager_0'] = array('#markup' => '<b>' . t("Drupal standard 'pager' theme:") . '</b>');
-  if ($vars['pagerer_override_pager']) {
-    $build['pager_pager_0'] = array(
-      '#markup' => '<br/>' . t("Drupal standard 'pager' theme is <a href='@url'>configured</a> to be overridden by 'pagerer' theme (see below)", array('@url' => url('admin/config/user-interface/pagerer'))) . '<br/>',
-    );
-  }
-  else {
-    $build['pager_pager_0'] = array(
-      '#theme' => 'pager',
-      '#element' => 0,
-    );
-  }
+  $build['pager_pager_0'] = array(
+    '#theme' => 'pagerer',
+    '#preset' => 'core',
+    '#element' => 0,
+  );
   $build['l_pagerer_standard_0'] = array('#markup' => '<br/>' . t("<b>'pagerer_standard' pager theme (mimick of Drupal's standard)</b> in three 'display' modes: 'pages', 'items', and 'item_ranges'"));
   $build['pagerer_standard_pages_0'] = array(
     '#theme' => 'pagerer_standard',
@@ -184,12 +178,10 @@ function pagerer_example_page() {
     '#element' => 0,
   );
 
-  $build['l_pagerer_pagerer_0'] = array('#markup' => '<br/><b>' . t("'pagerer' (configured) theme:") . '</b>');
+  $build['l_pagerer_pagerer_0'] = array('#markup' => '<br/><b>' . t("'pagerer' core replacement theme:") . '</b>');
   $build['pagerer_pagerer_0'] = array(
     '#theme' => 'pagerer',
-    '#left_pane' => $vars['left_pane'],
-    '#center_pane' => $vars['center_pane'],
-    '#right_pane' => $vars['right_pane'],
+    '#preset' => $vars['pagerer_override_pager'],
     '#element' => 0,
   );
 
@@ -219,12 +211,10 @@ function pagerer_example_page() {
       '#element' => 1,
     );
   }
-  $build['l_pagerer_pagerer_1'] = array('#markup' => '<br/><b>' . t("'pagerer' (configured) theme:") . '</b>');
+  $build['l_pagerer_pagerer_1'] = array('#markup' => '<br/><b>' . t("'pagerer' core replacement theme:") . '</b>');
   $build['pagerer_pagerer_1'] = array(
     '#theme' => 'pagerer',
-    '#left_pane' => $vars['left_pane'],
-    '#center_pane' => $vars['center_pane'],
-    '#right_pane' => $vars['right_pane'],
+    '#preset' => $vars['pagerer_override_pager'],
     '#element' => 1,
   );
   $build['l_pagerer_pagerer_direct_1'] = array('#markup' => '<br/><b>' . t("'pagerer' (direct call from module) theme:") . '</b> ' . t("Note the usage of the 'tags' variables to customise labels and hover titles."));
@@ -310,12 +300,10 @@ function pagerer_example_page() {
       '#element' => 2,
     );
   }
-  $build['l_pagerer_pagerer_2'] = array('#markup' => '<br/><b>' . t("'pagerer' (configured) theme:") . '</b>');
+  $build['l_pagerer_pagerer_2'] = array('#markup' => '<br/><b>' . t("'pagerer' core replacement theme:") . '</b>');
   $build['pagerer_pagerer_2'] = array(
     '#theme' => 'pagerer',
-    '#left_pane' => $vars['left_pane'],
-    '#center_pane' => $vars['center_pane'],
-    '#right_pane' => $vars['right_pane'],
+    '#preset' => $vars['pagerer_override_pager'],
     '#element' => 2,
   );
 

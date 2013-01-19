@@ -23,6 +23,7 @@ Features:
 - control whether to display links to pages, to items, or to item ranges
 - direct input of the page to go to through an input widget
 - selection of the page to go to through a jQuery slider
+- selection of the page to go to through a client-side scrolling pager
 - links to progressively more distant pages (like +10, + 20, +100, +200)
 - adaptive logic links
 - specify text to be used to render page separators (like a vertical bar)
@@ -37,6 +38,8 @@ pagerer_progressive - provides links to pages progressively more distant
 pagerer_adaptive - provides links to pages following an adaptive logic
 pagerer_mini - minimal pager, providing direct page entry
                (requires jQuery Update module)
+pagerer_scrollpane - provides page navigation through a scrolling pager
+                     (requires jQuery Update module)
 pagerer_slider - provides page navigation through a jQuery UI slider
                  (requires jQuery Update module)
 pagerer - a multi-pane (left, center, and right) pager theme, enabling
@@ -45,7 +48,8 @@ pagerer - a multi-pane (left, center, and right) pager theme, enabling
 Requirements:
 -------------
 - Drupal 7
-- jQuery update module (only for the pagerer_mini and pagerer_slider themes)
+- jQuery update module (for pagerer_mini, pagerer_scrollpane and pagerer_slider
+  themes)
 - for Microsoft Internet Explorer browsers, the pagerer_slider theme requires
   IE 9+
 
@@ -183,9 +187,15 @@ page 9 out of 955, total items = 47731, limit = 50, display = 'items':
 << < Item 401 of 47731 > >>
 -----------------------------------------------------------
 
+theme_pagerer_scrollpane
+------------------------
+This theme displays a standard pager that is scrollable on the browser
+through navigation buttons. Users can get to any page without having
+to send request to the server.
+
 theme_pagerer_slider
 --------------------
-This theme displays a jquery slider. Page navigation is managed via
+This theme displays a jQuery slider. Page navigation is managed via
 javascript.
 
 
@@ -214,7 +224,7 @@ Drupal core pager theme variables.
 - current_display: Determines how the current page is rendered in the pager.
   Options are "none" (not displayed), "normal" (as a text), "widget" (an active
   input box from where users can enter directly a page to go to), "slider"
-  (as a jQuery slider).
+  (as a slider), "scrollpane" (as a scrolling pane embedding a full pager).
 - total_display: Determines whether and where to render a text element
   indicating the total pages (or items). Options are "none" (not
   displayed), "after_current" (just after current page), "first" (at the
@@ -267,13 +277,19 @@ pagerer theme variables
 
 The 'pagerer' theme itself is more a container of individual
 pagerer_xxxx themes. The theme to be used in each pane (left, center,
-and right) and its variables are passed to a {position}_pane variable of
-the pagerer theme.
+and right) and its variables are either retrieved from a defined preset
+through the 'preset' variable, or passed to a {position}_pane variable
+of the pagerer theme.
 
 - element: same as Drupal, an optional integer to distinguish between
   multiple pagers on one page.
 - parameters: same as Drupal, an associative array of query string parameters
   to append to the pager links.
+- preset: (optional) specifies the preset pager configuration, created through
+  Pagerer's admin UI, to be used to render the pager. If not specified,
+  {position}_pane variables are to be passed. Also, any {position}_pane
+  variables will override the preset configuration, if specified along this
+  variable.
 - {position}_pane: where {position} is 'left'|'center'|'right', an associative
   array of
     - theme_name: 'pagerer_standard' |'pagerer_progressive' |

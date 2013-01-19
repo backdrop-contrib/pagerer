@@ -59,3 +59,34 @@ function pagerer_update_7100() {
   }
   variable_set('pagerer', $vars);
 }
+
+/**
+ * Prepare Pagerer variables for 7.x-1.1.
+ */
+function pagerer_update_7101() {
+  // Split 7.x-1.0 pagerer variable.
+  $vars = _pagerer_get_variables();
+  $core_replace = array();
+  if (isset($vars['left_pane'])) {
+    $core_replace['left_pane'] = $vars['left_pane'];
+  }
+  if (isset($vars['center_pane'])) {
+    $core_replace['center_pane'] = $vars['center_pane'];
+  }
+  if (isset($vars['right_pane'])) {
+    $core_replace['right_pane'] = $vars['right_pane'];
+  }
+  variable_set('pagerer.preset.core_replace', $core_replace);
+  unset(
+    $vars['left_pane'],
+    $vars['center_pane'],
+    $vars['right_pane']
+  );
+  if ($vars['pagerer_override_pager']) {
+    $vars['pagerer_override_pager'] = 'core_replace';
+  }
+  else {
+    $vars['pagerer_override_pager'] = 'core';
+  }
+  variable_set('pagerer', $vars);
+}

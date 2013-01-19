@@ -137,3 +137,6 @@ table.pagerer_admin_panes_config tbody tr td {
   margin: 0;
   padding: 0;
 }
+table.pagerer-admin-preset-list td.pagerer-admin-preset-preview {
+  font-size: 70%;
+}

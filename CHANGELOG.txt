@@ -1,6 +1,6 @@
 Pagerer 7.x-1.1-xxxx, xxxx-xx-xx
 --------------------------------
-- Issue #1870586 by mondrake: Implemented theme 'pagerer_scrolpane'
+- Issue #1870586 by mondrake: Implemented theme 'pagerer_scrollpane'.
   introducing a jQuery scrolling pager.
 - Issue #1870586 by mondrake: Make automatic widget width resizing optional.
 - Issue #1858410 by mondrake: code cleanup.
