@@ -296,6 +296,27 @@ function pagerer_theme_registry_alter(&$theme_registry) {
 }
 
 /**
+ * Implements hook_views_plugins().
+ *
+ * Pagerer provides a pager plugin for Views, that enables selecting a
+ * preset to render pagers.
+ */
+function pagerer_views_plugins() {
+  return array(
+    'pager' => array(
+      'pagerer' => array(
+        'title' => t('Paged output, Pagerer'),
+        'short title' => t('Pagerer'),
+        'handler' => 'pagerer_views_pager_plugin',
+        'help' => t('Paged output, Pagerer'),
+        'help topic' => 'pager-pagerer',
+        'uses options' => TRUE,
+      ),
+    ),
+  );
+}
+
+/**
  * Title callback for pagerer_preset_form().
  */
 function _pagerer_preset_form_title($preset_name) {

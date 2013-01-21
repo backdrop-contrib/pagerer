@@ -1,16 +1,20 @@
 Pagerer
 =======
 
-Pagerer is a module providing a collection of pager themes to enhance
-Drupal standard pager.
+Pagerer is a module providing a collection of pager themes to enhance Drupal
+standard pager.
 
-The most straightforward usage is to display on a page a pager that is
-made up of three 'panes' (left, center, and right); and each pane
-contains (or not) a pager theme, so providing plenty of possibilities to
-combine different elements to satisfy complex requirements. Pagerer's
-configuration provides an easy way to setup the pager according to the
-needs, and allows as well to override Drupal's core pager so that
-Pagerer's capabilities can be activated on a site by an administrator.
+Administrators can preset multiple pager configurations, where each preset
+allows a pager to be made up of three 'panes' (left, center, and right);
+and each pane contains (or not) a pager theme, so providing plenty of
+possibilities to combine different elements to satisfy complex requirements.
+
+Pagerer allows to override Drupal's core pager with any of the preset
+configurations.
+
+Pagerer also provides a pager plugin for Views, allowing to use any of the
+preset pagers within any view.
+
 Pagerer uses standard Drupal pager classes to render the pagers, so
 styling is preserved.
 
@@ -20,6 +24,7 @@ allowing even more complex scenarios.
 Features:
 ---------
 - multi-pane pager
+- Views pager plugin
 - control whether to display links to pages, to items, or to item ranges
 - direct input of the page to go to through an input widget
 - selection of the page to go to through a jQuery slider
@@ -48,15 +53,24 @@ pagerer - a multi-pane (left, center, and right) pager theme, enabling
 Requirements:
 -------------
 - Drupal 7
+- the Views pager plugin integrates with Views 3
 - jQuery update module (for pagerer_mini, pagerer_scrollpane and pagerer_slider
   themes)
-- for Microsoft Internet Explorer browsers, the pagerer_slider theme requires
-  IE 9+
+- for Microsoft Internet Explorer browsers, the pagerer_slider and
+  pagerer_scrollpane themes require IE 9+
 
 Instructions:
 -------------
 - Install and enable the module.
 - Check the Configuration page to setup.
+
+Views pager plugin:
+-------------------
+The pager plugin for Views introduces a new 'Paged output, Pagerer' option in
+the list of possible pagers to be used for a view.
+It behaves like a 'full pager', with the additional option to select the
+Pagerer preset to be used for rendering the pager - so that every view could
+use a different preset, but also many views could use the same preset.
 
 Credits:
 --------
