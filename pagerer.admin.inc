@@ -122,7 +122,10 @@ function pagerer_settings_form_submit($form, &$form_state) {
  * Including links to edit and delete operations.
  */
 function theme_pagerer_preset_list() {
-  $header = array(t('Preset name'), t('Preview'), array('data' => t('Operations'), 'colspan' => 2));
+  $header = array(
+    t('Preset name'),
+    t('Preview'), array('data' => t('Operations'), 'colspan' => 2)
+  );
   $rows = array();
   foreach (_pagerer_list_presets() as $key => $value) {
     $row = array();
@@ -136,10 +139,15 @@ function theme_pagerer_preset_list() {
     $rows[] = $row;
   }
   if (empty($rows)) {
-    $rows[] = array(array(
-      'colspan' => 4,
-      'data' => t('There are currently no presets. <a href="!url">Add a new one</a>.', array('!url' => url(_PAGERER_CONFIG_PATH . '/add'))),
-    ));
+    $rows[] = array(
+      array(
+        'colspan' => 4,
+        'data' => t(
+          'There are currently no presets. <a href="!url">Add a new one</a>.',
+          array('!url' => url(_PAGERER_CONFIG_PATH . '/add'))
+        ),
+      )
+    );
   }
   return theme(
     'table',
@@ -380,12 +388,12 @@ function pagerer_preset_form_submit($form, &$form_state) {
     $pane = $e[1];
     $form_state['redirect'] = _PAGERER_CONFIG_PATH . '/edit/' . $preset_name . '/' . $pane;
   }
-  else if (strpos($trigger, 'reset', 0) === 0) {
+  elseif (strpos($trigger, 'reset', 0) === 0) {
     $e = explode('_', $trigger);
     $pane = $e[1];
     $form_state['redirect'] = _PAGERER_CONFIG_PATH . '/edit/' . $preset_name . '/' . $pane . '/reset';
   }
-  else if ($trigger == 'save') {
+  elseif ($trigger == 'save') {
     drupal_set_message(t('Preset %preset has been saved.', array('%preset' => $preset_name)), 'status');
   }
   else {
@@ -413,7 +421,8 @@ function pagerer_preset_add_form($form, &$form_state) {
     t('Add preset'),
     _PAGERER_CONFIG_PATH,
     '',
-    t('Create preset'),  t('Cancel')
+    t('Create preset'),
+    t('Cancel')
   );
 }
 
@@ -460,7 +469,8 @@ function pagerer_preset_delete_form($form, &$form_state) {
     t('Delete preset %preset', array('%preset' => $preset_name)),
     _PAGERER_CONFIG_PATH,
     t('Are you sure you want to delete preset %preset ?', array('%preset' => $preset_name)),
-    t('Delete'),  t('Cancel')
+    t('Delete'),
+    t('Cancel')
   );
 }
 
@@ -819,7 +829,8 @@ function pagerer_pane_theme_reset_form($form, &$form_state) {
         '%theme' => $theme_name,
       )
     ),
-    t('Reset'),  t('Cancel')
+    t('Reset'),
+    t('Cancel')
   );
 }
 

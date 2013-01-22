@@ -11,7 +11,7 @@
  * @author   mondrake <mondrake@mondrake.org>
  */
 
-define ('_PAGERER_CONFIG_PATH', 'admin/config/user-interface/pagerer');
+define('_PAGERER_CONFIG_PATH', 'admin/config/user-interface/pagerer');
 
 /**
  * Implements hook_help().
@@ -62,7 +62,7 @@ function pagerer_menu() {
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'pagerer.admin.inc',
   );
-   $items[_PAGERER_CONFIG_PATH . '/delete/%'] = array(
+  $items[_PAGERER_CONFIG_PATH . '/delete/%'] = array(
     'title' => 'Delete preset',
     'description' => 'Delete a preset pager.',
     'page callback' => 'drupal_get_form',
@@ -91,7 +91,7 @@ function pagerer_menu() {
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
     'file' => 'pagerer.admin.inc',
   );
- return $items;
+  return $items;
 }
 
 /**
@@ -307,7 +307,7 @@ function pagerer_views_plugins() {
       'pagerer' => array(
         'title' => t('Paged output, Pagerer'),
         'short title' => t('Pagerer'),
-        'handler' => 'pagerer_views_pager_plugin',
+        'handler' => 'PagererViewsPagerPlugin',
         'help' => t('Paged output, Pagerer'),
         'help topic' => 'pager-pagerer',
         'uses options' => TRUE,
@@ -590,7 +590,15 @@ function theme_pagerer($variables) {
     $preset = array();
   }
   // Get core variables.
-  $core_vars = array_intersect_key($variables, array('tags' => NULL, 'element' => NULL, 'parameters' => NULL, 'quantity' => NULL));
+  $core_vars = array_intersect_key(
+    $variables,
+    array(
+      'tags' => NULL,
+      'element' => NULL,
+      'parameters' => NULL,
+      'quantity' => NULL
+    )
+  );
   // Get rendered panes.
   $panes = array();
   foreach (array('left', 'center', 'right') as $p) {
@@ -598,7 +606,7 @@ function theme_pagerer($variables) {
     if (isset($preset[$pane_key]['theme_name'])) {
       $theme_name = $preset[$pane_key]['theme_name'];
     }
-    else if (!isset($variables[$pane_key]['theme_name'])) {
+    elseif (!isset($variables[$pane_key]['theme_name'])) {
       switch ($p) {
         case 'left':
         case 'right':
@@ -1668,7 +1676,7 @@ function _pagerer_get_page_tag($variables) {
  * @param array $markers
  *   precalculated markers for the pager
  *
- * @return integer
+ * @return int
  *   total number of pages or items in the pager
  */
 function _pagerer_get_total($variables, $markers) {

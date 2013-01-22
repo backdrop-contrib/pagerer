@@ -94,34 +94,42 @@ Drupal.behaviors.pagerer = {
           event.stopPropagation();
           event.preventDefault();
           return false;
+
         case 27:
           // Escape.
           $(this).val(indexToValue(this.pagererState.current, this.pagererState));
           return false;
+
         case 38:
           // Up.
           widgetOffsetValue(this, -1);
           return false;
+
         case 40:
           // Down.
           widgetOffsetValue(this, 1);
           return false;
+
         case 33:
           // Page up.
           widgetOffsetValue(this, -5);
           return false;
+
         case 34:
           // Page down.
           widgetOffsetValue(this, 5);
           return false;
+
         case 35:
           // End.
            $(this).val(indexToValue(this.pagererState.total - 1, this.pagererState));
           return false;
+
         case 36:
           // Home.
            $(this).val(1);
           return false;
+
       }
     });
 
@@ -304,7 +312,7 @@ Drupal.behaviors.pagerer = {
       var viewport = $(this).find('.item-list');
       var pager = $(this).find('.pager').get(0);
       var pagerElements = $(pager).find('li');
-      var pagerPages =  $(pager).find('li:not(.separator)');
+      var pagerPages = $(pager).find('li:not(.separator)');
       var pagerSeparators = $(pager).find('li.separator');
 
       // Attach state variables to the wrapped pager.
@@ -685,7 +693,7 @@ Drupal.behaviors.pagerer = {
           scrollpaneScrollRequestEnqueue(pager, scope, scrollpaneGetScrollDuration(pager));
         }
 
-        var pagerPages =  $(pager).find('li:not(.separator)');
+        var pagerPages = $(pager).find('li:not(.separator)');
         var first = valueToIndex($(pagerPages[0]).text(), pager.pagererState);
         var last = valueToIndex($(pagerPages[pagerPages.length - 1]).text(), pager.pagererState);
         var addedElements;
@@ -851,7 +859,7 @@ Drupal.behaviors.pagerer = {
       var separatorDupe;
 
       for (var i = 0; i < count; i++) {
-        pagerPages =  $(pager).find('li:not(.separator)');
+        pagerPages = $(pager).find('li:not(.separator)');
         pagerSeparators = $(pager).find('li.separator');
 
         // If we have separators, prepare dupe and set width.
@@ -900,7 +908,7 @@ Drupal.behaviors.pagerer = {
         }
       }
       // Resize pager.
-      pagerPages =  $(pager).find('li:not(.separator)');
+      pagerPages = $(pager).find('li:not(.separator)');
       pagerSeparators = $(pager).find('li.separator');
       var pagerWidth = (pagerPages.length * pager.pagererState.pageWidth) + (pagerSeparators.length * pager.pagererState.separatorWidth);
       $(pager).css('width', pagerWidth + 'px');
@@ -924,7 +932,7 @@ Drupal.behaviors.pagerer = {
       var pagerPages;
       var pagerSeparators;
       for (var i = 0; i < count; i++) {
-        pagerPages =  $(pager).find('li:not(.separator)');
+        pagerPages = $(pager).find('li:not(.separator)');
         pagerSeparators = $(pager).find('li.separator');
         if (side === PAGERER_RIGHT) {
           $(pagerPages[pagerPages.length - 1]).remove();

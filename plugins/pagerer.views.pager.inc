@@ -16,17 +16,33 @@
  * the Pagerer preset to use for rendering the pager, and removes the options
  * to define the text tags.
  */
-class pagerer_views_pager_plugin extends views_plugin_pager_full {
+class PagererViewsPagerPlugin extends views_plugin_pager_full {
 
   /**
-   * Return a string to display as the clickable title for the
-   * pager plugin.
+   * Return a string to display as the clickable title.
    */
-  function summary_title() {
+  public function summary_title() {
     if (!empty($this->options['offset'])) {
-      return format_plural($this->options['items_per_page'], "Using preset <em>@preset</em>, @count item, skip @skip", "Using preset <em>@preset</em>, @count items, skip @skip", array('@preset' => $this->options['preset'], '@count' => $this->options['items_per_page'], '@skip' => $this->options['offset']));
+      return format_plural(
+        $this->options['items_per_page'],
+        "Using preset %preset, @count item, skip @skip",
+        "Using preset %preset, @count items, skip @skip",
+        array(
+          '%preset' => $this->options['preset'],
+          '@count' => $this->options['items_per_page'],
+          '@skip' => $this->options['offset']
+        )
+      );
     }
-    return format_plural($this->options['items_per_page'], "Using preset <em>@preset</em>, @count item", "Using preset <em>@preset</em>, @count items", array('@preset' => $this->options['preset'], '@count' => $this->options['items_per_page']));
+    return format_plural(
+      $this->options['items_per_page'],
+      "Using preset %preset, @count item",
+      "Using preset %preset, @count items",
+      array(
+        '%preset' => $this->options['preset'],
+        '@count' => $this->options['items_per_page']
+      )
+    );
   }
 
   /**
@@ -35,7 +51,7 @@ class pagerer_views_pager_plugin extends views_plugin_pager_full {
    * Same as parent, plus preset. Tags are left even if the options form
    * will not present them, as tags in Pagerer are different than in core.
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['preset'] = array('default' => 'core');
     return $options;
@@ -46,7 +62,7 @@ class pagerer_views_pager_plugin extends views_plugin_pager_full {
    *
    * Same as parent, plus preset, less tags.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     $preset_options = array(
       t('Default:') => array('core' => t('Use Drupal core pager')),
       t('Replace with:') => _pagerer_list_presets(),
@@ -65,11 +81,11 @@ class pagerer_views_pager_plugin extends views_plugin_pager_full {
   /**
    * Render the pager, using theme('pagerer', ...).
    *
-   * @param $input
+   * @param array $input
    *   Any extra GET parameters that should be retained, such as exposed
    *   input.
    */
-  function render($input) {
+  public function render($input) {
     $pager_theme = views_theme_functions('pagerer', $this->view, $this->display);
     $output = theme($pager_theme, array(
       'preset' => $this->options['preset'],
