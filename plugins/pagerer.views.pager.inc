@@ -30,7 +30,7 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
         array(
           '%preset' => $this->options['preset'],
           '@count' => $this->options['items_per_page'],
-          '@skip' => $this->options['offset']
+          '@skip' => $this->options['offset'],
         )
       );
     }
@@ -40,7 +40,7 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
       "Using preset %preset, @count items",
       array(
         '%preset' => $this->options['preset'],
-        '@count' => $this->options['items_per_page']
+        '@count' => $this->options['items_per_page'],
       )
     );
   }

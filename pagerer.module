@@ -596,7 +596,7 @@ function theme_pagerer($variables) {
       'tags' => NULL,
       'element' => NULL,
       'parameters' => NULL,
-      'quantity' => NULL
+      'quantity' => NULL,
     )
   );
   // Get rendered panes.

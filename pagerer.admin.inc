@@ -124,7 +124,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
 function theme_pagerer_preset_list() {
   $header = array(
     t('Preset name'),
-    t('Preview'), array('data' => t('Operations'), 'colspan' => 2)
+    t('Preview'), array('data' => t('Operations'), 'colspan' => 2),
   );
   $rows = array();
   foreach (_pagerer_list_presets() as $key => $value) {
@@ -146,7 +146,7 @@ function theme_pagerer_preset_list() {
           'There are currently no presets. <a href="!url">Add a new one</a>.',
           array('!url' => url(_PAGERER_CONFIG_PATH . '/add'))
         ),
-      )
+      ),
     );
   }
   return theme(
