@@ -1,5 +1,5 @@
-Pagerer 7.x-1.1-xxxx, xxxx-xx-xx
---------------------------------
+Pagerer 7.x-1.1-beta1, 2013-01-26
+---------------------------------
 - Issue #1894474 by mondrake: Implemented a Views pager plugin.
 - Issue #1890978 by mondrake: Implemented pager configuration presets.
 - Issue #1870586 by mondrake: Implemented theme 'pagerer_scrollpane'.
