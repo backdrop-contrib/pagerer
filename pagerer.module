@@ -11,6 +11,9 @@
  * @author   mondrake <mondrake@mondrake.org>
  */
 
+/**
+ * Path to Pagerer administration menu.
+ */
 define('_PAGERER_CONFIG_PATH', 'admin/config/user-interface/pagerer');
 
 /**
@@ -98,9 +101,11 @@ function pagerer_menu() {
  * Implements hook_theme().
  */
 function pagerer_theme() {
-  $vars = _pagerer_get_variables();
   $common_theme = drupal_common_theme();
   $theme = array(
+    'pagerer_link' => array(
+      'variables' => $common_theme['pager_link']['variables'],
+    ),
     'pagerer' => array(
       'variables' => array(
         'element'         => $common_theme['pager']['variables']['element'],
@@ -134,6 +139,29 @@ function pagerer_theme() {
         'pager_separator'         => 'none',
         'range_separator'         => '-',
         'fl_breakers'             => TRUE,
+        'widget_resize'           => TRUE,
+        'slider_action'           => 'tickmark',
+        'slider_action_timelapse' => 0,
+        'slider_navigation_icons' => 'yes',
+      ),
+    ),
+    'pagerer_adaptive' => array(
+      'variables' => array(
+        'element'                 => $common_theme['pager']['variables']['element'],
+        'parameters'              => $common_theme['pager']['variables']['parameters'],
+        'quantity'                => 5,
+        'display'                 => 'pages',
+        'label_display'           => 'none',
+        'current_display'         => 'normal',
+        'total_display'           => 'none',
+        'first_link'              => 'never',
+        'previous_link'           => 'never',
+        'next_link'               => 'never',
+        'last_link'               => 'never',
+        'progr_links'             => 'relative',
+        'pager_breaker'           => '…',
+        'pager_separator'         => 'none',
+        'range_separator'         => '-',
         'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
@@ -239,60 +267,24 @@ function pagerer_theme() {
       'file' => 'pagerer.admin.inc',
     ),
   );
-  if ($vars['pagerer_enable_adaptive']) {
-    $theme['pagerer_adaptive'] = array(
-      'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => 5,
-        'display'                 => 'pages',
-        'label_display'           => 'none',
-        'current_display'         => 'normal',
-        'total_display'           => 'none',
-        'first_link'              => 'never',
-        'previous_link'           => 'never',
-        'next_link'               => 'never',
-        'last_link'               => 'never',
-        'progr_links'             => 'relative',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
-        'slider_action_timelapse' => 0,
-        'slider_navigation_icons' => 'yes',
-      ),
-    );
-  }
   return $theme;
 }
 
 /**
  * Implements hook_theme_registry_alter().
  *
- * Pagerer replaces the theme_pager function defined in theme registry with
- * _pagerer_override_theme_pager() and stores the overriden function
- * whereabouts in its configuration variable, so it can be called when needed.
+ * Pagerer replaces the theme_pager function defined in the theme registry
+ * with its own internal function, and stores the overriden function
+ * whereabouts in a cache entry, so it can be called when needed.
  */
 function pagerer_theme_registry_alter(&$theme_registry) {
-  $vars = _pagerer_get_variables();
-  // Replace the built-in pagers only if appropriate options are set and
-  // the theme hooks are not already overridden.
-  if (_pagerer_theme_override_safe($theme_registry, 'pager', 'theme_pager', 'system')) {
-    $vars['overridden_pager']['theme path'] = $theme_registry['pager']['theme path'];
-    $vars['overridden_pager']['function'] = $theme_registry['pager']['function'];
-    $theme_registry['pager']['theme path'] = drupal_get_path('module', 'pagerer');
-    $theme_registry['pager']['function'] = '_pagerer_override_theme_pager';
-  }
-  else {
-    unset($vars['overridden_pager']);
-  }
-  if ($vars['pagerer_enable_adaptive']
-      and _pagerer_theme_override_safe($theme_registry, 'pager_link', 'theme_pager_link', 'system')) {
-    $theme_registry['pager_link']['theme path'] = drupal_get_path('module', 'pagerer');
-    $theme_registry['pager_link']['function'] = '_pagerer_override_theme_pager_link';
-  }
-  _pagerer_set_variables($vars);
+  global $theme_key;
+  // Stores away details of the overriden function.
+  cache_set('pagerer_override:' . $theme_key . ':pager', $theme_registry['pager']);
+  // Override the theme callback in the registry.
+  $theme_registry['pager']['type'] = 'module';
+  $theme_registry['pager']['theme path'] = drupal_get_path('module', 'pagerer');
+  $theme_registry['pager']['function'] = '_pagerer_override_theme_pager';
 }
 
 /**
@@ -337,42 +329,6 @@ function _pagerer_preset_pane_form_title($preset_name, $pane) {
     case 'right':
       return t("@preset - right pane settings", array('@preset' => $preset_name));
 
-  }
-}
-
-/**
- * Checks if standard pager theme can be safely taken over by pagerer module.
- *
- * @param array  $theme_registry
- *   Drupal theme registry from pagerer_theme_registry_alter()
- * @param string $theme
- *   theme name
- * @param string $function
- *   function name
- * @param string $module
- *   module name
- *
- * @return bool
- *   TRUE = override safe; FALSE = theme blocked by some other module
- */
-function _pagerer_theme_override_safe($theme_registry, $theme, $function, $module) {
-  if (($theme_registry[$theme]['function'] == $function and $theme_registry[$theme]['theme path'] == drupal_get_path('module', $module))
-      or $theme_registry[$theme]['theme path'] == drupal_get_path('module', 'pagerer')) {
-    return TRUE;
-  }
-  else {
-    drupal_set_message(
-      t("The '!theme' theme is currently overridden by '!function' from '!path'. Remove overrides to Drupal core pager themes by disabling affecting modules/templates to enable Pagerer.",
-        array(
-          '!theme'    => $theme,
-          '!function' => isset($theme_registry[$theme]['function']) ? $theme_registry[$theme]['function'] . '()' : $theme_registry[$theme]['template'] . '.tpl.php',
-          '!path'     => $theme_registry[$theme]['theme path'],
-        )
-      ),
-      'warning',
-      FALSE
-    );
-    return FALSE;
   }
 }
 
@@ -480,10 +436,8 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
  * configuration setup in the pagerer variable via admin.
  */
 function _pagerer_override_theme_pager($v) {
-  // Get Pagerer configuration.
-  $config_vars = _pagerer_get_variables();
   // If configured to use core pager, call it and return straight away.
-  if ($config_vars['pagerer_override_pager'] == 'core') {
+  if (_pagerer_get_variable('core_override_preset') == 'core') {
     return _pagerer_execute_overriden_theme_pager($v);
   }
   // Pass incoming and configuration variables to 'pagerer' theme $variables.
@@ -491,7 +445,7 @@ function _pagerer_override_theme_pager($v) {
   $variables['element']  = $v['element'];
   $variables['parameters'] = $v['parameters'];
   // Get preset panes setup.
-  $variables = array_merge($variables, _pagerer_get_preset($config_vars['pagerer_override_pager']));
+  $variables = array_merge($variables, _pagerer_get_preset(_pagerer_get_variable('core_override_preset')));
   // Supercede 'quantity' for standard pager if set from theme call.
   if (isset($v['quantity'])) {
     if (!isset($variables['left_pane']['theme_variables']['quantity'])
@@ -530,8 +484,7 @@ function _pagerer_override_theme_pager($v) {
   }
   // Do not use preset name when invoking theme_pagerer, to avoid overwrites.
   $variables['preset'] = NULL;
-  // Need to call directly the pagerer theming function, to avoid recursion.
-  return theme_pagerer($variables);
+  return theme('pagerer', $variables);
 }
 
 /**
@@ -541,9 +494,17 @@ function _pagerer_override_theme_pager($v) {
  * the theme_pager core function.
  */
 function _pagerer_execute_overriden_theme_pager($v) {
-  $config_vars = _pagerer_get_variables();
-  if (function_exists($config_vars['overridden_pager']['function'])) {
-    return $config_vars['overridden_pager']['function']($v);
+  global $theme_key;
+
+  // Get name of the overriden function.
+  $cache_entry = cache_get('pagerer_override:' . $theme_key . ':pager');
+  if ($cache_entry) {
+    $overridden_function = $cache_entry->data['function'];
+  }
+
+  // Calls the overriden function.
+  if ($overridden_function && function_exists($overridden_function)) {
+    return $overridden_function($v);
   }
   else {
     // Last resort.
@@ -829,8 +790,6 @@ function _pagerer_theme_handler($theme, $variables) {
   }
   // Add Pagerer's css.
   drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
-  // Get pagerer configuration.
-  $pagerer_vars = _pagerer_get_variables();
   // Resolve tags. The tags key bears already localised strings.
   $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['display'], isset($variables['tags']) ? $variables['tags'] : array());
   // Resolve markers.
@@ -839,26 +798,24 @@ function _pagerer_theme_handler($theme, $variables) {
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
 
-  // If adaptive theme enabled, sets adaptive markers.
-  if ($pagerer_vars['pagerer_enable_adaptive']) {
-    global $_pagerer_ak_array;
-    $qps = drupal_get_query_parameters();
-    // Initialise global array for all pagers' adaptive keys.
-    if (!isset($_pagerer_ak_array)) {
-      // Take querystring parameters if existing.
-      if (isset($qps['page_ak'])) {
-        // A 'page_ak' query parameter exists in the calling URL.
-        $_pagerer_ak_array = explode(',', $qps['page_ak']);
-      }
-      else {
-        $_pagerer_ak_array = array();
-      }
-    }
-    // Set default 'page_ak' querystring parameter for this pager.
+  // Set adaptive markers.
+  global $_pagerer_ak_array;
+  $qps = drupal_get_query_parameters();
+  // Initialise global array for all pagers' adaptive keys.
+  if (!isset($_pagerer_ak_array)) {
+    // Take querystring parameters if existing.
     if (isset($qps['page_ak'])) {
-      $page_ak = implode(',', _pagerer_load_ak_array(NULL, $variables['element'], $_pagerer_ak_array));
-      $variables['parameters']['page_ak'] = $page_ak;
+      // A 'page_ak' query parameter exists in the calling URL.
+      $_pagerer_ak_array = explode(',', $qps['page_ak']);
     }
+    else {
+      $_pagerer_ak_array = array();
+    }
+  }
+  // Set default 'page_ak' querystring parameter for this pager.
+  if (isset($qps['page_ak'])) {
+    $page_ak = implode(',', _pagerer_load_ak_array(NULL, $variables['element'], $_pagerer_ak_array));
+    $variables['parameters']['page_ak'] = $page_ak;
   }
 
   // Determine pager items needed.
@@ -1150,7 +1107,7 @@ function _pagerer_resolve_markers($variables) {
  * @param array $markers
  *   precalculated markers for the pager
  * @param string $type
- *   'anchor' returns a link via theme('pager_link', ...),
+ *   'anchor' returns a link via theme('pagerer_link', ...),
  *   'button' returns a div that jQuery will transform in a ui button
  *
  * @return array
@@ -1190,7 +1147,7 @@ function _pagerer_itemize_link($scope, $variables, $markers, $type = 'anchor') {
 
   if ($active_link and $type == 'anchor') {
     $li_data = theme(
-      'pager_link',
+      'pagerer_link',
       array(
         'text' => $text,
         'page_new' => pager_load_array($current_page + $offset, $variables['element'], $pager_page_array),
@@ -1291,9 +1248,9 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
           $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
 
-        // Get link data from theme_pager_link().
+        // Get link data from theme_pagerer_link().
         $link_data = theme(
-          'pager_link',
+          'pagerer_link',
           array(
             'text' => $text,
             'page_new' => $page_new,
@@ -1364,9 +1321,9 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
           $variables['parameters']['page_ak'] = implode(',', _pagerer_load_ak_array($aks, $element, $_pagerer_ak_array));
         }
 
-        // Get link data from theme_pager_link().
+        // Get link data from theme_pagerer_link().
         $link_data = theme(
-          'pager_link',
+          'pagerer_link',
           array(
             'text' => $text,
             'page_new' => $page_new,
@@ -1713,7 +1670,6 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   global $pager_page_array, $pager_limits;
   static $js_enabled;
 
-  $vars = _pagerer_get_variables();
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
 
@@ -1890,7 +1846,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 }
 
 /**
- * Override of standard theme_pager_link().
+ * Alternative to standard theme_pager_link().
  *
  * Needed as theme_pagerer_adaptive() handles additional paging parameters
  * in the querystring. The standard function would override the 'page_ak'
@@ -1899,7 +1855,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
  *
  * @see http://drupal.org/node/1588138
  */
-function _pagerer_override_theme_pager_link($variables) {
+function theme_pagerer_link($variables) {
   $text = $variables['text'];
   $page_new = $variables['page_new'];
   $element = $variables['element'];
@@ -1920,7 +1876,7 @@ function _pagerer_override_theme_pager_link($variables) {
     $query = array_merge($query_pager, $query);
   }
 
-  // Set each pager link title.
+  // Set each pager link title
   if (!isset($attributes['title'])) {
     static $titles = NULL;
     if (!isset($titles)) {
@@ -2015,39 +1971,59 @@ function _pagerer_list_presets() {
 }
 
 /**
- * Returns 'pagerer' configuration from Drupal variable.
+ * Return a 'pagerer' configuration variable.
+ *
+ * @param string $variable
+ *   the name of the pagerer configuration variable, or NULL to return
+ *   the entire array
+ *
+ * @return string|array
+ *   value of the requested configuration variable, or the entire array
+ *   if no variable specified in input
  */
-function _pagerer_get_variables() {
-  $vars = variable_get('pagerer', array());
-
-  // If nothing in Drupal's variable, then set default.
-  if (empty($vars)) {
-    $vars = array(
-      'pagerer_override_pager'    => 'core',
-      'pagerer_enable_adaptive'   => FALSE,
+function _pagerer_get_variable($variable = NULL) {
+  $vars = &drupal_static(__FUNCTION__);
+  if (!isset($vars)) {
+    $vars = variable_get('pagerer', array());
+    $vars += array(
+      'core_override_preset' => 'core',
     );
-    _pagerer_set_variables($vars);
   }
-
-  return $vars;
+  if ($variable) {
+    return isset($vars[$variable]) ? $vars[$variable] : NULL;
+  }
+  else {
+    return $vars;
+  }
 }
 
 /**
- * Store 'pagerer' configuration in a Drupal variable.
+ * Store a 'pagerer' configuration variable.
  *
- * @param array $vars
- *   the array of pagerer configuration variables
+ * @param string|array $variable
+ *   the name of the pagerer configuration variable, or the entire
+ *   configuration array
+ * @param string $alue
+ *   the value of the pagerer configuration variable to store
  */
-function _pagerer_set_variables($vars) {
+function _pagerer_set_variable($variable, $value = NULL) {
+  if (is_array($variable)) {
+    $vars = $variable;
+  }
+  else {
+    $vars = _pagerer_get_variable();
+    if ($variable) {
+      $vars[$variable] = $value;
+    }
+  }
   $vars = array_intersect_key(
     $vars,
     array(
-      'pagerer_override_pager' => NULL,
-      'pagerer_enable_adaptive' => NULL,
-      'overridden_pager' => NULL,
+      'core_override_preset' => NULL,
     )
   );
   variable_set('pagerer', $vars);
+  drupal_static_reset('_pagerer_get_variable');
 }
 
 /**

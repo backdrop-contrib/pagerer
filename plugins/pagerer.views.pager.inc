@@ -63,10 +63,7 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
    * Same as parent, plus preset, less tags.
    */
   public function options_form(&$form, &$form_state) {
-    $preset_options = array(
-      t('Default:') => array('core' => t('Use Drupal core pager')),
-      t('Replace with:') => _pagerer_list_presets(),
-    );
+    $preset_options = _pagerer_list_presets();
     $form['preset'] = array(
       '#type' => 'select',
       '#title' => t('Preset'),
