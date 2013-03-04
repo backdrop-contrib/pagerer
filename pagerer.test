@@ -56,8 +56,7 @@ class PagererTest extends PagerFunctionalWebTestCase {
     );
     $this->drupalPost($this->pagererAdmin . '/add', $edit, 'Create preset');
     $edit = array(
-      'pagerer_override_pager' => 'core_replace',
-      'pagerer_enable_adaptive' => TRUE,
+      'core_override_preset' => 'core_replace',
     );
     $this->drupalPost($this->pagererAdmin, $edit, 'Save configuration');
   }
