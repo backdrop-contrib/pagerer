@@ -1727,7 +1727,8 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare path to the page.
-  $path = request_path() . '?' . drupal_http_build_query($variables['parameters']);
+  $query_parms = drupal_get_query_parameters(NULL, array());
+  $path = $query_parms['q'] . '?' . drupal_http_build_query($variables['parameters']);
 
   // Prepare js widget state.
   $state = array(
