@@ -1,3 +1,14 @@
+Pagerer 7.x-1.1-beta2, 2013-03-07
+---------------------------------
+- Issue #1933000 by mondrake: Fixed wrong behavior with AJAX Views preview
+  when paginating via jQuery elements.
+- Issue #1933798 by mondrake: Fixed scrollpane pager not showing up correctly
+  on iPad.
+- Issue #1930034 by mondrake: Added additional classes/wrappers in Pagerer
+  HTML to facilitate styling.
+- Issue #1924022 by mondrake: Improve interaction with themes/modules that
+  override Drupal's core pager functions.
+
 Pagerer 7.x-1.1-beta1, 2013-01-26
 ---------------------------------
 - Issue #1894474 by mondrake: Implemented a Views pager plugin.
