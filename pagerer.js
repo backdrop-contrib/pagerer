@@ -50,6 +50,8 @@ Drupal.behaviors.pagerer = {
 
     /**
      * State variables.
+     *
+     * These variables are reset at every page load, either normal or AJAX.
      */
     var state = {
       timeoutAction: 0,
@@ -64,7 +66,7 @@ Drupal.behaviors.pagerer = {
     $('.pagerer-page', context)
     .ready().each(function(index) {
       state.isRelocating = false;
-      this.pagererState = eval('(' + $(this).attr('name') + ');');
+      this.pagererState = pagererEvalState($(this).attr('name'));
       // Item ranges do not really work on widget.
       if (this.pagererState.display === 'item_ranges') {
         this.pagererState.display = 'items';
@@ -139,7 +141,7 @@ Drupal.behaviors.pagerer = {
     $('.pagerer-slider', context)
     .ready().each(function(index) {
       state.isRelocating = false;
-      this.pagererState = eval('(' + $(this).attr('id') + ');');
+      this.pagererState = pagererEvalState($(this).attr('id'));
 
       // Create slider.
       var sliderBar = $(this);
@@ -316,7 +318,7 @@ Drupal.behaviors.pagerer = {
       var pagerSeparators = $(pager).find('li.separator');
 
       // Attach state variables to the wrapped pager.
-      pager.pagererState = eval('(' + $(this).attr('id') + ');');
+      pager.pagererState = pagererEvalState($(this).attr('id'));
       $.extend(pager.pagererState, {
         scrollpane: $(this).parent(),
         viewport: viewport,
@@ -582,6 +584,14 @@ Drupal.behaviors.pagerer = {
     }
 
     /**
+     * Return an element's pagererState from the HTML attribute.
+     */
+    function pagererEvalState(stringState) {
+      var pagererState = eval('(' + stringState + ');');
+      return pagererState;
+    }
+
+    /**
      * Reset pending transitions.
      *
      * Cancel timeout-bound page relocation and any unprocessed scrollpane
@@ -632,14 +642,14 @@ Drupal.behaviors.pagerer = {
         // Element is in Views preview context.
         var base = $(element).attr('id');
         var element_settings = {
-          'event': 'doViewsAjax',
+          'event': 'doViewsAjaxPreview',
           'progress': { 'type': 'throbber' },
           'url': Drupal.settings.basePath + path,
           'method': 'html',
           'wrapper': 'views-live-preview'
         };
         Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
-        $(element).trigger('doViewsAjax');
+        $(element).trigger('doViewsAjaxPreview');
 
       } else if (window.Drupal.overlayChild) {
         // Drupal admin overlay
@@ -1042,23 +1052,21 @@ Drupal.behaviors.pagerer = {
         } else {
           anchor[0].title = Drupal.formatString(pager.pagererState.pageTitle, {'@number': pageText});
         }
-        if (!onReady) {
-          // In views, add AJAX where appropriate.
-          if (pager.pagererState.viewsAjaxContext) {
-            // Element is in AJAX enabled view.
-            attachViewsAjax(anchor[0], 'click', pager.pagererState.viewsAjaxContext, path);
-          }  else if ($(pager).parents('#views-live-preview').length) {
-            // Element is in Views preview context.
-            var base = $(element).attr('id');
-            var element_settings = {
-              'event': 'click',
-              'progress': { 'type': 'throbber' },
-              'url': Drupal.settings.basePath + path,
-              'method': 'html',
-              'wrapper': 'views-live-preview'
-            };
-            Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
-          }
+        // In views, add AJAX where appropriate.
+        if (!onReady && pager.pagererState.viewsAjaxContext) {
+          // Element is in AJAX enabled view.
+          attachViewsAjax(anchor[0], 'click', pager.pagererState.viewsAjaxContext, path);
+        }  else if ($(pager).parents('#views-live-preview').length) {
+          // Element is in Views preview context.
+          var base = $(element).attr('id');
+          var element_settings = {
+            'event': 'click',
+            'progress': { 'type': 'throbber' },
+            'url': Drupal.settings.basePath + path,
+            'method': 'html',
+            'wrapper': 'views-live-preview'
+          };
+          Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
         }
       } else {
         // Current page has its own class, and no href.

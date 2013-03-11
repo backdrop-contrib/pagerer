@@ -99,6 +99,9 @@ div.pagerer-slider-handle-icon {
 }
 
 /* pagerer scrollpane */
+div.pagerer-pager.scrollpane-wrapper ul.pager li {
+  display: inline-block;
+}
 ul.pager li.pagerer-scrollpane {
   display: inline-block;
   padding: 0;
