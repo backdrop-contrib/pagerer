@@ -1,3 +1,7 @@
+Pagerer 7.x-1.1, 2013-03-25
+---------------------------
+- Updated README.txt
+
 Pagerer 7.x-1.1-beta2, 2013-03-07
 ---------------------------------
 - Issue #1933000 by mondrake: Fixed wrong behavior with AJAX Views preview
