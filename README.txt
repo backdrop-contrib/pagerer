@@ -2,24 +2,23 @@ Pagerer
 =======
 
 Pagerer is a module providing a collection of pager themes to enhance Drupal
-standard pager.
+and Views standard pagers.
 
-Administrators can preset multiple pager configurations, where each preset
-allows a pager to be made up of three 'panes' (left, center, and right);
-and each pane contains (or not) a pager theme, so providing plenty of
-possibilities to combine different elements to satisfy complex requirements.
+Administrators or site builders can preset multiple pager configurations. Each
+'preset' allows a pager to be made up of three 'panes': left, center, and
+right. Each pane can contain (or not) a pager theme. In this way there is
+plenty of possibilities to combine different elements to satisfy complex
+requirements.
 
 Pagerer allows to override Drupal's core pager with any of the preset
-configurations.
+configurations. Also, a built-in pager plugin for Views allows to use any of
+the preset pagers within any view.
 
-Pagerer also provides a pager plugin for Views, allowing to use any of the
-preset pagers within any view.
+Pagerer uses standard Drupal pager classes to render the pagers, so styling
+is preserved.
 
-Pagerer uses standard Drupal pager classes to render the pagers, so
-styling is preserved.
-
-Module developers can also make direct calls to the themes, thus
-allowing even more complex scenarios.
+Module developers can also make direct calls to the themes, thus allowing
+even more complex scenarios.
 
 Features:
 ---------
@@ -27,7 +26,7 @@ Features:
 - Views pager plugin
 - control whether to display links to pages, to items, or to item ranges
 - direct input of the page to go to through an input widget
-- selection of the page to go to through a jQuery slider
+- selection of the page to go to through a jQuery UI slider
 - selection of the page to go to through a client-side scrolling pager
 - links to progressively more distant pages (like +10, + 20, +100, +200)
 - adaptive logic links
@@ -63,6 +62,9 @@ Instructions:
 -------------
 - Install and enable the module.
 - Check the Configuration page to setup.
+- Create and configure any number of 'preset' pagers.
+- Select a preset to use as a general replacement of Drupal core pager, or
+  use a preset as a pager in Views.
 
 Views pager plugin:
 -------------------
@@ -87,14 +89,16 @@ Credits:
 Themes
 ======
 
+----------------------
 theme_pagerer_standard
 ----------------------
 This theme is alike standard Drupal pager theme.
 
 Provides links to the 'neigborhood' of current page, plus
-first/previous/next/last page. Extended control on the pager is
-available through pagerer's specific $variables.
+first/previous/next/last page. Extended control on the pager is available
+through Pagerer's specific variables.
 
+-------------------------
 theme_pagerer_progressive
 -------------------------
 This theme provides links to pages progressively more distant from current.
@@ -132,6 +136,7 @@ Examples: 'factors' => '10' will generate links for page offsets
 
 etc.
 
+----------------------
 theme_pagerer_adaptive
 ----------------------
 This theme provides links to pages following an adaptive logic.
@@ -184,6 +189,7 @@ a page number or as an offset from current page. This is controlled via
 the 'progr_links' theme variable, which can take a value either
 'absolute' or 'relative'.
 
+------------------
 theme_pagerer_mini
 ------------------
 This theme displays current page (or item), and provides a direct page
@@ -192,21 +198,23 @@ entry widget to allow navigating to another page.
 Examples:
 
 page 9 out of 955, display 'pages':
------------------------------------------------------------
+-----------------------
 << < Page 9 of 955 > >>
------------------------------------------------------------
+-----------------------
 
 page 9 out of 955, total items = 47731, limit = 50, display = 'items':
------------------------------------------------------------
+---------------------------
 << < Item 401 of 47731 > >>
------------------------------------------------------------
+---------------------------
 
+------------------------
 theme_pagerer_scrollpane
 ------------------------
 This theme displays a standard pager that is scrollable on the browser
-through navigation buttons. Users can get to any page without having
+through navigation buttons. Users can get to any page link without having
 to send request to the server.
 
+--------------------
 theme_pagerer_slider
 --------------------
 This theme displays a jQuery slider. Page navigation is managed via
@@ -302,12 +310,13 @@ of the pagerer theme.
 - preset: (optional) specifies the preset pager configuration, created through
   Pagerer's admin UI, to be used to render the pager. If not specified,
   {position}_pane variables are to be passed. Also, any {position}_pane
-  variables will override the preset configuration, if specified along this
-  variable.
+  variables will override the preset configuration, if specified along the
+  preset variable.
 - {position}_pane: where {position} is 'left'|'center'|'right', an associative
   array of
-    - theme_name: 'pagerer_standard' |'pagerer_progressive' |
-	  'pagerer_adaptive' | 'pagerer_mini' | 'pagerer_slider' | 'none'
+    - theme_name: 'pagerer_standard' | 'pagerer_progressive' |
+      'pagerer_scrollpane' | 'pagerer_adaptive' | 'pagerer_mini' |
+      'pagerer_slider' | 'none'
     - theme_variables: the $variables associative array for the theme passed
       in 'theme_name'
 
@@ -364,3 +373,21 @@ the corresponding element.
 - slider_tickmark_title: Help text appended to the slider help when user is
   expected to click on the tickmark to start page relocation. Defaults to:
   'Then, click on the tickmark.'.
+
+
+An example for overriding 'tags' at a theme's level
+===================================================
+
+Themers can override pager text elements by implementing in the theme's
+template.php a hook_preprocess_pagerer_xxxx() function to set the 'tags'
+values needed. xxxx should be replaced with the specific pagerer theme
+you want to address.
+
+Example:
+
+function mytheme_preprocess_pagerer_mini(&$variables) {
+  $variables['tags']['first'] = t('<< foo');
+  $variables['tags']['previous'] = t('< bar');
+  $variables['tags']['next'] = t('baz >');
+  $variables['tags']['last'] = t('qux >>');
+}
