@@ -162,6 +162,7 @@ function pagerer_theme() {
         'pager_breaker'           => '…',
         'pager_separator'         => 'none',
         'range_separator'         => '-',
+        'fl_breakers'             => TRUE,
         'widget_resize'           => TRUE,
         'slider_action'           => 'tickmark',
         'slider_action_timelapse' => 0,
