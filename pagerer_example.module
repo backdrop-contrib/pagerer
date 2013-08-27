@@ -130,41 +130,49 @@ function pagerer_example_page() {
   $build['l_pagerer_standard_0'] = array('#markup' => '<br/>' . t("<b>'pagerer_standard' pager theme (mimick of Drupal's standard)</b> in three 'display' modes: 'pages', 'items', and 'item_ranges'"));
   $build['pagerer_standard_pages_0'] = array(
     '#theme' => 'pagerer_standard',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
   $build['pagerer_standard_items_0'] = array(
     '#theme' => 'pagerer_standard',
+    '#display_restriction' => 'none',
     '#display' => 'items',
     '#element' => 0,
   );
   $build['pagerer_standard_item_ranges_0'] = array(
     '#theme' => 'pagerer_standard',
+    '#display_restriction' => 'none',
     '#display' => 'item_ranges',
     '#element' => 0,
   );
   $build['l_pagerer_progressive_0'] = array('#markup' => '<br/><b>' . t("'pagerer_progressive' pager theme:") . '</b>');
   $build['pagerer_progressive_0'] = array(
     '#theme' => 'pagerer_progressive',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
   $build['l_pagerer_adaptive_0'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   $build['pagerer_adaptive_0'] = array(
     '#theme' => 'pagerer_adaptive',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
   $build['l_pagerer_mini_0'] = array('#markup' => '<br/><b>' . t("'pagerer_mini' pager theme:") . '</b>');
   $build['pagerer_mini_0'] = array(
     '#theme' => 'pagerer_mini',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
   $build['l_pagerer_scrollpane_0'] = array('#markup' => '<br/><b>' . t("'pagerer_scrollpane' pager theme:") . '</b>');
   $build['pagerer_scrollpane_0'] = array(
     '#theme' => 'pagerer_scrollpane',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
   $build['l_pagerer_slider_0'] = array('#markup' => '<br/><b>' . t("'pagerer_slider' pager theme:") . '</b>');
   $build['pagerer_slider_0'] = array(
     '#theme' => 'pagerer_slider',
+    '#display_restriction' => 'none',
     '#element' => 0,
   );
 
@@ -192,6 +200,7 @@ function pagerer_example_page() {
   $build['l_pagerer_adaptive_1'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   $build['pagerer_adaptive_1'] = array(
     '#theme' => 'pagerer_adaptive',
+    '#display_restriction' => 'none',
     '#element' => 1,
   );
   $build['l_pagerer_pagerer_1'] = array('#markup' => '<br/><b>' . t("'pagerer' core replacement theme:") . '</b>');
@@ -227,6 +236,7 @@ function pagerer_example_page() {
           'item_label'           => t("Record"),
           'widget_title'   => t("Enter record and press Return. Up/Down arrow keys are enabled."),
         ),
+        'display_restriction' => 'none',
         'display'         => 'items',
         'label_display'   => 'before_current',
         'current_display' => 'widget',
@@ -274,6 +284,7 @@ function pagerer_example_page() {
   $build['l_pagerer_adaptive_2'] = array('#markup' => '<br/><b>' . t("'pagerer_adaptive' pager theme:") . '</b>');
   $build['pagerer_adaptive_2'] = array(
     '#theme' => 'pagerer_adaptive',
+    '#display_restriction' => 'none',
     '#element' => 2,
   );
   $build['l_pagerer_pagerer_2'] = array('#markup' => '<br/><b>' . t("'pagerer' core replacement theme:") . '</b>');

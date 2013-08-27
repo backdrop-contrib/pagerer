@@ -127,6 +127,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'none',
         'current_display'         => 'normal',
@@ -150,6 +151,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => 5,
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'none',
         'current_display'         => 'normal',
@@ -174,6 +176,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => 5,
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'none',
         'current_display'         => 'normal',
@@ -199,6 +202,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'before_current',
         'current_display'         => 'widget',
@@ -222,6 +226,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'before_current',
         'current_display'         => 'slider',
@@ -245,6 +250,7 @@ function pagerer_theme() {
         'element'                 => $common_theme['pager']['variables']['element'],
         'parameters'              => $common_theme['pager']['variables']['parameters'],
         'quantity'                => $common_theme['pager']['variables']['quantity'],
+        'display_restriction'     => 'default',
         'display'                 => 'pages',
         'label_display'           => 'none',
         'current_display'         => 'scrollpane',
@@ -382,6 +388,7 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
   switch ($display_mode) {
     case 'pages':
       $default_titles = array(
+        'pageset_empty'  => t("No pages to display."),
         'page_title'     => t("Go to page @number"),
         'first_title'    => t("Go to first page"),
         'previous_title' => t("Go to previous page"),
@@ -394,6 +401,7 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
 
     case 'items':
       $default_titles = array(
+        'pageset_empty'  => t("No items to display."),
         'page_title'     => t("Go to item @number"),
         'first_title'    => t("Go to first item"),
         'previous_title' => t("Go to previous items"),
@@ -406,6 +414,7 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
 
     case 'item_ranges':
       $default_titles = array(
+        'pageset_empty'  => t("No items to display."),
         'page_title'     => t("Go to items @number"),
         'first_title'    => t("Go to first items"),
         'previous_title' => t("Go to previous items"),
@@ -525,11 +534,6 @@ function _pagerer_execute_overriden_theme_pager($v) {
  * key in the variables.
  */
 function theme_pagerer($variables) {
-  global $pager_total, $pager_limits;
-  // Check if pager is needed; if not, return immediately.
-  if ($pager_total[$variables['element']] <= 1) {
-    return NULL;
-  }
   // If forced to use core pager, call it and return straight away.
   if (isset($variables['preset']) and $variables['preset'] == 'core') {
     $common_theme = drupal_common_theme();
@@ -544,6 +548,7 @@ function theme_pagerer($variables) {
     );
     return _pagerer_execute_overriden_theme_pager($core_vars);
   }
+
   // Get preset panes setup if specified.
   if (isset($variables['preset']) and !empty($variables['preset'])) {
     $preset = _pagerer_get_preset($variables['preset']);
@@ -551,6 +556,7 @@ function theme_pagerer($variables) {
   else {
     $preset = array();
   }
+
   // Get core variables.
   $core_vars = array_intersect_key(
     $variables,
@@ -561,39 +567,66 @@ function theme_pagerer($variables) {
       'quantity' => NULL,
     )
   );
-  // Get rendered panes.
-  $panes = array();
+
+  // Fully qualify all panes.
   foreach (array('left', 'center', 'right') as $p) {
     $pane_key = $p . '_pane';
+
+    // Determine pane's theme name.
     if (isset($preset[$pane_key]['theme_name'])) {
-      $theme_name = $preset[$pane_key]['theme_name'];
+      $variables[$pane_key]['theme_name'] = $preset[$pane_key]['theme_name'];
     }
     elseif (!isset($variables[$pane_key]['theme_name'])) {
       switch ($p) {
         case 'left':
         case 'right':
-          $theme_name = 'none';
+          $variables[$pane_key]['theme_name'] = 'none';
           break;
 
         case 'center':
-          $theme_name = 'pagerer_standard';
+          $variables[$pane_key]['theme_name'] = 'pagerer_standard';
           break;
 
       }
     }
-    else {
-      $theme_name = $variables[$pane_key]['theme_name'];
-    }
-    if ($theme_name <> 'none') {
-      $pane_vars = isset($variables[$pane_key]['theme_variables']) ? $variables[$pane_key]['theme_variables'] : array();
+
+    // Determine pane's theme variables.
+    if ($variables[$pane_key]['theme_name'] <> 'none') {
+      $tmp = isset($variables[$pane_key]['theme_variables']) ? $variables[$pane_key]['theme_variables'] : array();
       if (isset($preset[$pane_key]['theme_variables'])) {
-        $pane_vars = array_merge_recursive($preset[$pane_key]['theme_variables'], $pane_vars);
+        $tmp = array_merge_recursive($preset[$pane_key]['theme_variables'], $tmp);
       }
-      $pane_vars = array_merge($core_vars, $pane_vars);
+      $variables[$pane_key]['theme_variables'] = array_merge($core_vars, $tmp);
+    }
+    else {
+      $variables[$pane_key]['theme_variables'] = array();
+    }
+  }
+
+  // Check if pager is needed; if not, return immediately.
+  // It is the lowest required number of pages in any of the panes.
+  global $pager_total, $pager_limits;
+  if (empty($pager_total[$variables['element']])) {
+    $pager_total[$variables['element']] = 0;
+  }
+  $page_restriction = min(
+    _pagerer_get_page_restriction($variables['left_pane']['theme_variables']),
+    _pagerer_get_page_restriction($variables['center_pane']['theme_variables']),
+    _pagerer_get_page_restriction($variables['right_pane']['theme_variables'])
+  );
+  if ($pager_total[$variables['element']] < $page_restriction) {
+    return NULL;
+  }
+
+  // Build render array.
+  $panes = array();
+  foreach (array('left', 'center', 'right') as $p) {
+    $pane_key = $p . '_pane';
+    if ($variables[$pane_key]['theme_name'] <> 'none') {
       $panes[$pane_key] = array(
         'data' => theme(
-          $theme_name,
-          $pane_vars
+          $variables[$pane_key]['theme_name'],
+          $variables[$pane_key]['theme_variables']
         ),
         'class' => array('pagerer', 'pagerer-' . $p),
       );
@@ -602,6 +635,7 @@ function theme_pagerer($variables) {
       $panes[$pane_key] = NULL;
     }
   }
+
   // Render a 1 row * 3 columns table, where each cell is a 'pane'
   // holding a rendered pager. See pagerer.css for specific styling.
   $row = array(
@@ -786,7 +820,10 @@ function _pagerer_theme_handler($theme, $variables) {
   global $pager_total, $pager_limits;
 
   // Check if pager is needed; if not, return immediately.
-  if ($pager_total[$variables['element']] <= 1) {
+  if (empty($pager_total[$variables['element']])) {
+    $pager_total[$variables['element']] = 0;
+  }
+  if ($pager_total[$variables['element']] < _pagerer_get_page_restriction($variables)) {
     return NULL;
   }
   // Add Pagerer's css.
@@ -821,6 +858,47 @@ function _pagerer_theme_handler($theme, $variables) {
 
   // Determine pager items needed.
   $pages = array();
+
+  // Manage empty pageset.
+  if ($markers['pager_max'] == 0) {
+    $items = array();
+    // 'No pages' fallback message.
+    switch ($variables['current_display']) {
+      case 'none':
+        break;
+
+      case 'scrollpane':
+        $items = _pagerer_itemize_js_element($variables['current_display'], $variables, $markers);
+        break;
+
+      case 'widget':
+      case 'slider':
+      case 'normal':
+      default:
+        $text = format_string(
+          $variables['tags']['pageset_empty'],
+          array(
+            '@number' => 0,
+            '@offset' => 0,
+            '@total' => 0,
+          )
+        );
+        $items[] = array(
+          'class' => array('pager-current'),
+          'data' => $text,
+        );
+
+    }
+
+    // If a scrollpane pager, add a wrapper class.
+    $scrollpane_wrapper = ($variables['current_display'] == 'scrollpane') ? 'scrollpane-wrapper' : NULL;
+
+    return '<h2 class="element-invisible">' . t("Pages") . '</h2><div class="pagerer-pager ' . $scrollpane_wrapper . '">' . theme('item_list', array(
+      'items' => $items,
+      'attributes' => array('class' => array('pager')),
+    )) . '</div>';
+  }
+
   switch ($theme) {
     case 'pagerer_adaptive':
       // Determine adaptive keys coming from query parameters.
@@ -1655,6 +1733,28 @@ function _pagerer_get_total($variables, $markers) {
       return $markers['pager_max'];
 
   }
+}
+
+/**
+ * Return minimum number of pages to enable displaying the pager.
+ *
+ * @param array $variables
+ *   theme's variables
+ *
+ * @return int
+ *   minimum number of pages
+ */
+function _pagerer_get_page_restriction($variables) {
+  static $keys;
+  if (!isset($keys)) {
+    $keys = array(
+      'none'      => 0,
+      'one_above' => 1,
+      'default'   => 2,
+    );
+  }
+  $k = isset($variables['display_restriction']) ? $variables['display_restriction'] : 'default';
+  return $keys[$k];
 }
 
 /**

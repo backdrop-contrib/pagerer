@@ -498,10 +498,9 @@ function pagerer_pane_form($form, &$form_state) {
   // Display configuration.
   $form['display_container'] = array(
     '#type' => 'fieldset',
-    '#title' => t("Main elements"),
+    '#title' => t("Main options"),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#description' => t("Configure main pager elements as 'label', 'current page' and 'total'."),
   );
   $options = drupal_map_assoc(array('none', 'before_current', 'first', 'last'));
   $form['display_container']['label_display'] = array(
@@ -534,6 +533,18 @@ function pagerer_pane_form($form, &$form_state) {
     '#options' => $options,
     '#default_value' => $v['total_display'],
     '#description' => t("Select whether and where to render a text element indicating the total pages (or items). Options are 'none' (not displayed), 'after_current' (just after current page), 'first' (at the beginning), 'last' (at the end)."),
+    '#required' => TRUE,
+  );
+  $options = array(
+    'default' => t('Display pager only if there are at least two pages of results (default).'),
+    'one_above' => t('Display pager also if there is only one page of results.'),
+    'none' => t('Display pager also if the result set is empty.'),
+  );
+  $form['display_container']['display_restriction'] = array(
+    '#type' => 'radios',
+    '#title' => t("Restriction"),
+    '#options' => $options,
+    '#default_value' => $v['display_restriction'],
     '#required' => TRUE,
   );
 
@@ -702,6 +713,7 @@ function pagerer_pane_form_submit($form, &$form_state) {
   $preset[$p]['theme_variables']['pager_breaker'] = $v['pager_breaker'];
   $preset[$p]['theme_variables']['pager_separator'] = $v['pager_separator'];
   $preset[$p]['theme_variables']['range_separator'] = $v['range_separator'];
+  $preset[$p]['theme_variables']['display_restriction'] = $v['display_restriction'];
   $preset[$p]['theme_variables']['display'] = $v['display'];
   $preset[$p]['theme_variables']['quantity'] = $v['quantity'];
   $preset[$p]['theme_variables']['label_display'] = $v['label_display'];

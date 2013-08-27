@@ -237,6 +237,11 @@ Drupal core pager theme variables.
 - quantity: the number of pages in the list of the 'neighborhood' of the
   current page. For pagerer_slider theme, it serves to approximate the witdh
   of the jQuery slider.
+- display_restriction: it allows to restrict showing the pager based on the
+  actual number of pages in the result set. It can take the values "default"
+  (pager is shown if the result set is made of at least two pages), "one_above"
+  (pager is shown also if the result set is made of one page only), "none"
+  (pager is shown also if the result set is empty).
 - display: can take the values 'pages', 'items', 'item_ranges'. Determines
   whether to display pages, or items, or item ranges.
 - label_display: Determines whether and where to render a text "label"
@@ -354,6 +359,9 @@ the corresponding element.
 - item_label: Text to use to render a 'item' label. Defaults to: 'Item'.
 - item_range_label: Text to use to render a 'items range' label. Defaults
   to: 'Items'.
+
+- pageset_empty: Text to use to render the current page in the pager in case
+  there are no items in the pageset (e.g. 'No pages to display').
 
 - page_title: Help text used when hovering a page link (e.g. 'Go to page
   @number').

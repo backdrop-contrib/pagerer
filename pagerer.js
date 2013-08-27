@@ -333,25 +333,35 @@ Drupal.behaviors.pagerer = {
         fastScrolling: 0
       });
 
-      // Determine pager element width from maximum width possible.
-      var pageDupe = $(pagerPages[0]).clone();
-      pageDupe.removeClass('pager-current first last');
-      pageDupe.addClass('pager-item pagerer-dupe');
-      pageDupe.text(indexToValue(pager.pagererState.total - 1, pager.pagererState));
-      $(pager).append(pageDupe);
-      pager.pagererState.pageWidth = Math.ceil($(pageDupe).outerWidth(true));
-      pager.pagererState.pageLeftMargin = parseInt($(pageDupe).css('margin-left'));
-      var cellHeight = Math.ceil($(pageDupe).outerHeight(true));
-      $(pager).find('.pagerer-dupe').remove();
-
       // Determine pager separator width, if existing.
       if (pagerSeparators.length > 0) {
         pager.pagererState.separatorWidth = Math.ceil($(pagerSeparators[0]).outerWidth(true));
       }
 
+      // Determine pager element width from maximum width possible.
+      if (pager.pagererState.total > 0) {
+        var pageDupe = $(pagerPages[0]).clone();
+        pageDupe.removeClass('pager-current first last');
+        pageDupe.addClass('pager-item pagerer-dupe');
+        pageDupe.text(indexToValue(pager.pagererState.total - 1, pager.pagererState));
+        $(pager).append(pageDupe);
+        pager.pagererState.pageWidth = Math.ceil($(pageDupe).outerWidth(true));
+        pager.pagererState.pageLeftMargin = parseInt($(pageDupe).css('margin-left'));
+        var cellHeight = Math.ceil($(pageDupe).outerHeight(true));
+        var pagerWidth = (pagerPages.length * pager.pagererState.pageWidth) + (pagerSeparators.length * pager.pagererState.separatorWidth);
+        var viewportWidth = Math.min((pager.pagererState.quantity * pager.pagererState.pageWidth) + ((pager.pagererState.quantity - 1) * pager.pagererState.separatorWidth), pagerWidth);
+        $(pager).find('.pagerer-dupe').remove();
+      } else {
+        // If no pages, then only 'No pages' message is in the pager.
+        pager.pagererState.pageWidth = $(pagerPages[0]).outerWidth(true);
+        pager.pagererState.pageLeftMargin = $(pagerPages[0]).css('margin-left');
+        var cellHeight = $(pagerPages[0]).outerHeight(true);
+        var pagerWidth = pager.pagererState.pageWidth;
+        var viewportWidth = pager.pagererState.pageWidth;
+        $(pagerPages[0]).css('left', '0px');
+      }
+
       // Set dimensions.
-      var pagerWidth = (pagerPages.length * pager.pagererState.pageWidth) + (pagerSeparators.length * pager.pagererState.separatorWidth);
-      var viewportWidth = Math.min((pager.pagererState.quantity * pager.pagererState.pageWidth) + ((pager.pagererState.quantity - 1) * pager.pagererState.separatorWidth), pagerWidth);
       $(this).css({
         width: viewportWidth + 'px',
         height: cellHeight + 'px'
@@ -364,6 +374,11 @@ Drupal.behaviors.pagerer = {
         width: pagerWidth + 'px',
         height: cellHeight + 'px'
       });
+
+      // If no pages, return.
+      if (pager.pagererState.total === 0) {
+        return;
+      }
 
       // Allocate input pager elements to pager.
       var elementLeft = 0;
