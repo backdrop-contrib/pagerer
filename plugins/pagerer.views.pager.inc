@@ -72,7 +72,10 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
       '#default_value' => $this->options['preset'],
     );
     parent::options_form($form, $form_state);
-    unset($form['tags']);
+    unset(
+      $form['tags'],
+      $form['quantity']
+    );
   }
 
   /**
