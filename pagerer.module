@@ -513,7 +513,7 @@ function _pagerer_execute_overriden_theme_pager($v) {
   }
 
   // Calls the overriden function.
-  if ($overridden_function && function_exists($overridden_function)) {
+  if (isset($overridden_function) && function_exists($overridden_function)) {
     return $overridden_function($v);
   }
   else {
