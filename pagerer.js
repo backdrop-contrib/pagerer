@@ -64,7 +64,7 @@ Drupal.behaviors.pagerer = {
      * 'pagerer-page' input box event binding
      */
     $('.pagerer-page', context)
-    .ready().each(function(index) {
+    .each(function(index) {
       state.isRelocating = false;
       this.pagererState = pagererEvalState($(this).attr('name'));
       // Item ranges do not really work on widget.
@@ -139,7 +139,7 @@ Drupal.behaviors.pagerer = {
      * 'pagerer-slider' jQuery UI slider event binding.
      */
     $('.pagerer-slider', context)
-    .ready().each(function(index) {
+    .each(function(index) {
       state.isRelocating = false;
       this.pagererState = pagererEvalState($(this).attr('id'));
 
@@ -306,7 +306,7 @@ Drupal.behaviors.pagerer = {
      * 'pagerer-scrollpane' event binding.
      */
     $('.pagerer-scrollpane', context)
-    .ready().each(function(index) {
+    .each(function(index) {
       state.isRelocating = false;
 
       // Get the scrollpane components, i.e. the viewport, the
@@ -446,7 +446,7 @@ Drupal.behaviors.pagerer = {
       * first/last page.
       */
     $('.pagerer-scrollpane-button', context)
-    .ready().each(function(index) {
+    .each(function(index) {
       this.pagererState = {
         scrollpane: $(this).parents('.pager').get(0),
         pager: $(this).parents('.pager').find('.pagerer-scrollpane').find('.item-list').find('.pager').get(0)
