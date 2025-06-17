@@ -3,7 +3,7 @@
  * @file
  * Pagerer administration
  *
- * Backdrop core 7.x
+ * Backdrop core 1.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
