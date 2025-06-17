@@ -1,0 +1,6 @@
+[PagererTest]
+name = Replacement of Backdrop core pager
+description = Checks that when the basic 'pagerer_standard' theme is set up as a replacement of Backdrop core pager, it still provides the same HTML.
+group = Pagerer
+file = pagerer.test
+

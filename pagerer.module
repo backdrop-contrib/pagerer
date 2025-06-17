@@ -3,9 +3,9 @@
  * @file
  * Pagerer
  *
- * A collection of pager themes to enhance Drupal standard pager.
+ * A collection of pager themes to enhance Backdrop standard pager.
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -22,7 +22,7 @@ define('_PAGERER_CONFIG_PATH', 'admin/config/user-interface/pagerer');
 function pagerer_help($path, $arg) {
   switch ($path) {
     case _PAGERER_CONFIG_PATH:
-      $output = '<p>' . t("Pagerer allows to pre-define multiple pager configurations through the 'presets'. A preset can be selected as a replacement of Drupal's core pager theme.") . '</p>';
+      $output = '<p>' . t("Pagerer allows to pre-define multiple pager configurations through the 'presets'. A preset can be selected as a replacement of Backdrop's core pager theme.") . '</p>';
       return $output;
 
     case _PAGERER_CONFIG_PATH . '/edit/%':
@@ -40,7 +40,7 @@ function pagerer_menu() {
   $items[_PAGERER_CONFIG_PATH] = array(
     'title' => 'Pagerer',
     'description' => 'Configure Pagerer.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_settings_form'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
@@ -49,7 +49,7 @@ function pagerer_menu() {
   $items[_PAGERER_CONFIG_PATH . '/add'] = array(
     'title' => 'Add preset',
     'description' => 'Add a new preset pager.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_preset_add_form'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_LOCAL_ACTION | MENU_VISIBLE_IN_BREADCRUMB,
@@ -59,7 +59,7 @@ function pagerer_menu() {
     'title callback' => '_pagerer_preset_form_title',
     'title arguments' => array(5),
     'description' => 'Configure a preset pager.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_preset_form', 5),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
@@ -68,7 +68,7 @@ function pagerer_menu() {
   $items[_PAGERER_CONFIG_PATH . '/delete/%'] = array(
     'title' => 'Delete preset',
     'description' => 'Delete a preset pager.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_preset_delete_form', 5),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
@@ -78,7 +78,7 @@ function pagerer_menu() {
     'title callback' => '_pagerer_preset_pane_form_title',
     'title arguments' => array(5, 6),
     'description' => 'Configure preset pager panes.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_pane_form', 5, 6),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
@@ -88,7 +88,7 @@ function pagerer_menu() {
     'title' => 'Reset pane theme',
     'title arguments' => array(5, 6),
     'description' => 'Reset preset pager pane theme.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('pagerer_pane_theme_reset_form', 5, 6),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK | MENU_VISIBLE_IN_BREADCRUMB,
@@ -101,170 +101,170 @@ function pagerer_menu() {
  * Implements hook_theme().
  */
 function pagerer_theme() {
-  $common_theme = drupal_common_theme();
+  $common_theme = backdrop_common_theme();
   $theme = array(
     'pagerer_link' => array(
       'variables' => $common_theme['pager_link']['variables'],
     ),
     'pagerer' => array(
       'variables' => array(
-        'element'         => $common_theme['pager']['variables']['element'],
-        'parameters'      => $common_theme['pager']['variables']['parameters'],
-        'preset'      => NULL,
-        'left_pane'    => array(
-          'theme_name'   => 'none',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'preset' => NULL,
+        'left_pane' => array(
+          'theme_name' => 'none',
         ),
-        'center_pane'  => array(
-          'theme_name'   => 'pagerer_standard',
+        'center_pane' => array(
+          'theme_name' => 'pagerer_standard',
         ),
-        'right_pane'   => array(
-          'theme_name'   => 'none',
+        'right_pane' => array(
+          'theme_name' => 'none',
         ),
       ),
     ),
     'pagerer_standard' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => $common_theme['pager']['variables']['quantity'],
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'none',
-        'current_display'         => 'normal',
-        'total_display'           => 'none',
-        'first_link'              => 'not_on_first',
-        'previous_link'           => 'not_on_first',
-        'next_link'               => 'not_on_last',
-        'last_link'               => 'not_on_last',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => TRUE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => $common_theme['pager']['variables']['quantity'],
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'none',
+        'current_display' => 'normal',
+        'total_display' => 'none',
+        'first_link' => 'not_on_first',
+        'previous_link' => 'not_on_first',
+        'next_link' => 'not_on_last',
+        'last_link' => 'not_on_last',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => TRUE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_adaptive' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => 5,
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'none',
-        'current_display'         => 'normal',
-        'total_display'           => 'none',
-        'first_link'              => 'never',
-        'previous_link'           => 'never',
-        'next_link'               => 'never',
-        'last_link'               => 'never',
-        'progr_links'             => 'relative',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => TRUE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => 5,
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'none',
+        'current_display' => 'normal',
+        'total_display' => 'none',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'never',
+        'last_link' => 'never',
+        'progr_links' => 'relative',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => TRUE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_progressive' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => 5,
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'none',
-        'current_display'         => 'normal',
-        'total_display'           => 'none',
-        'first_link'              => 'never',
-        'previous_link'           => 'never',
-        'next_link'               => 'never',
-        'last_link'               => 'never',
-        'progr_links'             => 'relative',
-        'factors'                 => '2.5,5,10',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => TRUE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => 5,
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'none',
+        'current_display' => 'normal',
+        'total_display' => 'none',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'never',
+        'last_link' => 'never',
+        'progr_links' => 'relative',
+        'factors' => '2.5,5,10',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => TRUE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_mini' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => $common_theme['pager']['variables']['quantity'],
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'before_current',
-        'current_display'         => 'widget',
-        'total_display'           => 'after_current',
-        'first_link'              => 'always',
-        'previous_link'           => 'always',
-        'next_link'               => 'always',
-        'last_link'               => 'always',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => FALSE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => $common_theme['pager']['variables']['quantity'],
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'before_current',
+        'current_display' => 'widget',
+        'total_display' => 'after_current',
+        'first_link' => 'always',
+        'previous_link' => 'always',
+        'next_link' => 'always',
+        'last_link' => 'always',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => FALSE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_slider' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => $common_theme['pager']['variables']['quantity'],
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'before_current',
-        'current_display'         => 'slider',
-        'total_display'           => 'after_current',
-        'first_link'              => 'never',
-        'previous_link'           => 'never',
-        'next_link'               => 'never',
-        'last_link'               => 'never',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => FALSE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => $common_theme['pager']['variables']['quantity'],
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'before_current',
+        'current_display' => 'slider',
+        'total_display' => 'after_current',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'never',
+        'last_link' => 'never',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => FALSE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
     ),
     'pagerer_scrollpane' => array(
       'variables' => array(
-        'element'                 => $common_theme['pager']['variables']['element'],
-        'parameters'              => $common_theme['pager']['variables']['parameters'],
-        'quantity'                => $common_theme['pager']['variables']['quantity'],
-        'display_restriction'     => 'default',
-        'display'                 => 'pages',
-        'label_display'           => 'none',
-        'current_display'         => 'scrollpane',
-        'total_display'           => 'none',
-        'first_link'              => 'never',
-        'previous_link'           => 'never',
-        'next_link'               => 'never',
-        'last_link'               => 'never',
-        'pager_breaker'           => '…',
-        'pager_separator'         => 'none',
-        'range_separator'         => '-',
-        'fl_breakers'             => FALSE,
-        'widget_resize'           => TRUE,
-        'slider_action'           => 'tickmark',
+        'element' => $common_theme['pager']['variables']['element'],
+        'parameters' => $common_theme['pager']['variables']['parameters'],
+        'quantity' => $common_theme['pager']['variables']['quantity'],
+        'display_restriction' => 'default',
+        'display' => 'pages',
+        'label_display' => 'none',
+        'current_display' => 'scrollpane',
+        'total_display' => 'none',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'never',
+        'last_link' => 'never',
+        'pager_breaker' => '…',
+        'pager_separator' => 'none',
+        'range_separator' => '-',
+        'fl_breakers' => FALSE,
+        'widget_resize' => TRUE,
+        'slider_action' => 'tickmark',
         'slider_action_timelapse' => 0,
         'slider_navigation_icons' => 'yes',
       ),
@@ -290,7 +290,7 @@ function pagerer_theme_registry_alter(&$theme_registry) {
   cache_set('pagerer_override:' . $theme_key . ':pager', $theme_registry['pager']);
   // Override the theme callback in the registry.
   $theme_registry['pager']['type'] = 'module';
-  $theme_registry['pager']['theme path'] = drupal_get_path('module', 'pagerer');
+  $theme_registry['pager']['theme path'] = backdrop_get_path('module', 'pagerer');
   $theme_registry['pager']['function'] = '_pagerer_override_theme_pager';
 }
 
@@ -356,30 +356,30 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
   switch ($theme) {
     case 'pagerer_standard':
       $default_tags = array(
-        'page'             => t("@number"),
-        'first'            => t("« first"),
-        'previous'         => t("‹ previous"),
-        'next'             => t("next ›"),
-        'last'             => t("last »"),
-        'total'            => t("of @total"),
-        'page_label'       => t("Page"),
-        'item_label'       => t("Item"),
+        'page' => t("@number"),
+        'first' => t("« first"),
+        'previous' => t("‹ previous"),
+        'next' => t("next ›"),
+        'last' => t("last »"),
+        'total' => t("of @total"),
+        'page_label' => t("Page"),
+        'item_label' => t("Item"),
         'item_range_label' => t("Items"),
       );
       break;
 
     default:
       $default_tags = array(
-        'page'             => t("@number"),
-        'first'            => t("«"),
-        'previous'         => t("<"),
-        'next'             => t(">"),
-        'last'             => t("»"),
-        'previous_progr'   => t("-@number"),
-        'next_progr'       => t("+@number"),
-        'total'            => t("of @total"),
-        'page_label'       => t("Page"),
-        'item_label'       => t("Item"),
+        'page' => t("@number"),
+        'first' => t("«"),
+        'previous' => t("<"),
+        'next' => t(">"),
+        'last' => t("»"),
+        'previous_progr' => t("-@number"),
+        'next_progr' => t("+@number"),
+        'total' => t("of @total"),
+        'page_label' => t("Page"),
+        'item_label' => t("Item"),
         'item_range_label' => t("Items"),
       );
       break;
@@ -388,40 +388,40 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
   switch ($display_mode) {
     case 'pages':
       $default_titles = array(
-        'pageset_empty'  => t("No pages to display."),
-        'page_title'     => t("Go to page @number"),
-        'first_title'    => t("Go to first page"),
+        'pageset_empty' => t("No pages to display."),
+        'page_title' => t("Go to page @number"),
+        'first_title' => t("Go to first page"),
         'previous_title' => t("Go to previous page"),
-        'next_title'     => t("Go to next page"),
-        'last_title'     => t("Go to last page"),
-        'widget_title'   => t("Enter page, then press Return."),
-        'slider_title'   => t("Drag the handle to the page required."),
+        'next_title' => t("Go to next page"),
+        'last_title' => t("Go to last page"),
+        'widget_title' => t("Enter page, then press Return."),
+        'slider_title' => t("Drag the handle to the page required."),
       );
       break;
 
     case 'items':
       $default_titles = array(
-        'pageset_empty'  => t("No items to display."),
-        'page_title'     => t("Go to item @number"),
-        'first_title'    => t("Go to first item"),
+        'pageset_empty' => t("No items to display."),
+        'page_title' => t("Go to item @number"),
+        'first_title' => t("Go to first item"),
         'previous_title' => t("Go to previous items"),
-        'next_title'     => t("Go to next items"),
-        'last_title'     => t("Go to last items"),
-        'widget_title'   => t("Enter item, then press Return."),
-        'slider_title'   => t("Drag the handle to the item required."),
+        'next_title' => t("Go to next items"),
+        'last_title' => t("Go to last items"),
+        'widget_title' => t("Enter item, then press Return."),
+        'slider_title' => t("Drag the handle to the item required."),
       );
       break;
 
     case 'item_ranges':
       $default_titles = array(
-        'pageset_empty'  => t("No items to display."),
-        'page_title'     => t("Go to items @number"),
-        'first_title'    => t("Go to first items"),
+        'pageset_empty' => t("No items to display."),
+        'page_title' => t("Go to items @number"),
+        'first_title' => t("Go to first items"),
         'previous_title' => t("Go to previous items"),
-        'next_title'     => t("Go to next items"),
-        'last_title'     => t("Go to last items"),
-        'widget_title'   => t("Enter item, then press Return."),
-        'slider_title'   => t("Drag the handle to the item required."),
+        'next_title' => t("Go to next items"),
+        'last_title' => t("Go to last items"),
+        'widget_title' => t("Enter item, then press Return."),
+        'slider_title' => t("Drag the handle to the item required."),
       );
       break;
 
@@ -439,7 +439,7 @@ function _pagerer_tags_merge_default($theme, $display_mode, $tags = NULL) {
 /**
  * Pagerer's wrapper for overriden standard 'pager' theme calls.
  *
- * When Pagerer is set in admin to override Drupal built-in pager,
+ * When Pagerer is set in admin to override Backdrop built-in pager,
  * theme('pager', ...) calls are redirected here via
  * _pagerer_override_theme_pager(). In turn, this wrapper
  * is then invoking theme_pagerer() after having fetched the
@@ -459,15 +459,15 @@ function _pagerer_override_theme_pager($v) {
   // Supercede 'quantity' for standard pager if set from theme call.
   if (isset($v['quantity'])) {
     if (!isset($variables['left_pane']['theme_variables']['quantity'])
-        and $variables['left_pane']['theme_name'] == 'pagerer_standard') {
+          and $variables['left_pane']['theme_name'] == 'pagerer_standard') {
       $variables['left_pane']['theme_variables']['quantity'] = $v['quantity'];
     }
     if (!isset($variables['center_pane']['theme_variables']['quantity'])
-        and $variables['center_pane']['theme_name'] == 'pagerer_standard') {
+          and $variables['center_pane']['theme_name'] == 'pagerer_standard') {
       $variables['center_pane']['theme_variables']['quantity'] = $v['quantity'];
     }
     if (!isset($variables['right_pane']['theme_variables']['quantity'])
-        and $variables['right_pane']['theme_name'] == 'pagerer_standard') {
+          and $variables['right_pane']['theme_name'] == 'pagerer_standard') {
       $variables['right_pane']['theme_variables']['quantity'] = $v['quantity'];
     }
   }
@@ -518,7 +518,7 @@ function _pagerer_execute_overriden_theme_pager($v) {
   }
   else {
     // Last resort.
-    require_once DRUPAL_ROOT . '/includes/pager.inc';
+    require_once BACKDROP_ROOT . '/includes/pager.inc';
     return theme_pager($v);
   }
 }
@@ -526,7 +526,7 @@ function _pagerer_execute_overriden_theme_pager($v) {
 /**
  * Pagerer multi-pane pager.
  *
- * When Pagerer is set to override Drupal built-in pager, theme('pager', ...)
+ * When Pagerer is set to override Backdrop built-in pager, theme('pager', ...)
  * calls are redirected here via _pagerer_override_theme_pager(). The theme can
  * also be invoked directly by calls to theme('pagerer', ...). In such case,
  * the theme variables to be used in each pane either have to be passed
@@ -536,14 +536,14 @@ function _pagerer_execute_overriden_theme_pager($v) {
 function theme_pagerer($variables) {
   // If forced to use core pager, call it and return straight away.
   if (isset($variables['preset']) and $variables['preset'] == 'core') {
-    $common_theme = drupal_common_theme();
+    $common_theme = backdrop_common_theme();
     $core_vars = array_merge(
       array(
-        'tags' => $common_theme['pager']['variables']['tags'],
-        'element' => $common_theme['pager']['variables']['element'],
-        'parameters' => $common_theme['pager']['variables']['parameters'],
-        'quantity' => $common_theme['pager']['variables']['quantity'],
-      ),
+      'tags' => $common_theme['pager']['variables']['tags'],
+      'element' => $common_theme['pager']['variables']['element'],
+      'parameters' => $common_theme['pager']['variables']['parameters'],
+      'quantity' => $common_theme['pager']['variables']['quantity'],
+    ),
       $variables
     );
     return _pagerer_execute_overriden_theme_pager($core_vars);
@@ -561,11 +561,11 @@ function theme_pagerer($variables) {
   $core_vars = array_intersect_key(
     $variables,
     array(
-      'tags' => NULL,
-      'element' => NULL,
-      'parameters' => NULL,
-      'quantity' => NULL,
-    )
+    'tags' => NULL,
+    'element' => NULL,
+    'parameters' => NULL,
+    'quantity' => NULL,
+  )
   );
 
   // Fully qualify all panes.
@@ -645,20 +645,20 @@ function theme_pagerer($variables) {
   $output = theme(
     'table',
     array(
-      'header'     => array(),
-      'rows'       => array($row),
-      'attributes' => array('class' => array('pagerer')),
-      'caption'    => NULL,
-      'colgroups'  => NULL,
-      'sticky'     => FALSE,
-      'empty'      => NULL,
-    )
+    'header' => array(),
+    'rows' => array($row),
+    'attributes' => array('class' => array('pagerer')),
+    'caption' => NULL,
+    'colgroups' => NULL,
+    'sticky' => FALSE,
+    'empty' => NULL,
+  )
   );
   return $output;
 }
 
 /**
- * This theme is alike standard Drupal pager theme.
+ * This theme is alike standard Backdrop pager theme.
  *
  * Provides links to the 'neigborhood' of current page, plus first/previous/
  * next/last page. Extended control on the pager is available through
@@ -827,7 +827,7 @@ function _pagerer_theme_handler($theme, $variables) {
     return NULL;
   }
   // Add Pagerer's css.
-  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
   // Resolve tags. The tags key bears already localised strings.
   $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['display'], isset($variables['tags']) ? $variables['tags'] : array());
   // Resolve markers.
@@ -838,7 +838,7 @@ function _pagerer_theme_handler($theme, $variables) {
 
   // Set adaptive markers.
   global $_pagerer_ak_array;
-  $qps = drupal_get_query_parameters();
+  $qps = backdrop_get_query_parameters();
   // Initialise global array for all pagers' adaptive keys.
   if (!isset($_pagerer_ak_array)) {
     // Take querystring parameters if existing.
@@ -878,10 +878,10 @@ function _pagerer_theme_handler($theme, $variables) {
         $text = format_string(
           $variables['tags']['pageset_empty'],
           array(
-            '@number' => 0,
-            '@offset' => 0,
-            '@total' => 0,
-          )
+          '@number' => 0,
+          '@offset' => 0,
+          '@total' => 0,
+        )
         );
         $items[] = array(
           'class' => array('pager-current'),
@@ -1232,12 +1232,12 @@ function _pagerer_itemize_link($scope, $variables, $markers, $type = 'anchor') {
     $li_data = theme(
       'pagerer_link',
       array(
-        'text' => $text,
-        'page_new' => pager_load_array($current_page + $offset, $variables['element'], $pager_page_array),
-        'element' => $variables['element'],
-        'parameters' => $variables['parameters'],
-        'attributes' => array('title' => $text_title),
-      )
+      'text' => $text,
+      'page_new' => pager_load_array($current_page + $offset, $variables['element'], $pager_page_array),
+      'element' => $variables['element'],
+      'parameters' => $variables['parameters'],
+      'attributes' => array('title' => $text_title),
+    )
     );
     $li_active = TRUE;
   }
@@ -1252,7 +1252,7 @@ function _pagerer_itemize_link($scope, $variables, $markers, $type = 'anchor') {
 
   return array(
     'class' => array('pager-' . $scope, $li_active ? 'active' : NULL),
-    'data' => $li_data ? _pagerer_resolve_link_data($li_data) : $text,
+    'data' => $li_data?_pagerer_resolve_link_data($li_data) : $text,
   );
 }
 
@@ -1338,13 +1338,13 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
         $link_data = theme(
           'pagerer_link',
           array(
-            'text' => $text,
-            'page_new' => $page_new,
-            'element' => $variables['element'],
-            'interval' => -$page_data['interval'],
-            'parameters' => $variables['parameters'],
-            'attributes' => array('title' => $text_title),
-          )
+          'text' => $text,
+          'page_new' => $page_new,
+          'element' => $variables['element'],
+          'interval' => -$page_data['interval'],
+          'parameters' => $variables['parameters'],
+          'attributes' => array('title' => $text_title),
+        )
         );
 
         $items[] = array(
@@ -1411,13 +1411,13 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
         $link_data = theme(
           'pagerer_link',
           array(
-            'text' => $text,
-            'page_new' => $page_new,
-            'element' => $variables['element'],
-            'interval' => $page_data['interval'],
-            'parameters' => $variables['parameters'],
-            'attributes' => array('title' => $text_title),
-          )
+          'text' => $text,
+          'page_new' => $page_new,
+          'element' => $variables['element'],
+          'interval' => $page_data['interval'],
+          'parameters' => $variables['parameters'],
+          'attributes' => array('title' => $text_title),
+        )
         );
         $items[] = array(
           'class' => array('pager-item', 'active'),
@@ -1439,7 +1439,7 @@ function _pagerer_itemize_page_links($variables, $markers, $pages) {
 /**
  * Return an array of 'pages' in the neighborhood of the current one.
  *
- * This is in fact generating the same list of pages as standard Drupal
+ * This is in fact generating the same list of pages as standard Backdrop
  * pager. The neighborhood is centered on the current page, with
  * ($variables['quantity'] / 2) pages falling aside left and right
  * of the current, provided there are enough pages.
@@ -1529,7 +1529,7 @@ function _pagerer_get_progressive_pages($variables, $markers, $pages, $scale_fac
     }
     // Positive offset.
     if ($c + $offset < $markers['pager_max']
-      and !isset($pages[$c + $offset])) {
+        and !isset($pages[$c + $offset])) {
       $pages[$c + $offset]['progressive'] = TRUE;
       $pages[$c + $offset]['interval'] = $offset;
       list($pages[$c + $offset]['text'], $pages[$c + $offset]['text_title']) = _pagerer_get_page_text($variables, $markers, $offset, 'page', $variables['progr_links']);
@@ -1628,10 +1628,10 @@ function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page
       $min = ($c + $offset) * $pager_limits[$variables['element']] + 1;
       $max = min(($c + $offset + 1) * $pager_limits[$variables['element']], $markers['pager_item_max']);
       $absolute_page_num = t("@min@separator@max", array(
-          '@min' => $min,
-          '@separator' => $variables['range_separator'],
-          '@max' => $max,
-        )
+        '@min' => $min,
+        '@separator' => $variables['range_separator'],
+        '@max' => $max,
+      )
       );
       $relative_page_num = abs($offset * $pager_limits[$variables['element']]);
       break;
@@ -1654,9 +1654,9 @@ function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page
     $text = format_string(
       $page_tag_relative,
       array(
-        '@number' => $relative_page_num,
-        '@total' => _pagerer_get_total($variables, $markers),
-      )
+      '@number' => $relative_page_num,
+      '@total' => _pagerer_get_total($variables, $markers),
+    )
     );
   }
   else {
@@ -1664,9 +1664,9 @@ function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page
     $text = format_string(
       $variables['tags'][$page_tag],
       array(
-        '@number' => $absolute_page_num,
-        '@total' => _pagerer_get_total($variables, $markers),
-      )
+      '@number' => $absolute_page_num,
+      '@total' => _pagerer_get_total($variables, $markers),
+    )
     );
   }
 
@@ -1674,9 +1674,9 @@ function _pagerer_get_page_text($variables, $markers, $offset, $page_tag = 'page
   $text_title = format_string(
     $variables['tags'][$title_tag . '_title'],
     array(
-      '@number' => $absolute_page_num,
-      '@total' => _pagerer_get_total($variables, $markers),
-    )
+    '@number' => $absolute_page_num,
+    '@total' => _pagerer_get_total($variables, $markers),
+  )
   );
 
   return array($text, $text_title);
@@ -1748,9 +1748,9 @@ function _pagerer_get_page_restriction($variables) {
   static $keys;
   if (!isset($keys)) {
     $keys = array(
-      'none'      => 0,
+      'none' => 0,
       'one_above' => 1,
-      'default'   => 2,
+      'default' => 2,
     );
   }
   $k = isset($variables['display_restriction']) ? $variables['display_restriction'] : 'default';
@@ -1787,7 +1787,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     if (module_exists('jquery_update')) {
       // Add pagerer js.
       $js_enabled = TRUE;
-      drupal_add_js(drupal_get_path('module', 'pagerer') . '/pagerer.js');
+      backdrop_add_js(backdrop_get_path('module', 'pagerer') . '/pagerer.js');
     }
     else {
       // Degrade.
@@ -1828,22 +1828,22 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   }
 
   // Prepare path to the page.
-  $query_parms = drupal_get_query_parameters(NULL, array());
-  $path = $query_parms['q'] . '?' . drupal_http_build_query($variables['parameters']);
+  $query_parms = backdrop_get_query_parameters(NULL, array());
+  $path = $query_parms['q'] . '?' . backdrop_http_build_query($variables['parameters']);
 
   // Prepare js widget state.
   $state = array(
-    'path'           => $path,
-    'element'        => $variables['element'],
-    'quantity'       => $variables['quantity'],
-    'total'          => $markers['pager_max'],
-    'totalItems'     => $markers['pager_item_max'],
-    'current'        => $markers['pager_current'] - 1,
-    'interval'       => $interval,
-    'display'        => $variables['display'],
+    'path' => $path,
+    'element' => $variables['element'],
+    'quantity' => $variables['quantity'],
+    'total' => $markers['pager_max'],
+    'totalItems' => $markers['pager_item_max'],
+    'current' => $markers['pager_current'] - 1,
+    'interval' => $interval,
+    'display' => $variables['display'],
     'pagerSeparator' => $variables['pager_separator'],
     'rangeSeparator' => $variables['range_separator'],
-    'pageTag'        => $variables['tags']['page'],
+    'pageTag' => $variables['tags']['page'],
   );
   switch ($element_type) {
     case 'widget':
@@ -1864,7 +1864,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
       break;
 
   }
-  $state_encoded = drupal_json_encode($state);
+  $state_encoded = backdrop_json_encode($state);
 
   // Create items.
   $items = array();
@@ -1880,7 +1880,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
       case 'scrollpane':
         // Add ui.button library.
-        drupal_add_library('system', 'ui.button');
+        backdrop_add_library('system', 'ui.button');
 
         // Left buttons.
         $items[] = _pagerer_itemize_link('first', $variables, $markers, 'button');
@@ -1908,7 +1908,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
       case 'slider':
         // Add ui.slider library.
-        drupal_add_library('system', 'ui.slider');
+        backdrop_add_library('system', 'ui.slider');
 
         if ($variables['slider_navigation_icons'] <> 'no') {
           $items[] = array(
@@ -1978,7 +1978,7 @@ function theme_pagerer_link($variables) {
 
   $query = array();
   if (count($parameters)) {
-    $query = drupal_get_query_parameters($parameters, array());
+    $query = backdrop_get_query_parameters($parameters, array());
   }
   if ($query_pager = pager_get_query_parameters()) {
     // @see http://drupal.org/node/1588138
@@ -2005,12 +2005,23 @@ function theme_pagerer_link($variables) {
   }
 
   // @todo l() cannot be used here, since it adds an 'active' class based on the
-  //   path only (which is always the current path for pager links). Apparently,
-  //   none of the pager links is active at any time - but it should still be
-  //   possible to use l() here.
+//   path only (which is always the current path for pager links). Apparently,
+//   none of the pager links is active at any time - but it should still be
+//   possible to use l() here.
   // @see http://drupal.org/node/1410574
   $attributes['href'] = url($_GET['q'], array('query' => $query));
-  return '<a' . drupal_attributes($attributes) . '>' . check_plain($text) . '</a>';
+  return '<a' . backdrop_attributes($attributes) . '>' . check_plain($text) . '</a>';
+}
+
+/**
+ * Implements hook_config_info().
+ */
+function pagerer_config_info() {
+  $prefixes['pagerer.settings'] = array(
+    'label' => t('Pagerer settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
 }
 
 /**
@@ -2023,7 +2034,7 @@ function theme_pagerer_link($variables) {
  *   the preset configuration array
  */
 function _pagerer_get_preset($preset_name) {
-  $preset = variable_get('pagerer.preset.' . $preset_name);
+  $preset = config_get('pagerer.settings', 'pagerer.preset.' . $preset_name);
   return is_array($preset) ? $preset : array();
 }
 
@@ -2039,12 +2050,12 @@ function _pagerer_save_preset($preset_name, $preset) {
   $preset = array_intersect_key(
     $preset,
     array(
-      'left_pane' => NULL,
-      'center_pane' => NULL,
-      'right_pane' => NULL,
-    )
+    'left_pane' => NULL,
+    'center_pane' => NULL,
+    'right_pane' => NULL,
+  )
   );
-  variable_set('pagerer.preset.' . $preset_name, $preset);
+  config_set('pagerer.settings', 'pagerer.preset.' . $preset_name, $preset);
 }
 
 /**
@@ -2054,7 +2065,7 @@ function _pagerer_save_preset($preset_name, $preset) {
  *   the name of the preset to be deleted
  */
 function _pagerer_delete_preset($preset_name) {
-  variable_del('pagerer.preset.' . $preset_name);
+  config_clear('pagerer.settings', 'pagerer.preset.' . $preset_name);
 }
 
 /**
@@ -2072,7 +2083,7 @@ function _pagerer_list_presets() {
   $list = array();
   if ($res) {
     foreach ($res as $row) {
-      $preset = drupal_substr($row->name, drupal_strlen('pagerer.preset.'));
+      $preset = backdrop_substr($row->name, backdrop_strlen('pagerer.preset.'));
       $list[$preset] = $preset;
     }
   }
@@ -2091,9 +2102,9 @@ function _pagerer_list_presets() {
  *   if no variable specified in input
  */
 function _pagerer_get_variable($variable = NULL) {
-  $vars = &drupal_static(__FUNCTION__);
+  $vars = &backdrop_static(__FUNCTION__);
   if (!isset($vars)) {
-    $vars = variable_get('pagerer', array());
+    $vars = config_get('pagerer.settings', 'pagerer');
     $vars += array(
       'core_override_preset' => 'core',
     );
@@ -2128,17 +2139,17 @@ function _pagerer_set_variable($variable, $value = NULL) {
   $vars = array_intersect_key(
     $vars,
     array(
-      'core_override_preset' => NULL,
-    )
+    'core_override_preset' => NULL,
+  )
   );
-  variable_set('pagerer', $vars);
-  drupal_static_reset('_pagerer_get_variable');
+  config_set('pagerer.settings', 'pagerer', $vars);
+  backdrop_static_reset('_pagerer_get_variable');
 }
 
 /**
  * Helper to convert data returned from theme_pager_xxxx() calls.
  *
- * Tao based-themes override Drupal core theme_pager_xxxx() calls and
+ * Tao based-themes override Backdrop core theme_pager_xxxx() calls and
  * return an array that can be used by theme_links(), instead of
  * HTML markup. In this case the input is themed and HTML returned.
  *
@@ -2246,4 +2257,13 @@ function _pagerer_browser_info($agent = NULL) {
   );
 
   return $ret;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function pagerer_autoload_info() {
+  return array(
+    'PagererViewsPagerPlugin' => 'plugins/pagerer.views.pager.inc',
+  );
 }

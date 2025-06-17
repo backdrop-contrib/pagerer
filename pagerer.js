@@ -8,7 +8,7 @@
  * stored in a 'pagererState' object attached to each widget.
  *
  * pagererState properties:
- * - path: drupal *request* path inclusive of querystring fragment, no base
+ * - path: backdrop *request* path inclusive of querystring fragment, no base
  *   path
  * - element: integer to distinguish between multiple pagers on one page
  * - quantity: number of page elements in the pager list
@@ -39,7 +39,7 @@
  */
 
 (function ($) {
-Drupal.behaviors.pagerer = {
+Backdrop.behaviors.pagerer = {
   attach: function(context, settings) {
 
     /**
@@ -534,16 +534,16 @@ Drupal.behaviors.pagerer = {
     function indexToValue(index, state) {
       switch(state.display) {
         case 'pages':
-          return Drupal.formatString(state.pageTag, {'@number': index + 1});
+          return Backdrop.formatString(state.pageTag, {'@number': index + 1});
 
         case 'items':
-          return Drupal.formatString(state.pageTag, {'@number': (index * state.interval) + 1});
+          return Backdrop.formatString(state.pageTag, {'@number': (index * state.interval) + 1});
 
         case 'item_ranges':
-          return Drupal.formatString('@min@separator@max', {
-            '@min': Drupal.formatString(state.pageTag, {'@number': (index * state.interval) + 1}),
+          return Backdrop.formatString('@min@separator@max', {
+            '@min': Backdrop.formatString(state.pageTag, {'@number': (index * state.interval) + 1}),
             '@separator': state.rangeSeparator,
-            '@max': Drupal.formatString(state.pageTag, {'@number': Math.min(((index + 1) * state.interval), state.totalItems)})
+            '@max': Backdrop.formatString(state.pageTag, {'@number': Math.min(((index + 1) * state.interval), state.totalItems)})
           });
 
       }
@@ -659,20 +659,20 @@ Drupal.behaviors.pagerer = {
         var element_settings = {
           'event': 'doViewsAjaxPreview',
           'progress': { 'type': 'throbber' },
-          'url': Drupal.settings.basePath + path,
+          'url': Backdrop.settings.basePath + path,
           'method': 'html',
           'wrapper': 'views-live-preview'
         };
-        Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
+        Backdrop.ajax[base] = new Backdrop.ajax(base, element, element_settings);
         $(element).trigger('doViewsAjaxPreview');
 
-      } else if (window.Drupal.overlayChild) {
-        // Drupal admin overlay
+      } else if (window.Backdrop.overlayChild) {
+        // Backdrop admin overlay
         window.parent.jQuery.bbq.pushState({'overlay': path});
 
       } else {
         // Normal page
-        document.location = Drupal.settings.basePath + path;
+        document.location = Backdrop.settings.basePath + path;
 
       }
     }
@@ -1058,14 +1058,14 @@ Drupal.behaviors.pagerer = {
         // Format hyperlink.
         var path = pager.pagererState.path.replace(/pagererpage/, targetPage);
         var pageText = indexToValue(targetPage, pager.pagererState);
-        anchor[0].href = Drupal.settings.basePath + path;
+        anchor[0].href = Backdrop.settings.basePath + path;
         $(anchor[0]).text(pageText);
         if (targetPage === 0) {
-          anchor[0].title = Drupal.formatString(pager.pagererState.firstTitle, {'@number': pageText});
+          anchor[0].title = Backdrop.formatString(pager.pagererState.firstTitle, {'@number': pageText});
         } else if (targetPage === pager.pagererState.total - 1) {
-          anchor[0].title = Drupal.formatString(pager.pagererState.lastTitle, {'@number': pageText});
+          anchor[0].title = Backdrop.formatString(pager.pagererState.lastTitle, {'@number': pageText});
         } else {
-          anchor[0].title = Drupal.formatString(pager.pagererState.pageTitle, {'@number': pageText});
+          anchor[0].title = Backdrop.formatString(pager.pagererState.pageTitle, {'@number': pageText});
         }
         // In views, add AJAX where appropriate.
         if (!onReady && pager.pagererState.viewsAjaxContext) {
@@ -1077,11 +1077,11 @@ Drupal.behaviors.pagerer = {
           var element_settings = {
             'event': 'click',
             'progress': { 'type': 'throbber' },
-            'url': Drupal.settings.basePath + path,
+            'url': Backdrop.settings.basePath + path,
             'method': 'html',
             'wrapper': 'views-live-preview'
           };
-          Drupal.ajax[base] = new Drupal.ajax(base, element, element_settings);
+          Backdrop.ajax[base] = new Backdrop.ajax(base, element, element_settings);
         }
       } else {
         // Current page has its own class, and no href.
@@ -1094,15 +1094,15 @@ Drupal.behaviors.pagerer = {
      * Views - Check if element is part of an AJAX enabled view.
      */
     function getViewsAjaxContext(element) {
-      if (Drupal.settings && Drupal.settings.views && Drupal.settings.views.ajaxViews) {
+      if (Backdrop.settings && Backdrop.settings.views && Backdrop.settings.views.ajaxViews) {
         // Loop through active Views Ajax elements.
-        for (var i in Drupal.settings.views.ajaxViews) {
-          var view = '.view-dom-id-' + Drupal.settings.views.ajaxViews[i].view_dom_id;
+        for (var i in Backdrop.settings.views.ajaxViews) {
+          var view = '.view-dom-id-' + Backdrop.settings.views.ajaxViews[i].view_dom_id;
           var viewDiv = $(element).parents(view);
           if (viewDiv.size()) {
             return {
               target: viewDiv.get(0),
-              settings: Drupal.settings.views.ajaxViews[i],
+              settings: Backdrop.settings.views.ajaxViews[i],
               selector: view
             };
           }
@@ -1120,7 +1120,7 @@ Drupal.behaviors.pagerer = {
       var $link = $(element);
 
       // Retrieve the path to use for views' ajax.
-      var ajax_path = Drupal.settings.views.ajax_path;
+      var ajax_path = Backdrop.settings.views.ajax_path;
 
       // If there are multiple views this might've ended up showing up multiple times.
       if (ajax_path.constructor.toString().indexOf('Array') !== -1) {
@@ -1130,7 +1130,7 @@ Drupal.behaviors.pagerer = {
       // Check if there are any GET parameters to send to views.
       var queryString = window.location.search || '';
       if (queryString !== '') {
-        // Remove the question mark and Drupal path component if any.
+        // Remove the question mark and Backdrop path component if any.
         var queryString = queryString.slice(1).replace(/q=[^&]+&?|&?render=[^&]+/, '');
         if (queryString !== '') {
           // If there is a '?' in ajax_path, clean url are on and & should be used to add parameters.
@@ -1143,8 +1143,8 @@ Drupal.behaviors.pagerer = {
       $.extend(
         viewData,
         viewContext.settings,
-        Drupal.Views.parseQueryString(Drupal.settings.basePath + path),
-        Drupal.Views.parseViewArgs(Drupal.settings.basePath + path, viewContext.settings.view_base_path)
+        Backdrop.Views.parseQueryString(Backdrop.settings.basePath + path),
+        Backdrop.Views.parseViewArgs(Backdrop.settings.basePath + path, viewContext.settings.view_base_path)
       );
 
       // Load AJAX element_settings object and attach AJAX behaviour.
@@ -1156,7 +1156,7 @@ Drupal.behaviors.pagerer = {
         selector: viewContext.selector,
         progress: { type: 'throbber' }
       };
-      viewContext.pagerAjax = new Drupal.ajax(false, $link, elementAjaxSettings);
+      viewContext.pagerAjax = new Backdrop.ajax(false, $link, elementAjaxSettings);
     }
 
   }

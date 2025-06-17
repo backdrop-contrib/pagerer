@@ -3,7 +3,7 @@
  * @file
  * Pagerer administration
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -14,7 +14,7 @@
  */
 function pagerer_settings_form($form, &$form_state) {
   // Add Pagerer's css.
-  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
 
   // Prepare fake pager for previews.
   pager_default_initialize(47884, 50);
@@ -31,13 +31,13 @@ function pagerer_settings_form($form, &$form_state) {
   );
   // Global option for pager override.
   $options = array(
-    t('Default:') => array('core' => t('No - use Drupal core pager')),
+    t('Default:') => array('core' => t('No - use Backdrop core pager')),
     t('Replace with:') => _pagerer_list_presets(),
   );
   $form['pagerer']['core_override_preset'] = array(
     '#type' => 'select',
     '#title' => t("Replace standard pager"),
-    '#description' => t("Core pager theme requests can be overridden with any Pagerer preset. Select whether they need to be fulfilled by Drupal core pager, or the Pagerer preset to use."),
+    '#description' => t("Core pager theme requests can be overridden with any Pagerer preset. Select whether they need to be fulfilled by Backdrop core pager, or the Pagerer preset to use."),
     '#options' => $options,
     '#default_value' => _pagerer_get_variable('core_override_preset'),
   );
@@ -59,7 +59,7 @@ function pagerer_settings_form_submit($form, &$form_state) {
   $v = $form_state['values'];
   // Set variable.
   _pagerer_set_variable('core_override_preset', $v['core_override_preset']);
-  drupal_set_message(t('The configuration options have been saved.'), 'status');
+  backdrop_set_message(t('The configuration options have been saved.'), 'status');
 }
 
 /**
@@ -70,7 +70,11 @@ function pagerer_settings_form_submit($form, &$form_state) {
 function theme_pagerer_preset_list() {
   $header = array(
     t('Preset name'),
-    t('Preview'), array('data' => t('Operations'), 'colspan' => 2),
+    t('Preview'),
+    array(
+      'data' => t('Operations'),
+      'colspan' => 2,
+    ),
   );
   $rows = array();
   foreach (_pagerer_list_presets() as $key => $value) {
@@ -98,10 +102,10 @@ function theme_pagerer_preset_list() {
   return theme(
     'table',
     array(
-      'header' => $header,
-      'rows' => $rows,
-      'attributes' => array('class' => array('pagerer-admin-preset-list')),
-    )
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array('class' => array('pagerer-admin-preset-list')),
+  )
   );
 }
 
@@ -111,7 +115,7 @@ function theme_pagerer_preset_list() {
 function pagerer_preset_form($form, &$form_state) {
 
   // Add Pagerer's css.
-  drupal_add_css(drupal_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
 
   // Get pagerer preset.
   $preset = _pagerer_get_preset($form_state['build_info']['args'][0]);
@@ -122,7 +126,7 @@ function pagerer_preset_form($form, &$form_state) {
   }
   else {
     $js_enabled = FALSE;
-    drupal_set_message(
+    backdrop_set_message(
       t("To enable the jQuery based themes 'pagerer_mini', 'pagerer_slider' and 'pagerer_scrollpane', Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
@@ -140,13 +144,13 @@ function pagerer_preset_form($form, &$form_state) {
   // installed.
   if ($js_enabled) {
     $options = array_merge($options, array(
-        'pagerer_mini',
-        'pagerer_slider',
-        'pagerer_scrollpane',
-      )
+      'pagerer_mini',
+      'pagerer_slider',
+      'pagerer_scrollpane',
+    )
     );
   }
-  $options = drupal_map_assoc($options);
+  $options = backdrop_map_assoc($options);
 
   // Panes configuration.
   $form['panes_container'] = array(
@@ -157,12 +161,12 @@ function pagerer_preset_form($form, &$form_state) {
 
   // Table container to render the 3 pane config boxes inline.
   $form['panes_container']['panes'] = array(
-    '#tree'          => TRUE,
-    '#title'         => t("Panes"),
-    '#theme'         => 'table',
-    '#header'        => array(),
-    '#rows'          => array(),
-    '#attributes'    => array('class' => array('pagerer_admin_panes_config')),
+    '#tree' => TRUE,
+    '#title' => t("Panes"),
+    '#theme' => 'table',
+    '#header' => array(),
+    '#rows' => array(),
+    '#attributes' => array('class' => array('pagerer_admin_panes_config')),
   );
   // Left pane.
   $left_pane = array(
@@ -248,10 +252,10 @@ function pagerer_preset_form($form, &$form_state) {
   );
   $form['preview']['pagerer'] = array(
     '#markup' => theme('pagerer', array(
-                        'left_pane'   => $preset['left_pane'],
-                        'center_pane' => $preset['center_pane'],
-                        'right_pane' => $preset['right_pane'],
-                      )),
+      'left_pane' => $preset['left_pane'],
+      'center_pane' => $preset['center_pane'],
+      'right_pane' => $preset['right_pane'],
+    )),
   );
 
   // Save configuration.
@@ -314,10 +318,10 @@ function pagerer_preset_form_submit($form, &$form_state) {
     $form_state['redirect'] = _PAGERER_CONFIG_PATH . '/edit/' . $preset_name . '/' . $pane . '/reset';
   }
   elseif ($trigger == 'save') {
-    drupal_set_message(t('Preset %preset has been saved.', array('%preset' => $preset_name)), 'status');
+    backdrop_set_message(t('Preset %preset has been saved.', array('%preset' => $preset_name)), 'status');
   }
   else {
-    drupal_set_message(t('Preset %preset has been saved.', array('%preset' => $preset_name)), 'status');
+    backdrop_set_message(t('Preset %preset has been saved.', array('%preset' => $preset_name)), 'status');
     $form_state['redirect'] = _PAGERER_CONFIG_PATH;
   }
 }
@@ -354,7 +358,7 @@ function pagerer_preset_add_form_submit($form, &$form_state) {
   $theme_registry = theme_get_registry();
   $preset = $theme_registry['pagerer']['variables'];
   _pagerer_save_preset($preset_name, $preset);
-  drupal_set_message(t('Preset %name was created.', array('%name' => $preset_name)));
+  backdrop_set_message(t('Preset %name was created.', array('%name' => $preset_name)));
   $form_state['redirect'] = _PAGERER_CONFIG_PATH . '/edit/' . $preset_name;
 }
 
@@ -401,10 +405,10 @@ function pagerer_preset_delete_form_submit($form, &$form_state) {
   $preset_name = $form_state['build_info']['args'][0];
   if (_pagerer_get_variable('core_override_preset') == $preset_name) {
     _pagerer_set_variable('core_override_preset', 'core');
-    drupal_set_message(t("Preset %preset was being used as replacement of Drupal's core pager. Drupal's core pager has been reset as main pager to allow for deletion of the preset.", array('%preset' => $preset_name)), 'warning');
+    backdrop_set_message(t("Preset %preset was being used as replacement of Backdrop's core pager. Backdrop's core pager has been reset as main pager to allow for deletion of the preset.", array('%preset' => $preset_name)), 'warning');
   }
   _pagerer_delete_preset($preset_name);
-  drupal_set_message(t('Preset %preset has been deleted.', array('%preset' => $preset_name)), 'status');
+  backdrop_set_message(t('Preset %preset has been deleted.', array('%preset' => $preset_name)), 'status');
   $form_state['redirect'] = _PAGERER_CONFIG_PATH;
 }
 
@@ -419,7 +423,7 @@ function pagerer_pane_form($form, &$form_state) {
   }
   else {
     $js_enabled = FALSE;
-    drupal_set_message(
+    backdrop_set_message(
       t("To enable the jQuery elements 'widget', 'slider' and 'scrollpane' for current page, Pagerer requires the 'jQuery update' module to be installed and enabled."),
       'status',
       FALSE
@@ -467,7 +471,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#disabled' => TRUE,
   );
 
-  $options = drupal_map_assoc(array('pages', 'items', 'item_ranges'));
+  $options = backdrop_map_assoc(array('pages', 'items', 'item_ranges'));
   $form['display'] = array(
     '#type' => 'select',
     '#title' => t("Display"),
@@ -502,7 +506,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-  $options = drupal_map_assoc(array('none', 'before_current', 'first', 'last'));
+  $options = backdrop_map_assoc(array('none', 'before_current', 'first', 'last'));
   $form['display_container']['label_display'] = array(
     '#type' => 'select',
     '#title' => t("Label"),
@@ -517,7 +521,7 @@ function pagerer_pane_form($form, &$form_state) {
   if ($js_enabled) {
     $options = array_merge($options, array('widget', 'slider', 'scrollpane'));
   }
-  $options = drupal_map_assoc($options);
+  $options = backdrop_map_assoc($options);
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
     '#title' => t("Current page"),
@@ -526,7 +530,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#description' => t("Select how the current page is rendered in the pager. Options are 'none' (not displayed), 'normal' (as a text), 'widget' (an active input box for users to enter directly a page to go to), 'slider' (as a slider), 'scrollpane' (as a scrolling pane embedding a full pager)."),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('none', 'after_current', 'first', 'last'));
+  $options = backdrop_map_assoc(array('none', 'after_current', 'first', 'last'));
   $form['display_container']['total_display'] = array(
     '#type' => 'select',
     '#title' => t("Total pages/items"),
@@ -556,7 +560,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#collapsed' => TRUE,
     '#description' => t("Configure link elements like '<< first', '< previous', 'next >' and 'last >>'."),
   );
-  $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
+  $options = backdrop_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['first_link'] = array(
     '#type' => 'select',
     '#title' => t("First"),
@@ -565,7 +569,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#description' => t("Select when to render a link to the first page (e.g. '<< first'). Options are 'never' (not displayed), 'not_on_first' (not displayed if current page is the first), 'always' (always displayed)."),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('never', 'not_on_first', 'always'));
+  $options = backdrop_map_assoc(array('never', 'not_on_first', 'always'));
   $form['links_container']['previous_link'] = array(
     '#type' => 'select',
     '#title' => t("Previous"),
@@ -574,7 +578,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#description' => t("Select when to render a link to the previous page (e.g. '<< previous'). Options are 'never' (not displayed), 'not_on_first' (not displayed if current page is the first), 'always' (always displayed)."),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
+  $options = backdrop_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['next_link'] = array(
     '#type' => 'select',
     '#title' => t("Next"),
@@ -583,7 +587,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#description' => t("Select when to render a link to the next page (e.g. 'next >'). Options are 'never' (not displayed), 'not_on_last' (not displayed if current page is the last), 'always' (always displayed)."),
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('never', 'not_on_last', 'always'));
+  $options = backdrop_map_assoc(array('never', 'not_on_last', 'always'));
   $form['links_container']['last_link'] = array(
     '#type' => 'select',
     '#title' => t("Last"),
@@ -593,7 +597,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#required' => TRUE,
   );
   if ($theme == 'pagerer_adaptive' or $theme == 'pagerer_progressive') {
-    $options = drupal_map_assoc(array('relative', 'absolute'));
+    $options = backdrop_map_assoc(array('relative', 'absolute'));
     $form['links_container']['progr_links'] = array(
       '#type' => 'select',
       '#title' => t("Outer pages"),
@@ -657,7 +661,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#collapsible' => FALSE,
     '#description' => t("jQuery slider options."),
   );
-  $options = drupal_map_assoc(array('tickmark', 'timelapse', 'auto'));
+  $options = backdrop_map_assoc(array('tickmark', 'timelapse', 'auto'));
   $form['advanced_options_container']['slider']['slider_action'] = array(
     '#type' => 'select',
     '#title' => t("Action confirmation method"),
@@ -675,7 +679,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#maxlength' => 5,
     '#required' => TRUE,
   );
-  $options = drupal_map_assoc(array('yes', 'no', 'auto'));
+  $options = backdrop_map_assoc(array('yes', 'no', 'auto'));
   $form['advanced_options_container']['slider']['slider_navigation_icons'] = array(
     '#type' => 'select',
     '#title' => t("Display navigation icons"),
@@ -734,7 +738,7 @@ function pagerer_pane_form_submit($form, &$form_state) {
   $preset[$p]['theme_variables']['slider_action_timelapse'] = $v['slider_action_timelapse'];
   $preset[$p]['theme_variables']['slider_navigation_icons'] = $v['slider_navigation_icons'];
   _pagerer_save_preset($preset_name, $preset);
-  drupal_set_message(t('The pane configuration has been saved.'), 'status');
+  backdrop_set_message(t('The pane configuration has been saved.'), 'status');
   $form_state['redirect'] = _PAGERER_CONFIG_PATH . '/edit/' . $preset_name;
 }
 
@@ -752,10 +756,10 @@ function pagerer_pane_theme_reset_form($form, &$form_state) {
     _PAGERER_CONFIG_PATH . '/edit/' . $preset_name,
     t('Are you sure you want to reset %pane pane of preset %preset to %theme default theme variables?',
       array(
-        '%preset' => $preset_name,
-        '%pane' => $pane,
-        '%theme' => $theme_name,
-      )
+    '%preset' => $preset_name,
+    '%pane' => $pane,
+    '%theme' => $theme_name,
+  )
     ),
     t('Reset'),
     t('Cancel')
@@ -777,7 +781,7 @@ function pagerer_pane_theme_reset_form_submit($form, &$form_state) {
     $preset[$pane . '_pane']['theme_variables']['parameters']
   );
   _pagerer_save_preset($preset_name, $preset);
-  drupal_set_message(
+  backdrop_set_message(
     t('The %pane pane configuration has been reset to default %theme theme variables.', array('%theme' => $theme_name, '%pane' => $pane)),
     'status'
   );

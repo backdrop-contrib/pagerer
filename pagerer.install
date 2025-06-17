@@ -5,7 +5,7 @@
  *
  * Pagerer installation hooks.
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -16,12 +16,14 @@
  */
 function pagerer_install() {
   $t = get_t();
-  drupal_set_message(
+  backdrop_set_message(
     $t(
       'The Pagerer module has been installed. Visit <a href="@url">configure</a> for configuration.',
       array('@url' => url('admin/config/user-interface/pagerer'))
     )
   );
+  // Dynamically generated variable data was detected on the following lines.
+  // /pagerer/pagerer.module line 2026
 }
 
 /**
@@ -35,70 +37,38 @@ function pagerer_uninstall() {
       ->execute();
   if ($res) {
     foreach ($res as $row) {
+      // TODO This variable was probably removed in Backdrop without replacement.
       variable_del($row->name);
-      drupal_set_message(t('Variable %var has been deleted.', array('%var' => $row->name)));
+      backdrop_set_message(t('Variable %var has been deleted.', array('%var' => $row->name)));
     }
   }
 }
 
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function pagerer_update_7100() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function pagerer_update_7101() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function pagerer_update_7102() { }
+
 /**
- * Update Pagerer variable and themes.
+ * Implements hook_update_last_removed().
  */
-function pagerer_update_7100() {
-  // Ensure latest theme definitions are loaded in registry.
-  drupal_theme_rebuild();
-  // Get rid of any leftover 'tags' keys in pagerer variable.
-  $vars = variable_get('pagerer', array());
-  if (isset($vars['tags'])) {
-    unset($vars['tags']);
-  }
-  foreach (array('left_pane', 'center_pane', 'right_pane') as $p) {
-    if (isset($vars[$p]['theme_variables']['tags'])) {
-      unset($vars[$p]['theme_variables']['tags']);
-    }
-  }
-  variable_set('pagerer', $vars);
+function pagerer_update_last_removed() {
+  return 7102;
 }
 
 /**
- * 1. Prepare Pagerer variables for 7.x-1.1.
+ * Migrate pagerer variables to config.
  */
-function pagerer_update_7101() {
-  // Split 7.x-1.0 pagerer variable.
-  $vars = variable_get('pagerer', array());
-  $core_replace = array();
-  if (isset($vars['left_pane'])) {
-    $core_replace['left_pane'] = $vars['left_pane'];
-  }
-  if (isset($vars['center_pane'])) {
-    $core_replace['center_pane'] = $vars['center_pane'];
-  }
-  if (isset($vars['right_pane'])) {
-    $core_replace['right_pane'] = $vars['right_pane'];
-  }
-  variable_set('pagerer.preset.core_replace', $core_replace);
-  unset(
-    $vars['left_pane'],
-    $vars['center_pane'],
-    $vars['right_pane']
-  );
-  if ($vars['pagerer_override_pager']) {
-    $vars['pagerer_override_pager'] = 'core_replace';
-  }
-  else {
-    $vars['pagerer_override_pager'] = 'core';
-  }
-  variable_set('pagerer', $vars);
-}
+function pagerer_update_1000() {
+  $config = config('pagerer.settings');
+  $config->set('pagerer', update_variable_get('pagerer', array()));
+  $config->set('pagererpresetpreset_name', update_variable_get('pagererpresetpreset_name', 'dynamic variable in file /pagerer/pagerer.module line 2026'));
+  $config->save();
 
-/**
- * 2. Prepare Pagerer variables for 7.x-1.1.
- */
-function pagerer_update_7102() {
-  $vars = variable_get('pagerer', array());
-  if (!isset($vars['core_override_preset'])) {
-    $vars['core_override_preset'] = isset($vars['pagerer_override_pager']) ? $vars['pagerer_override_pager'] : 'core';
-  }
-  unset($vars['pagerer_override_pager']);
-  variable_set('pagerer', $vars);
+  update_variable_del('pagerer');
+  update_variable_del('pagererpresetpreset_name');
 }

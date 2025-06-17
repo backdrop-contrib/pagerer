@@ -5,7 +5,7 @@
  *
  * Display various combinations of Pagerer themes.
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -34,11 +34,11 @@ function pagerer_example_page() {
 
   // Set the page title to show running pagerer version.
   $module_info = system_get_info('module', 'pagerer');
-  drupal_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
+  backdrop_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
 
   // Check if jQuery update is installed.
   if (!module_exists('jquery_update')) {
-    drupal_set_message(
+    backdrop_set_message(
       t("Pagerer requires the 'jQuery update' module to be installed and enabled, to display properly 'pagerer_mini' and 'pagerer_slider' pagers."),
       'status',
       FALSE
@@ -49,7 +49,7 @@ function pagerer_example_page() {
   // raise a warning message.
   $browser_info = _pagerer_browser_info();
   if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
-    drupal_set_message(
+    backdrop_set_message(
       t("Internet Explorer version 9+ is needed to display correctly the slider and the scrollpane elements."),
       'warning',
       FALSE
@@ -121,13 +121,13 @@ function pagerer_example_page() {
   );
 
   // Attach the pager themes.
-  $build['l_pager_pager_0'] = array('#markup' => '<b>' . t("Drupal standard 'pager' theme:") . '</b>');
+  $build['l_pager_pager_0'] = array('#markup' => '<b>' . t("Backdrop standard 'pager' theme:") . '</b>');
   $build['pager_pager_0'] = array(
     '#theme' => 'pagerer',
     '#preset' => 'core',
     '#element' => 0,
   );
-  $build['l_pagerer_standard_0'] = array('#markup' => '<br/>' . t("<b>'pagerer_standard' pager theme (mimick of Drupal's standard)</b> in three 'display' modes: 'pages', 'items', and 'item_ranges'"));
+  $build['l_pagerer_standard_0'] = array('#markup' => '<br/>' . t("<b>'pagerer_standard' pager theme (mimick of Backdrop's standard)</b> in three 'display' modes: 'pages', 'items', and 'item_ranges'"));
   $build['pagerer_standard_pages_0'] = array(
     '#theme' => 'pagerer_standard',
     '#display_restriction' => 'none',
@@ -215,53 +215,53 @@ function pagerer_example_page() {
     '#left_pane' => array(
       'theme_name' => 'pagerer_mini',
       'theme_variables' => array(
-        'tags'            => array(
-          'first_title'    => t("Go to the beginning of the recordset"),
+        'tags' => array(
+          'first_title' => t("Go to the beginning of the recordset"),
           'previous_title' => t("Go to the previous range of records"),
         ),
-        'display'         => 'items',
-        'label_display'   => 'none',
+        'display' => 'items',
+        'label_display' => 'none',
         'current_display' => 'none',
-        'total_display'   => 'none',
-        'first_link'      => 'always',
-        'previous_link'   => 'always',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
+        'total_display' => 'none',
+        'first_link' => 'always',
+        'previous_link' => 'always',
+        'next_link' => 'never',
+        'last_link' => 'never',
       ),
     ),
     '#center_pane' => array(
       'theme_name' => 'pagerer_mini',
       'theme_variables' => array(
-        'tags'            => array(
-          'item_label'           => t("Record"),
-          'widget_title'   => t("Enter record and press Return. Up/Down arrow keys are enabled."),
+        'tags' => array(
+          'item_label' => t("Record"),
+          'widget_title' => t("Enter record and press Return. Up/Down arrow keys are enabled."),
         ),
         'display_restriction' => 'none',
-        'display'         => 'items',
-        'label_display'   => 'before_current',
+        'display' => 'items',
+        'label_display' => 'before_current',
         'current_display' => 'widget',
-        'total_display'   => 'after_current',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'never',
-        'last_link'       => 'never',
+        'total_display' => 'after_current',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'never',
+        'last_link' => 'never',
       ),
     ),
     '#right_pane' => array(
       'theme_name' => 'pagerer_mini',
       'theme_variables' => array(
-        'tags'            => array(
-          'next_title'     => t("Go to the next range of records"),
-          'last_title'     => t("Go to the end of the recordset"),
+        'tags' => array(
+          'next_title' => t("Go to the next range of records"),
+          'last_title' => t("Go to the end of the recordset"),
         ),
-        'display'         => 'items',
-        'label_display'   => 'none',
+        'display' => 'items',
+        'label_display' => 'none',
         'current_display' => 'none',
-        'total_display'   => 'none',
-        'first_link'      => 'never',
-        'previous_link'   => 'never',
-        'next_link'       => 'always',
-        'last_link'       => 'always',
+        'total_display' => 'none',
+        'first_link' => 'never',
+        'previous_link' => 'never',
+        'next_link' => 'always',
+        'last_link' => 'always',
       ),
     ),
     '#element' => 1,
@@ -299,4 +299,13 @@ function pagerer_example_page() {
   );
 
   return $build;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function pagerer_example_autoload_info() {
+  return array(
+    'PagererViewsPagerPlugin' => 'plugins/pagerer.views.pager.inc',
+  );
 }

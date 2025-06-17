@@ -3,9 +3,9 @@
  * @file
  * Pagerer test case script.
  *
- * A collection of pager themes to enhance Drupal standard pager.
+ * A collection of pager themes to enhance Backdrop standard pager.
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -23,8 +23,8 @@ class PagererTest extends PagerFunctionalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'Replacement of Drupal core pager',
-      'description' => "Checks that when the basic 'pagerer_standard' theme is set up as a replacement of Drupal core pager, it still provides the same HTML.",
+      'name' => 'Replacement of Backdrop core pager',
+      'description' => "Checks that when the basic 'pagerer_standard' theme is set up as a replacement of Backdrop core pager, it still provides the same HTML.",
       'group' => 'Pagerer',
     );
   }
@@ -38,34 +38,34 @@ class PagererTest extends PagerFunctionalWebTestCase {
       'dblog',
       'pagerer',
     );
-    DrupalWebTestCase::setUp($modules);
+    BackdropWebTestCase::setUp($modules);
 
     // Insert 300 log messages.
     for ($i = 0; $i < 300; $i++) {
       watchdog('pager_test', $this->randomString(), NULL, WATCHDOG_DEBUG);
     }
 
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->backdropCreateUser(array(
       'access site reports',
       'administer site configuration',
     ));
-    $this->drupalLogin($this->admin_user);
+    $this->backdropLogin($this->admin_user);
 
     $edit = array(
       'name' => 'core_replace',
     );
-    $this->drupalPost($this->pagererAdmin . '/add', $edit, 'Create preset');
+    $this->backdropPost($this->pagererAdmin . '/add', $edit, 'Create preset');
     $edit = array(
       'core_override_preset' => 'core_replace',
     );
-    $this->drupalPost($this->pagererAdmin, $edit, 'Save configuration');
+    $this->backdropPost($this->pagererAdmin, $edit, 'Save configuration');
   }
 
   /**
    * Tear down.
    */
   public function tearDown() {
-    DrupalWebTestCase::tearDown();
+    BackdropWebTestCase::tearDown();
   }
 
 }

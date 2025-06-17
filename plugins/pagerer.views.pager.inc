@@ -3,7 +3,7 @@
  * @file
  * Pagerer - Definition of the Views pager plugin.
  *
- * Drupal core 7.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -21,17 +21,17 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
   /**
    * Return a string to display as the clickable title.
    */
-  public function summary_title() {
+  public function pagerer_summary_title() {
     if (!empty($this->options['offset'])) {
       return format_plural(
         $this->options['items_per_page'],
         "Using preset %preset, @count item, skip @skip",
         "Using preset %preset, @count items, skip @skip",
         array(
-          '%preset' => $this->options['preset'],
-          '@count' => $this->options['items_per_page'],
-          '@skip' => $this->options['offset'],
-        )
+        '%preset' => $this->options['preset'],
+        '@count' => $this->options['items_per_page'],
+        '@skip' => $this->options['offset'],
+      )
       );
     }
     return format_plural(
@@ -39,9 +39,9 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
       "Using preset %preset, @count item",
       "Using preset %preset, @count items",
       array(
-        '%preset' => $this->options['preset'],
-        '@count' => $this->options['items_per_page'],
-      )
+      '%preset' => $this->options['preset'],
+      '@count' => $this->options['items_per_page'],
+    )
     );
   }
 
@@ -51,7 +51,7 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
    * Same as parent, plus preset. Tags are left even if the options form
    * will not present them, as tags in Pagerer are different than in core.
    */
-  public function option_definition() {
+  public function pagerer_option_definition() {
     $options = parent::option_definition();
     $options['preset'] = array('default' => 'core');
     return $options;
@@ -62,12 +62,12 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
    *
    * Same as parent, plus preset, less tags.
    */
-  public function options_form(&$form, &$form_state) {
+  public function pagerer_options_form(&$form, &$form_state) {
     $preset_options = _pagerer_list_presets();
     $form['preset'] = array(
       '#type' => 'select',
       '#title' => t('Preset'),
-      '#description' => t("Select the Pagerer preset to use to render the pager, or 'Use Drupal core pager'."),
+      '#description' => t("Select the Pagerer preset to use to render the pager, or 'Use Backdrop core pager'."),
       '#options' => $preset_options,
       '#default_value' => $this->options['preset'],
     );
@@ -85,7 +85,7 @@ class PagererViewsPagerPlugin extends views_plugin_pager_full {
    *   Any extra GET parameters that should be retained, such as exposed
    *   input.
    */
-  public function render($input) {
+  public function pagerer_render($input) {
     $pager_theme = views_theme_functions('pagerer', $this->view, $this->display);
     $output = theme($pager_theme, array(
       'preset' => $this->options['preset'],
