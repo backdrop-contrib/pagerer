@@ -827,7 +827,7 @@ function _pagerer_theme_handler($theme, $variables) {
     return NULL;
   }
   // Add Pagerer's css.
-  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/css/pagerer.css');
   // Resolve tags. The tags key bears already localised strings.
   $variables['tags'] = _pagerer_tags_merge_default($theme, $variables['display'], isset($variables['tags']) ? $variables['tags'] : array());
   // Resolve markers.
@@ -1787,7 +1787,7 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
     if (module_exists('jquery_update')) {
       // Add pagerer js.
       $js_enabled = TRUE;
-      backdrop_add_js(backdrop_get_path('module', 'pagerer') . '/pagerer.js');
+      backdrop_add_js(backdrop_get_path('module', 'pagerer') . '/js/pagerer.js');
     }
     else {
       // Degrade.
