@@ -1,5 +1,4 @@
-Pagerer
-=======
+# Pagerer
 
 Pagerer is a module providing a collection of pager themes to enhance Drupal
 and Views standard pagers.
@@ -20,8 +19,8 @@ is preserved.
 Module developers can also make direct calls to the themes, thus allowing
 even more complex scenarios.
 
-Features:
----------
+## Features:
+
 - multi-pane pager
 - Views pager plugin
 - control whether to display links to pages, to items, or to item ranges
@@ -34,8 +33,8 @@ Features:
   and page breakers (like an ellipsis)
 - supports Views' AJAX enabled pager
 
-Themes:
--------
+## Themes:
+
 pagerer_standard - alike standard Drupal pager theme
 pagerer_progressive - provides links to pages progressively more distant
                       from current
@@ -49,33 +48,32 @@ pagerer_slider - provides page navigation through a jQuery UI slider
 pagerer - a multi-pane (left, center, and right) pager theme, enabling
           each pane to contain one of the themes above
 
-Requirements:
--------------
-- Drupal 7
-- the Views pager plugin integrates with Views 3
+## Requirements:
+
+- the Views pager plugin integrates with Views
 - jQuery update module (for pagerer_mini, pagerer_scrollpane and pagerer_slider
   themes)
 - for Microsoft Internet Explorer browsers, the pagerer_slider and
   pagerer_scrollpane themes require IE 9+
 
-Instructions:
--------------
+## Instructions:
+
 - Install and enable the module.
 - Check the Configuration page to setup.
 - Create and configure any number of 'preset' pagers.
 - Select a preset to use as a general replacement of Drupal core pager, or
   use a preset as a pager in Views.
 
-Views pager plugin:
--------------------
+## Views pager plugin:
+
 The pager plugin for Views introduces a new 'Paged output, Pagerer' option in
 the list of possible pagers to be used for a view.
 It behaves like a 'full pager', with the additional option to select the
 Pagerer preset to be used for rendering the pager - so that every view could
 use a different preset, but also many views could use the same preset.
 
-Credits:
---------
+## Credits:
+
 - The 'pagerer_mini' theme concept and javascript code are to a large
   extent the same of the 'Minimax pager' module for Drupal 6 (i.e. proudly
   copied, thanks mattyoung).
@@ -85,22 +83,18 @@ Credits:
   Nadel's blog post http://www.bennadel.com/blog/1864-Experimenting-With-jQuery-s-Queue-And-Dequeue-Methods.htm
 
 
+## Themes
 
-Themes
-======
+### theme_pagerer_standard
 
-----------------------
-theme_pagerer_standard
-----------------------
 This theme is alike standard Drupal pager theme.
 
 Provides links to the 'neigborhood' of current page, plus
 first/previous/next/last page. Extended control on the pager is available
 through Pagerer's specific variables.
 
--------------------------
-theme_pagerer_progressive
--------------------------
+### theme_pagerer_progressive
+
 This theme provides links to pages progressively more distant from current.
 
 Besides links to the 'neigborhood' of current page, creates a list of
@@ -136,9 +130,8 @@ Examples: 'factors' => '10' will generate links for page offsets
 
 etc.
 
-----------------------
-theme_pagerer_adaptive
-----------------------
+### theme_pagerer_adaptive
+
 This theme provides links to pages following an adaptive logic.
 
 Besides links to the 'neigborhood' of current page, creates page links
@@ -189,9 +182,9 @@ a page number or as an offset from current page. This is controlled via
 the 'progr_links' theme variable, which can take a value either
 'absolute' or 'relative'.
 
-------------------
-theme_pagerer_mini
-------------------
+
+### theme_pagerer_mini
+
 This theme displays current page (or item), and provides a direct page
 entry widget to allow navigating to another page.
 
@@ -207,22 +200,21 @@ page 9 out of 955, total items = 47731, limit = 50, display = 'items':
 << < Item 401 of 47731 > >>
 ---------------------------
 
-------------------------
-theme_pagerer_scrollpane
-------------------------
+
+### theme_pagerer_scrollpane
+
 This theme displays a standard pager that is scrollable on the browser
 through navigation buttons. Users can get to any page link without having
 to send request to the server.
 
---------------------
-theme_pagerer_slider
---------------------
+
+### theme_pagerer_slider
+
 This theme displays a jQuery slider. Page navigation is managed via
 javascript.
 
 
-pagerer_xxxx themes' variables
-==============================
+## pagerer_xxxx themes' variables
 
 Pagerer themes' variables array differs, to some extent, from standard
 Drupal core pager theme variables.
@@ -299,8 +291,7 @@ Advanced:
   on the sides of the jQuery slider. Options are "yes", "no", "auto" (the icons
   are automatically displayed based on the accuracy of the slider).
 
-pagerer theme variables
-=======================
+## pagerer theme variables
 
 The 'pagerer' theme itself is more a container of individual
 pagerer_xxxx themes. The theme to be used in each pane (left, center,
@@ -326,8 +317,7 @@ of the pagerer theme.
       in 'theme_name'
 
 
-The 'tags' variable in Pagerer
-==============================
+## The 'tags' variable in Pagerer
 
 The 'tags' variable in pagerer_xxxx themes is an associative array of
 tags to be used to render any of the textual elements of the pager. It
@@ -383,8 +373,7 @@ the corresponding element.
   'Then, click on the tickmark.'.
 
 
-An example for overriding 'tags' at a theme's level
-===================================================
+## An example for overriding 'tags' at a theme's level
 
 Themers can override pager text elements by implementing in the theme's
 template.php a hook_preprocess_pagerer_xxxx() function to set the 'tags'
