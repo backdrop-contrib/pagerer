@@ -1776,24 +1776,12 @@ function _pagerer_get_page_restriction($variables) {
  */
 function _pagerer_itemize_js_element($element_type, $variables, $markers) {
   global $pager_page_array, $pager_limits;
-  static $js_enabled;
 
   $c = $markers['pager_current'] - 1;
   $m = $markers['pager_max'] - 1;
 
-  // Checks jQuery is available.
-  if (!isset($js_enabled)) {
-    // Requires 'jquery_update' module.
-    if (module_exists('jquery_update')) {
-      // Add pagerer js.
-      $js_enabled = TRUE;
-      backdrop_add_js(backdrop_get_path('module', 'pagerer') . '/js/pagerer.js');
-    }
-    else {
-      // Degrade.
-      $js_enabled = FALSE;
-    }
-  }
+  // Add pagerer js.
+  backdrop_add_js(backdrop_get_path('module', 'pagerer') . '/js/pagerer.js');
 
   // Slider and scrollpane will not work for Internet Explorer below version 9.
   // In such case, degrade to widget.
@@ -1868,87 +1856,79 @@ function _pagerer_itemize_js_element($element_type, $variables, $markers) {
 
   // Create items.
   $items = array();
-  if ($js_enabled) {
-    switch ($element_type) {
-      case 'widget':
-        $title = $variables['tags']['widget_title'];
+  switch ($element_type) {
+    case 'widget':
+      $title = $variables['tags']['widget_title'];
+      $items[] = array(
+        'class' => array('pager-item', 'widget', 'active'),
+        'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
+      );
+      break;
+
+    case 'scrollpane':
+      // Add ui.button library.
+      backdrop_add_library('system', 'ui.button');
+
+      // Left buttons.
+      $items[] = _pagerer_itemize_link('first', $variables, $markers, 'button');
+      $items[] = _pagerer_itemize_link('previous', $variables, $markers, 'button');
+
+      // Scrollpane.
+      $variables['label_display'] = 'none';
+      $variables['current_display'] = 'normal';
+      $variables['total_display'] = 'none';
+      $variables['first_link'] = 'never';
+      $variables['previous_link'] = 'never';
+      $variables['next_link'] = 'never';
+      $variables['last_link'] = 'never';
+      $items[] = array(
+        'class' => array('pager-item', 'pagerer-scrollpane'),
+        'id' => $state_encoded,
+        'data' => theme('pagerer_standard', $variables),
+      );
+
+      // Right buttons.
+      $items[] = _pagerer_itemize_link('next', $variables, $markers, 'button');
+      $items[] = _pagerer_itemize_link('last', $variables, $markers, 'button');
+
+      break;
+
+    case 'slider':
+      // Add ui.slider library.
+      backdrop_add_library('system', 'ui.slider');
+
+      if ($variables['slider_navigation_icons'] <> 'no') {
         $items[] = array(
           'class' => array('pager-item', 'widget', 'active'),
-          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
+          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
         );
-        break;
-
-      case 'scrollpane':
-        // Add ui.button library.
-        backdrop_add_library('system', 'ui.button');
-
-        // Left buttons.
-        $items[] = _pagerer_itemize_link('first', $variables, $markers, 'button');
-        $items[] = _pagerer_itemize_link('previous', $variables, $markers, 'button');
-
-        // Scrollpane.
-        $variables['label_display'] = 'none';
-        $variables['current_display'] = 'normal';
-        $variables['total_display'] = 'none';
-        $variables['first_link'] = 'never';
-        $variables['previous_link'] = 'never';
-        $variables['next_link'] = 'never';
-        $variables['last_link'] = 'never';
+      }
+      $title = $variables['tags']['slider_title'];
+      $items[] = array(
+        'class' => array('pager-item', 'widget'),
+        'data' => "<div class='pagerer-slider' id='$state_encoded' title='$title'/>",
+      );
+      if ($variables['slider_navigation_icons'] <> 'no') {
         $items[] = array(
-          'class' => array('pager-item', 'pagerer-scrollpane'),
-          'id' => $state_encoded,
-          'data' => theme('pagerer_standard', $variables),
+          'class' => array('pager-item', 'widget', 'active'),
+          'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
         );
+      }
+      break;
 
-        // Right buttons.
-        $items[] = _pagerer_itemize_link('next', $variables, $markers, 'button');
-        $items[] = _pagerer_itemize_link('last', $variables, $markers, 'button');
+    case 'slider_degraded':
+      // Basically, a widget with first/prev/next/last links.
+      $items[] = _pagerer_itemize_link('first', $variables, $markers);
+      $items[] = _pagerer_itemize_link('previous', $variables, $markers);
+      $title = $variables['tags']['widget_title'];
+      $items[] = array(
+        'class' => array('pager-current', 'widget'),
+        'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
+      );
+      $items[] = _pagerer_itemize_link('next', $variables, $markers);
+      $items[] = _pagerer_itemize_link('last', $variables, $markers);
+      break;
 
-        break;
-
-      case 'slider':
-        // Add ui.slider library.
-        backdrop_add_library('system', 'ui.slider');
-
-        if ($variables['slider_navigation_icons'] <> 'no') {
-          $items[] = array(
-            'class' => array('pager-item', 'widget', 'active'),
-            'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-minus'/>",
-          );
-        }
-        $title = $variables['tags']['slider_title'];
-        $items[] = array(
-          'class' => array('pager-item', 'widget'),
-          'data' => "<div class='pagerer-slider' id='$state_encoded' title='$title'/>",
-        );
-        if ($variables['slider_navigation_icons'] <> 'no') {
-          $items[] = array(
-            'class' => array('pager-item', 'widget', 'active'),
-            'data' => "<div class='pagerer-slider-control-icon ui-icon ui-icon-circle-plus'/>",
-          );
-        }
-        break;
-
-      case 'slider_degraded':
-        // Basically, a widget with first/prev/next/last links.
-        $items[] = _pagerer_itemize_link('first', $variables, $markers);
-        $items[] = _pagerer_itemize_link('previous', $variables, $markers);
-        $title = $variables['tags']['widget_title'];
-        $items[] = array(
-          'class' => array('pager-current', 'widget'),
-          'data' => "<input type=\"text\" class=\"pagerer-page\" name ='$state_encoded' title=\"$title\" value=\"$current\" />",
-        );
-        $items[] = _pagerer_itemize_link('next', $variables, $markers);
-        $items[] = _pagerer_itemize_link('last', $variables, $markers);
-        break;
-
-    }
-  }
-  else {
-    $items[] = array(
-      'class' => array('pager-current'),
-      'data' => $current,
-    );
   }
 
   return $items;

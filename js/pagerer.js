@@ -60,7 +60,7 @@ Backdrop.behaviors.pagerer = {
       isRelocating: false
     };
 
-     /**
+    /**
      * 'pagerer-page' input box event binding
      */
     $('.pagerer-page', context)
@@ -124,12 +124,12 @@ Backdrop.behaviors.pagerer = {
 
         case 35:
           // End.
-           $(this).val(indexToValue(this.pagererState.total - 1, this.pagererState));
+          $(this).val(indexToValue(this.pagererState.total - 1, this.pagererState));
           return false;
 
         case 36:
           // Home.
-           $(this).val(1);
+          $(this).val(1);
           return false;
 
       }

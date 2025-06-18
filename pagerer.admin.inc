@@ -14,7 +14,7 @@
  */
 function pagerer_settings_form($form, &$form_state) {
   // Add Pagerer's css.
-  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/css/pagerer.css');
 
   // Prepare fake pager for previews.
   pager_default_initialize(47884, 50);
@@ -102,10 +102,10 @@ function theme_pagerer_preset_list() {
   return theme(
     'table',
     array(
-    'header' => $header,
-    'rows' => $rows,
-    'attributes' => array('class' => array('pagerer-admin-preset-list')),
-  )
+      'header' => $header,
+      'rows' => $rows,
+      'attributes' => array('class' => array('pagerer-admin-preset-list')),
+    )
   );
 }
 
@@ -115,23 +115,10 @@ function theme_pagerer_preset_list() {
 function pagerer_preset_form($form, &$form_state) {
 
   // Add Pagerer's css.
-  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/pagerer.css');
+  backdrop_add_css(backdrop_get_path('module', 'pagerer') . '/css/pagerer.css');
 
   // Get pagerer preset.
   $preset = _pagerer_get_preset($form_state['build_info']['args'][0]);
-
-  // Check if jQuery update is installed.
-  if (module_exists('jquery_update')) {
-    $js_enabled = TRUE;
-  }
-  else {
-    $js_enabled = FALSE;
-    backdrop_set_message(
-      t("To enable the jQuery based themes 'pagerer_mini', 'pagerer_slider' and 'pagerer_scrollpane', Pagerer requires the 'jQuery update' module to be installed and enabled."),
-      'status',
-      FALSE
-    );
-  }
 
   // List of the themes available for panes.
   $options = array(
@@ -139,17 +126,10 @@ function pagerer_preset_form($form, &$form_state) {
     'pagerer_standard',
     'pagerer_progressive',
     'pagerer_adaptive',
+    'pagerer_mini',
+    'pagerer_slider',
+    'pagerer_scrollpane',
   );
-  // Mini, Slider and Scrollpane are only available with jQuery update
-  // installed.
-  if ($js_enabled) {
-    $options = array_merge($options, array(
-      'pagerer_mini',
-      'pagerer_slider',
-      'pagerer_scrollpane',
-    )
-    );
-  }
   $options = backdrop_map_assoc($options);
 
   // Panes configuration.
@@ -417,19 +397,6 @@ function pagerer_preset_delete_form_submit($form, &$form_state) {
  */
 function pagerer_pane_form($form, &$form_state) {
 
-  // Check if jQuery update is installed.
-  if (module_exists('jquery_update')) {
-    $js_enabled = TRUE;
-  }
-  else {
-    $js_enabled = FALSE;
-    backdrop_set_message(
-      t("To enable the jQuery elements 'widget', 'slider' and 'scrollpane' for current page, Pagerer requires the 'jQuery update' module to be installed and enabled."),
-      'status',
-      FALSE
-    );
-  }
-
   // Get pagerer preset.
   $preset = _pagerer_get_preset($form_state['build_info']['args'][0]);
 
@@ -515,12 +482,7 @@ function pagerer_pane_form($form, &$form_state) {
     '#description' => t("Select whether and where to render a text 'label' element (e.g. 'Page'). Options are 'none' (not displayed), 'before_current' (in front of current page), 'first' (at the beginning), 'last' (at the end)."),
     '#required' => TRUE,
   );
-  $options = array('none', 'normal');
-  // Widget, Slider and Scrollpane are only available with jQuery update
-  // installed.
-  if ($js_enabled) {
-    $options = array_merge($options, array('widget', 'slider', 'scrollpane'));
-  }
+  $options = array('none', 'normal', 'widget', 'slider', 'scrollpane');
   $options = backdrop_map_assoc($options);
   $form['display_container']['current_display'] = array(
     '#type' => 'select',
@@ -756,10 +718,10 @@ function pagerer_pane_theme_reset_form($form, &$form_state) {
     _PAGERER_CONFIG_PATH . '/edit/' . $preset_name,
     t('Are you sure you want to reset %pane pane of preset %preset to %theme default theme variables?',
       array(
-    '%preset' => $preset_name,
-    '%pane' => $pane,
-    '%theme' => $theme_name,
-  )
+        '%preset' => $preset_name,
+        '%pane' => $pane,
+        '%theme' => $theme_name,
+      )
     ),
     t('Reset'),
     t('Cancel')

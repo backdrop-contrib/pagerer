@@ -36,15 +36,6 @@ function pagerer_example_page() {
   $module_info = system_get_info('module', 'pagerer');
   backdrop_set_title(t("Pagerer @version - example page", array('@version' => $module_info['version'])), PASS_THROUGH);
 
-  // Check if jQuery update is installed.
-  if (!module_exists('jquery_update')) {
-    backdrop_set_message(
-      t("Pagerer requires the 'jQuery update' module to be installed and enabled, to display properly 'pagerer_mini' and 'pagerer_slider' pagers."),
-      'status',
-      FALSE
-    );
-  }
-
   // It will not work for Internet Explorer below version 9. In such case,
   // raise a warning message.
   $browser_info = _pagerer_browser_info();
