@@ -5,7 +5,7 @@
  *
  * A collection of pager themes to enhance Backdrop standard pager.
  *
- * Backdrop core 1.x
+ * Backdrop core 7.x
  *
  * @package  User interface
  * @author   mondrake <mondrake@mondrake.org>
@@ -21,7 +21,7 @@ class PagererTest extends PagerFunctionalWebTestCase {
   /**
    * Get info.
    */
-  public static function getInfo() {
+  public static function pagerer_getInfo() {
     return array(
       'name' => 'Replacement of Backdrop core pager',
       'description' => "Checks that when the basic 'pagerer_standard' theme is set up as a replacement of Backdrop core pager, it still provides the same HTML.",
@@ -32,7 +32,7 @@ class PagererTest extends PagerFunctionalWebTestCase {
   /**
    * Set up.
    */
-  public function setUp() {
+  public function pagerer_setUp() {
     // Enable required modules.
     $modules = array(
       'dblog',
@@ -64,7 +64,7 @@ class PagererTest extends PagerFunctionalWebTestCase {
   /**
    * Tear down.
    */
-  public function tearDown() {
+  public function pagerer_tearDown() {
     BackdropWebTestCase::tearDown();
   }
 
