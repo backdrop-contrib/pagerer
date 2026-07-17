@@ -1,5 +1,32 @@
 {
     "_config_name": "pagerer.settings",
-    "pagerer": [],
-    "pagererpresetpreset_name": "dynamic variable in file /pagerer/pagerer.module line 2026"
+    "pagerer": {
+        "general": {
+            "core_override_preset": "core"
+        },
+        "preset": {
+            "mini_pager": {
+                "left_pane": {
+                    "theme_name": "none"
+                },
+                "center_pane": {
+                    "theme_name": "pagerer_mini"
+                },
+                "right_pane": {
+                    "theme_name": "none"
+                }
+            },
+            "slider_pager": {
+                "left_pane": {
+                    "theme_name": "none"
+                },
+                "center_pane": {
+                    "theme_name": "pagerer_slider"
+                },
+                "right_pane": {
+                    "theme_name": "none"
+                }
+            }
+        }
+    }
 }

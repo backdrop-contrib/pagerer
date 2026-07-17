@@ -1,7 +1,7 @@
 name = Pagerer
 description = "Extended pager themes."
-package = User interface
 backdrop = 1.x
 type = module
+package = User Interface
 
 configure = admin/config/user-interface/pagerer

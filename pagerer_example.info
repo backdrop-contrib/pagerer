@@ -1,8 +1,7 @@
 name = Pagerer example
 description = "Pagerer example."
-package = User interface
 backdrop = 1.x
 type = module
+package = User Interface
 
 dependencies[] = pagerer
-

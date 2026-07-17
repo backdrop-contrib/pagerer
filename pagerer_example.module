@@ -15,7 +15,7 @@
  * Implements hook_menu().
  */
 function pagerer_example_menu() {
-  $items['pagerer/example'] = array(
+  $items['admin/config/user-interface/pagerer/example'] = array(
     'title' => 'Pagerer example',
     'description' => 'Display various combinations of Pagerer themes.',
     'page callback' => 'pagerer_example_page',
