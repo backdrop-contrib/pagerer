@@ -53,13 +53,39 @@ It behaves like a 'full pager', with the additional option to select the
 Pagerer preset to be used for rendering the pager - so that every view could
 use a different preset, but also many views could use the same preset.
 
-## Differences from Drupal 7 <!-- Do not include if there are no differences. -->
+## Differences from Drupal 7
 
 - The jQuery update module is not required since jQuery in Backdrop is up to date.
 
+## Known Issues
+
+### Compatibility with the [Pager Fix](https://github.com/backdrop-contrib/pager_fix) module.
+- While Backdrop's pager is zero-based internally, the Pager Fix module makes
+  the `page` URL parameter match the displayed page number by adding 1 to
+  outbound links built with `url()` and subtracting 1 from incoming requests.
+
+  Pagerer's `mini` and `slider` panes build their navigation URLs directly in
+  JavaScript rather than through `url()`, so they never receive Pager Fix's
+  outbound `+1`. Pager Fix's inbound `-1` still applies unconditionally,
+  which shifts the target page by one (e.g. entering "5" in the mini pager
+  lands on page 4).
+
+  To be compatible with the Pager Fix module on Pagerer's main settings page
+  (`admin/config/user-interface/pagerer`), under "General", check "Start
+  page numbering at 1 in generated URLs". This is a single, site-wide
+  setting - it applies to every `mini`/`slider` pane wherever it ends up in
+  use (core pager override, a theme preset, or a views pager plugin),
+  rather than needing to be set separately in each place. Enabling it makes
+  those panes apply the same `+1` to their own generated URLs that Pager Fix
+  would have applied through `url()`, so Pager Fix's inbound `-1` lands on
+  the correct page.
+
+  Panes that render plain links (`pagerer_standard`, `pagerer_adaptive`, `pagerer_progressive`, `pagerer_scrollpane`) go through `url()` normally and
+  are not affected.
+
 ## Documentation <!-- Do not include if you have not created a wiki page. -->
 
-See USING_PAGERER.md file.
+See [USING_PAGERER.md](./USING_PAGERER.md) file.
 
 Additional documentation is located in [the Wiki](https://github.com/backdrop-contrib/pagerer/wiki/Documentation).
 
@@ -76,7 +102,7 @@ Bugs and feature requests should be reported in [the Issue Queue](https://github
 
 ## Credits:
 
-- Ported to Backdrop CMS by [izmeez](https://github.com/izmeez).
+- Ported to Backdrop CMS by [izmeez](https://github.com/izmeez). Assisted-by: LLM agent.
 - Originally written for Drupal by [mondrake](https://github.com/mondrake).
 - The 'pagerer_mini' theme concept and javascript code are to a large
   extent the same of the 'Minimax pager' module for Drupal 6 (i.e. proudly

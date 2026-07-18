@@ -1,4 +1,4 @@
-# Pagerer
+# Using Pagerer
 
 Pagerer is a module providing a collection of pager themes to enhance Drupal
 and Views standard pagers.
