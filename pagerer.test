@@ -33,6 +33,7 @@ class PagererTest extends PagerFunctionalWebTestCase {
     $modules = array(
       'dblog',
       'pagerer',
+      'pagerer_example',
     );
     parent::setUp($modules);
 
@@ -62,6 +63,33 @@ class PagererTest extends PagerFunctionalWebTestCase {
    */
   public function tearDown() {
     parent::tearDown();
+  }
+
+  /**
+   * Test that the pagerer_example page loads cleanly.
+   *
+   * Regression test for two bugs found during the Backdrop port: a query
+   * against Drupal 7's 'date_formats' table (which no longer exists in
+   * Backdrop - it was migrated to config), and a PHP syntax error from a
+   * mistyped logical operator. Both would have been caught immediately by
+   * a test that simply loads the page.
+   */
+  public function testExamplePage() {
+    $this->backdropGet('admin/config/user-interface/pagerer/example');
+    $this->assertResponse(200);
+
+    // All three example tables should have rendered.
+    $this->assertText('First data table:');
+    $this->assertText('Second data table:');
+    $this->assertText('Third data table:');
+
+    // No PHP errors, warnings, or database exceptions should have leaked
+    // into the page output.
+    $this->assertNoText('PDOException');
+    $this->assertNoText('Warning:');
+    $this->assertNoText('Notice:');
+    $this->assertNoText('Fatal error');
+    $this->assertNoText('Parse error');
   }
 
 }
