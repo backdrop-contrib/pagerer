@@ -2,7 +2,8 @@
     "_config_name": "pagerer.settings",
     "pagerer": {
         "general": {
-            "core_override_preset": "core"
+            "core_override_preset": "core",
+            "page_start_at_one": false
         },
         "preset": {
             "mini_pager": {
@@ -21,7 +22,11 @@
                     "theme_name": "none"
                 },
                 "center_pane": {
-                    "theme_name": "pagerer_slider"
+                    "theme_name": "pagerer_slider",
+                    "theme_variables": {
+                        "slider_action": "timelapse",
+                        "slider_action_timelapse": 0
+                    }
                 },
                 "right_pane": {
                     "theme_name": "none"

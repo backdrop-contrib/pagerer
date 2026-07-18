@@ -1828,6 +1828,14 @@ function _pagerer_itemize_js_element($element_type, array $variables, array $mar
     'pagerSeparator' => $variables['pager_separator'],
     'rangeSeparator' => $variables['range_separator'],
     'pageTag' => $variables['tags']['page'],
+    // When set, generated navigation URLs use a one-based 'page' parameter
+    // instead of Backdrop core's native zero-based numbering, for
+    // compatibility with modules (e.g. Pager Fix) that convert the site's
+    // pager URLs to be one-based. This is a global setting (see the main
+    // Pagerer settings page) rather than a per-pane one, since it needs to
+    // apply consistently regardless of how a preset ends up in use -
+    // core override, theme preset selection, or a view's pager plugin.
+    'pageStartAtOne' => (bool) _pagerer_get_variable('page_start_at_one'),
   );
   switch ($element_type) {
     case 'widget':
@@ -2082,6 +2090,7 @@ function _pagerer_get_variable($variable = NULL) {
     }
     $vars += array(
       'core_override_preset' => 'core',
+      'page_start_at_one' => FALSE,
     );
   }
   if ($variable) {
@@ -2115,6 +2124,7 @@ function _pagerer_set_variable($variable, $value = NULL) {
     $vars,
     array(
       'core_override_preset' => NULL,
+      'page_start_at_one' => NULL,
     )
   );
   // Stored under 'pagerer.general' - a namespace of its own, separate from

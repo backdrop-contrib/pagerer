@@ -643,8 +643,13 @@ Backdrop.behaviors.pagerer = {
       }
       state.isRelocating = true;
 
-      // Replace placeholder with page target.
-      var path = element.pagererState.path.replace(/pagererpage/, targetPage);
+      // Replace placeholder with page target. When 'pageStartAtOne' is set,
+      // the outbound 'page' URL parameter is bumped by 1 so that a module
+      // which subtracts 1 from all inbound page parameters (e.g. Pager Fix,
+      // making pager URLs sitewide one-based) lands back on the correct
+      // zero-based page.
+      var outboundPage = element.pagererState.pageStartAtOne ? targetPage + 1 : targetPage;
+      var path = element.pagererState.path.replace(/pagererpage/, outboundPage);
 
       // Check if element is in Views AJAX context.
       var viewsAjaxContext = getViewsAjaxContext(element);
