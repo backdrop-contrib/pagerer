@@ -89,7 +89,7 @@ See [USING_PAGERER.md](./USING_PAGERER.md) file.
 
 Additional documentation is located in [the Wiki](https://github.com/backdrop-contrib/pagerer/wiki/Documentation).
 
-# Issues
+## Issues
 
 Bugs and feature requests should be reported in [the Issue Queue](https://github.com/backdrop-contrib/pagerer/issues).
 
