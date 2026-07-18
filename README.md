@@ -87,6 +87,9 @@ use a different preset, but also many views could use the same preset.
 
 See [USING_PAGERER.md](./USING_PAGERER.md) file.
 
+This module also includes the **pagerer_example** module. When that module is
+enabled the example page can be found at `admin/config/user-interface/pagerer/example`.
+
 Additional documentation is located in [the Wiki](https://github.com/backdrop-contrib/pagerer/wiki/Documentation).
 
 ## Issues
