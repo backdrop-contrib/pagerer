@@ -35,7 +35,7 @@ function pagerer_example_page() {
   // It will not work for Internet Explorer below version 9. In such case,
   // raise a warning message.
   $browser_info = _pagerer_browser_info();
-  if ($browser_info['browser'] == 'MSIE' $$ $browser_info['version_major'] < 9) {
+  if ($browser_info['browser'] == 'MSIE' && $browser_info['version_major'] < 9) {
     backdrop_set_message(
       t("Internet Explorer version 9+ is needed to display correctly the slider and the scrollpane elements."),
       'warning',
@@ -61,16 +61,21 @@ function pagerer_example_page() {
   }
 
   // *** Second data table - associated to pager element 1 ***
+  // Note: Drupal 7's 'date_formats' table was migrated to Backdrop's config
+  // system and no longer exists as a database table, so this example uses
+  // Backdrop's 'system' table (the module/theme registry) instead - it is
+  // always present and always populated, making it a reliable stand-in for
+  // demonstration purposes.
   $header_1 = array(
-    array('data' => 'dfid'),
-    array('data' => 'format'),
+    array('data' => 'name'),
     array('data' => 'type'),
+    array('data' => 'status'),
   );
-  $query_1 = db_select('date_formats', 'd')->extend('PagerDefault')->element(1);
-  $query_1->fields('d', array('dfid', 'format', 'type'));
+  $query_1 = db_select('system', 'd')->extend('PagerDefault')->element(1);
+  $query_1->fields('d', array('name', 'type', 'status'));
   $result_1 = $query_1
     ->limit(10)
-    ->orderBy('d.dfid')
+    ->orderBy('d.name')
     ->execute();
   $rows_1 = array();
   foreach ($result_1 as $row) {
