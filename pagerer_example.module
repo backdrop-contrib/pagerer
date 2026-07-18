@@ -5,10 +5,6 @@
  *
  * Display various combinations of Pagerer themes.
  *
- * Backdrop core 1.x
- *
- * @package  User interface
- * @author   mondrake <mondrake@mondrake.org>
  */
 
 /**
@@ -39,7 +35,7 @@ function pagerer_example_page() {
   // It will not work for Internet Explorer below version 9. In such case,
   // raise a warning message.
   $browser_info = _pagerer_browser_info();
-  if ($browser_info['browser'] == 'MSIE' and $browser_info['version_major'] < 9) {
+  if ($browser_info['browser'] == 'MSIE' $$ $browser_info['version_major'] < 9) {
     backdrop_set_message(
       t("Internet Explorer version 9+ is needed to display correctly the slider and the scrollpane elements."),
       'warning',
