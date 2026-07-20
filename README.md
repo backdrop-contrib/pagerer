@@ -89,6 +89,8 @@ See [USING_PAGERER.md](./USING_PAGERER.md) file.
 
 This module also includes the **pagerer_example** module. When that module is
 enabled the example page can be found at `admin/config/user-interface/pagerer/example`.
+If the [Pager Fix](https://github.com/backdrop-contrib/pager_fix) module is enabled
+on the site use the `pager_fix` exclude path option to exclude `admin/config/user-interface/pagerer/example`.
 
 Additional documentation is located in [the Wiki](https://github.com/backdrop-contrib/pagerer/wiki/Documentation).
 
