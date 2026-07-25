@@ -510,7 +510,7 @@ Backdrop.behaviors.pagerer = {
         pager.pagererState.fastScrolling = 0;
       });
     })
-    .load().each(function(index) {
+    .each(function(index) {
       // Aligns viewport border color to button style.
       if ($(this).hasClass('pagerer-first')) {
         this.pagererState.pager.pagererState.viewport.css({
